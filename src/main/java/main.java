@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.tree.*;
 
 public class main {
     public static void main(String[] args) throws Exception{
-        InputStream is = new FileInputStream("example.txt");
+        InputStream is = new FileInputStream("program.txt");
         ANTLRInputStream input = new ANTLRInputStream(is);
         demoLexer lexer = new demoLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
