@@ -611,7 +611,7 @@ public class TempTestScope {
         else if (u instanceof Return_Int){
             Type t1 = dfs1(((Return_Int)u).Left, v);
             Type t2 = dfs1(((Return_Int)u).Right, v);
-            if (t1.dim != 0 || t2.dim != 0 || !t1.S.equals((t2.S))){
+            if (t1.dim != 0 || t2.dim != 0 || !t1.S.equals((t2.S)) || (!t1.S.equals("int") && !t1.S.equals("string"))){
                 System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
                 System.exit(1);
             }
