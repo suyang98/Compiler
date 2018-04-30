@@ -178,7 +178,7 @@ public class TempTestScope {
         Type t = null;
         VarTypeRef tmp = v.var.get(u.ID);
         if (tmp != null &&
-                (tmp.line < u.Location.line || (tmp.line == u.Location.line && tmp.column <= u.Location.column))) {
+                (tmp.line < u.Location.line /*|| (tmp.line == u.Location.line && tmp.column <= u.Location.column)*/)) {
             if (tmp.Type.equals("int")) t = new IntType();
             else if (tmp.Type.equals("bool")) t = new BoolType();
             else if (tmp.Type.equals("str")) t = new ClassType("string");
@@ -828,6 +828,10 @@ public class TempTestScope {
 
         else if (u instanceof MethodNode){
             Type t;
+            if (((MethodNode) u).FuncID.equals("main")){
+                System.err.println(u.Location.line+" "+u.Location.column+" 'main' can't be called");
+                System.exit(1);
+            }
             FuncScope flag = IsFunc(((MethodNode) u).FuncID, v);
             if (flag == null) {
                 System.err.println(u.Location.line+" "+u.Location.column+"This function isn't defined");
