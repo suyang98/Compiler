@@ -196,9 +196,10 @@ public class TempTestScope {
         }
     }
 
-    boolean IsReturn(Scope v){
-        if (v instanceof GeneralScope) return false;
-        else if (v instanceof FuncScope) return true;
+    FuncScope IsReturn(Scope v){
+        FuncScope tmp = null;
+        if (v instanceof GeneralScope) return tmp;
+        else if (v instanceof FuncScope) return tmp = (FuncScope)v;
         else return IsReturn(v.parent);
     }
 
@@ -218,7 +219,7 @@ public class TempTestScope {
     FuncScope IsFunc(String S, Scope v){
         if (v instanceof ClassScope) {
             FuncScope tmp = ((ClassScope) v).func.get(S);
-            if (tmp == null) IsFunc(S, v.parent);
+            if (tmp == null) return IsFunc(S, v.parent);
             else return tmp;
         }
         else if (v.parent != null) return IsFunc(S, v.parent);
@@ -262,6 +263,10 @@ public class TempTestScope {
             if (!((ClassScope)v).func.isEmpty()
                     && ((ClassScope)v).func.containsKey(tmp.name)) {
                 System.err.println(u.Location.line+" "+u.Location.column+" "+"Function "+v.name+" is redefined");
+                System.exit(1);
+            }
+            if (((FuncDefNode) u).ID.equals("main") && !((FuncDefNode) u).Return.equals("int")){
+                System.err.println(u.Location.line+" "+u.Location.column+" Function main's return type is wrong");
                 System.exit(1);
             }
 
@@ -441,19 +446,10 @@ public class TempTestScope {
             FuncScope tmp = ((ClassScope) v).func.get(((FuncDefNode) u).ID);
 
             for (int i = 0; i < ((FuncDefNode) u).Body.size(); ++i) {
-                if (((FuncDefNode) u).Body.sons(i) instanceof JumpNode
-                        && ((JumpNode) ((FuncDefNode) u).Body.sons(i)).Label == Jump.Return) {
-                    t = dfs1(((FuncDefNode) u).Body.sons(i), tmp);
-                }
-                else dfs1(((FuncDefNode) u).Body.sons(i), tmp);
+                dfs1(((FuncDefNode) u).Body.sons(i), tmp);
             }
 
-            if (((FuncDefNode) u).Return.equals("void") || ((FuncDefNode) u).ID.equals("main")) return t;
-            else if (t instanceof NullType || (t.dim != ((FuncDefNode) u).dim && t.S != ((FuncDefNode)u).Return)) {
-                System.err.println(u.Location.line+" "+u.Location.column+"Function " + ((FuncDefNode) u).ID + "'s return type is wrong");
-                System.exit(1);
-            }
-            else return t;
+            return t;
         }
 
         else if (u instanceof ClassDefNode) {
@@ -604,6 +600,17 @@ public class TempTestScope {
             return t1;
         }
 
+        else if (u instanceof EquNode || u instanceof NEqNode){
+            BoolType t = new BoolType();
+            Type t1 = dfs1(((Return_Bool) u).Left, v);
+            Type t2 = dfs1(((Return_Bool) u).Right, v);
+            if ((!(t1 instanceof  NullType) && !(t2 instanceof NullType)) && (!t1.S.equals(t2.S) || t1.dim != t2.dim)) {
+                System.err.println(u.Location.line+" "+u.Location.column+"different type can't be compared");
+                System.exit(1);
+            }
+            return t;
+        }
+
         else if (u instanceof Return_Bool){
             BoolType t = new BoolType();
             Type t1 = dfs1(((Return_Bool) u).Left, v);
@@ -644,12 +651,16 @@ public class TempTestScope {
 
         else if (u instanceof JumpNode) {
             if (((JumpNode) u).Label == Jump.Return) {
-                boolean flag = IsReturn(v);
-                if (flag == false) {
+                FuncScope flag = IsReturn(v);
+                if (flag == null) {
                     System.err.println(u.Location.line+" "+u.Location.column+"unnecssary return");
                     System.exit(1);
                 }
                 Type T = dfs1(((JumpNode) u).Return, v);
+                if (!(T instanceof NullType) && (!T.S.equals(flag.Return) || T.dim != flag.dim)){
+                    System.err.println(u.Location.line+" "+u.Location.column+" function "+flag.name+" return type is wrong");
+                    System.exit(1);
+                }
                 return T;
             }
             else {
@@ -749,6 +760,7 @@ public class TempTestScope {
             }
             else {
                 ClassScope t = IsClass(t1.S);
+
                 if (((ClassNode) u).Varname instanceof VarNode) {
                     VarTypeRef tt = t.var.get(((VarNode) ((ClassNode) u).Varname).ID);
                     if (tt == null) {
@@ -760,7 +772,12 @@ public class TempTestScope {
                     else if (tt.Type.equals("bool")) t2 = new BoolType();
                     else t2 = new ClassType(tt.Type);
                     t2.dim = tt.dim;
-                } else {
+                }
+                else if (((ClassNode) u).Varname instanceof ArrNode){
+
+
+                }
+                else {
                     FuncScope tt = t.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
                     if (tt == null) {
                         System.err.println(u.Location.line + " " + u.Location.column + "This function is not in " + t1.S);
