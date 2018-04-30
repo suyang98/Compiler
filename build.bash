@@ -4,4 +4,4 @@
 set -e
 cd "$(dirname "$0")"
 mkdir -p bin
-find ./src -name *.java | javac -d bin -classpath "lib/antlr4-runtime-4.7.1.jar" @/dev/stdin
+find ./src/main/java -name *.java | javac -d bin -classpath "lib/antlr-4.7.1-complete.jar" @/dev/stdin
