@@ -234,6 +234,7 @@ public class TempTestScope {
             tmp = new ClassType(v.name);
             return tmp;
         }
+        else if (v instanceof LocalScope) return InClass(v.parent, flag);
         return tmp;
     }
 
@@ -583,7 +584,8 @@ public class TempTestScope {
                 System.exit(1);
             }
             if (!(((AssignNode) u).Left instanceof VarNode) && !(((AssignNode) u).Left instanceof ArrNode)
-                    && !((((AssignNode) u).Left instanceof ClassNode) && ((ClassNode)((AssignNode) u).Left).Varname instanceof VarNode)){
+                    && !((((AssignNode) u).Left instanceof ClassNode) &&
+                    (((ClassNode)((AssignNode) u).Left).Varname instanceof VarNode)||((ClassNode)((AssignNode) u).Left).Varname instanceof ArrNode) ){
                 System.err.println(u.Location.line+" "+u.Location.column+"this isn't a left value");
                 System.exit(1);
             }
@@ -699,6 +701,9 @@ public class TempTestScope {
         }
 
         else if (u instanceof VarNode){
+            if (((VarNode) u).ID.equals("this")) {
+                return InClass(v, false);
+            }
             Type t = IsVar((VarNode) u, v);
             if (t == null){
                 System.err.println(u.Location.line+" "+u.Location.column+((VarNode) u).ID+" is not defined");
@@ -764,7 +769,7 @@ public class TempTestScope {
                 if (((ClassNode) u).Varname instanceof VarNode) {
                     VarTypeRef tt = t.var.get(((VarNode) ((ClassNode) u).Varname).ID);
                     if (tt == null) {
-                        System.err.println(u.Location.line + " " + u.Location.column + "This var is not in " + t1.S);
+                        System.err.println(u.Location.line + " " + u.Location.column + "This var "+((ClassNode) u).Varname+" is not in " + t1.S);
                         System.exit(1);
                     }
                     if (tt.Type.equals("int")) t2 = new IntType();
@@ -774,8 +779,19 @@ public class TempTestScope {
                     t2.dim = tt.dim;
                 }
                 else if (((ClassNode) u).Varname instanceof ArrNode){
-
-
+                    int cnt = 0;
+                    Node uu = ((ClassNode) u).Varname;
+                    while (!(uu instanceof VarNode)) {uu = ((ArrNode)uu).ID; cnt++;}
+                    VarTypeRef tt = t.var.get(((VarNode) uu).ID);
+                    if (tt == null) {
+                        System.err.println(u.Location.line + " " + u.Location.column + "This var "+((VarNode) uu).ID+" is not in " + t1.S);
+                        System.exit(1);
+                    }
+                    if (tt.Type.equals("int")) t2 = new IntType();
+                    else if (tt.Type.equals("string")) t2 = new ClassType("string");
+                    else if (tt.Type.equals("bool")) t2 = new BoolType();
+                    else t2 = new ClassType(tt.Type);
+                    t2.dim = tt.dim - cnt;
                 }
                 else {
                     FuncScope tt = t.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
