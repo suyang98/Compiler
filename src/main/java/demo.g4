@@ -9,22 +9,6 @@ block:funcdef  #block_funcdef
 ;
 
 
-//内建函数
-//voidbuilt:PRINT'('expr')'                       #print
-//         |PRINTLN'('expr')'                     #println
-//;
-//exprbuilt:GETSTRING'('')'                       #getstring
-//         |GETINT'('')'                          #getint
-//         |TOSTRING'('expr')'                    #tostring
-//         |LENGTH'('')'                          #length
-//         |SUBSTRING'('left=expr','right=expr')' #substring
-//         |PARSEINT'('')'                        #parseint
-//         |ORD'('expr')'                         #ord
-//;
-
-
-
-
 funcdef:functype funcid '(' paralist? ')' stat;
 
 
@@ -78,7 +62,7 @@ expr:primary                                           #expr_prim
     |NEW creator                                       #expr_crea
     |expr postfix=('++'|'--')                          #expr_posd
     |prefix=('++'|'--') expr                           #expr_fixd
-    |prefix=('!'|'~') expr                             #expr_fixn
+    |prefix=('!'|'~'|'-') expr                         #expr_fixn
     |left=expr bop=('*'|'/'|'%') right=expr            #expr_divd
     |left=expr bop=('+'|'-') right=expr                #expr_plus
     |left=expr bop=('<<'|'>>') right=expr              #expr_shif
@@ -92,12 +76,13 @@ expr:primary                                           #expr_prim
     |left=expr bop='=' right=expr                      #expr_assi
 ;
 
-primary:'('expr')'                          #primary_parens
-       |varid                               #primary_var
-//       |exprbuilt                           #primary_built
-       |NULL                                #primary_null
+primary:NULL                                #primary_null
        |Int                                 #primary_int
        |String                              #primary_str
+       |Bool                               #primary_bool
+       |'('expr')'                          #primary_parens
+       |varid                               #primary_var
+//       |exprbuilt                           #primary_built
 ;
 
 
@@ -105,7 +90,7 @@ sif:IF '('expr')' then_state=stat (ELSE else_state=stat)?;
 
 swhile: WHILE '('expr')'stat;
 
-sfor:FOR'(' expr1 = expr';' expr2 = expr?';' expr3 = expr')'stat;
+sfor:FOR'(' expr1 = expr?';' expr2 = expr?';' expr3 = expr?')'stat;
 
 
 
@@ -154,8 +139,8 @@ BREAK:'break';
 CONTINUE:'continue';
 
 
-ID:('a'..'z'|'A'..'Z')('0'..'9'|'_'|'a'..'z'|'A'..'Z')*;
 Bool:'true'|'false';
+ID:('a'..'z'|'A'..'Z')('0'..'9'|'_'|'a'..'z'|'A'..'Z')*;
 Int:('0'..'9')+;
 String : '"' (ESC | .)*? '"' ;
 fragment ESC : '\\' [btnr"\\];

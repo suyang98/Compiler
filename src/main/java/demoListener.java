@@ -479,30 +479,6 @@ public interface demoListener extends ParseTreeListener {
 	 */
 	void exitExpr_arra(demoParser.Expr_arraContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code primary_parens}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 */
-	void enterPrimary_parens(demoParser.Primary_parensContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code primary_parens}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 */
-	void exitPrimary_parens(demoParser.Primary_parensContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code primary_var}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 */
-	void enterPrimary_var(demoParser.Primary_varContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code primary_var}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 */
-	void exitPrimary_var(demoParser.Primary_varContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code primary_null}
 	 * labeled alternative in {@link demoParser#primary}.
 	 * @param ctx the parse tree
@@ -538,6 +514,42 @@ public interface demoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitPrimary_str(demoParser.Primary_strContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code primary_bool}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrimary_bool(demoParser.Primary_boolContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code primary_bool}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrimary_bool(demoParser.Primary_boolContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code primary_parens}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrimary_parens(demoParser.Primary_parensContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code primary_parens}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrimary_parens(demoParser.Primary_parensContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code primary_var}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrimary_var(demoParser.Primary_varContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code primary_var}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrimary_var(demoParser.Primary_varContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link demoParser#sif}.
 	 * @param ctx the parse tree

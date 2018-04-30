@@ -197,7 +197,7 @@ class ModNode extends Return_Int {
 class LShNode extends Return_Int {
 }
 
-class RShNode extends Return_Bool {
+class RShNode extends Return_Int {
 }
 
 class GreNode extends Return_Bool {
@@ -262,6 +262,9 @@ class LNoNode extends PreNode {
 class ANoNode extends PreNode {
 }
 
+class MinNode extends PreNode{
+}
+
 class PosNode extends ExpressionNode
 {
     public ExpressionNode InnerNode;
@@ -294,6 +297,13 @@ class NumberNode extends ExpressionNode {
         return null;
     }
 
+}
+
+class BoolNode extends ExpressionNode{
+    public String S;
+    void print (){System.out.println("BoolNode");}
+    int size(){return 0;}
+    Node sons(int i) {return null;}
 }
 
 class StrNode extends ExpressionNode {
@@ -661,6 +671,13 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         tmp.Content = ctx.String().getText();
         return tmp;
     }
+    @Override
+    public BoolNode visitPrimary_bool(demoParser.Primary_boolContext ctx){
+        BoolNode tmp = new BoolNode();
+        tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
+        tmp.S = ctx.Bool().getText();
+        return tmp;
+    }
 
     @Override
     public MethodNode visitExpr_meth(demoParser.Expr_methContext ctx){
@@ -747,7 +764,8 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     public PreNode visitExpr_fixn(demoParser.Expr_fixnContext ctx){
         PreNode tmp = null;
         if (ctx.prefix.getText().equals("!")) tmp = new LNoNode();
-        else tmp = new ANoNode();
+        else if (ctx.prefix.getText().equals("~")) tmp = new ANoNode();
+        else tmp = new MinNode();
         tmp.InnerNode = (ExpressionNode) visit(ctx.expr());
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
         return tmp;
@@ -878,10 +896,12 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public ForNode visitSfor(demoParser.SforContext ctx){
         ForNode tmp = new ForNode();
-        tmp.Expr1 = (ExpressionNode) visit(ctx.expr1);
+        if (ctx.expr1 == null) tmp.Expr1 = null;
+            else tmp.Expr1 = (ExpressionNode) visit(ctx.expr1);
         if (ctx.expr2 == null) tmp.Expr2 = null;
             else tmp.Expr2 = (ExpressionNode) visit(ctx.expr2);
-        tmp.Expr3 = (ExpressionNode) visit(ctx.expr3);
+        if (ctx.expr3 == null) tmp.Expr3 = null;
+            else tmp.Expr3 = (ExpressionNode) visit(ctx.expr3);
         if (ctx.stat() == null) tmp.Block = null;
             else tmp.Block = (StateNode) visit(ctx.stat());
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());

@@ -287,20 +287,6 @@ public interface demoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpr_arra(demoParser.Expr_arraContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code primary_parens}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrimary_parens(demoParser.Primary_parensContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code primary_var}
-	 * labeled alternative in {@link demoParser#primary}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrimary_var(demoParser.Primary_varContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code primary_null}
 	 * labeled alternative in {@link demoParser#primary}.
 	 * @param ctx the parse tree
@@ -321,6 +307,27 @@ public interface demoVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrimary_str(demoParser.Primary_strContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code primary_bool}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrimary_bool(demoParser.Primary_boolContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code primary_parens}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrimary_parens(demoParser.Primary_parensContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code primary_var}
+	 * labeled alternative in {@link demoParser#primary}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrimary_var(demoParser.Primary_varContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link demoParser#sif}.
 	 * @param ctx the parse tree

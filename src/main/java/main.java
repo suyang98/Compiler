@@ -12,21 +12,21 @@ public class main {
         demoParser parser = new demoParser(tokens);
         ParseTree tree = parser.prog();
 
-        System.out.println("LISP:");
-        System.out.println(tree.toStringTree(parser));
-        System.out.println();
+//        System.out.println("LISP:");
+//        System.out.println(tree.toStringTree(parser));
+//        System.out.println();
 
-        System.out.println("Visitor:");
+//        System.out.println("Visitor:");
         BuildASTVisitor buildASTVistor = new BuildASTVisitor();
         TempTestAst test = new TempTestAst();
         Node Root = buildASTVistor.visit(tree);
-        test.dfs(Root);
+//        test.dfs(Root);
         System.out.println();
 
-        System.out.println("Scope");
+//        System.out.println("Scope");
         TempTestScope BuildScope = new TempTestScope();
         BuildScope.dfs(Root, BuildScope.Root);
-        BuildScope.dfs2(BuildScope.Root);
+//        BuildScope.dfs2(BuildScope.Root);
         BuildScope.dfs1(Root, BuildScope.Root);
     }
 }

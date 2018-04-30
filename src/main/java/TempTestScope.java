@@ -1,4 +1,5 @@
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +8,7 @@ class VarTypeRef{
     int line, column;
     String Type;
     int dim;
-    boolean IsNew = false;
+    int IsNew = 1000;
 }
 class ParTypeRef extends VarTypeRef{
     String ID;
@@ -30,7 +31,7 @@ class LocalScope extends Scope{
     Map<String, LocalScope> sons = new HashMap<>();
 }
 class FuncScope extends LocalScope{
-    //List<ParTypeRef> para = new ArrayList<>();
+    List<ParTypeRef> para = new ArrayList<>();
     String Return;
     int dim = 0;
 }
@@ -50,8 +51,11 @@ public class TempTestScope {
         Print.Return = "void";
         Print.name = "print";
         VarTypeRef tmp1 = new VarTypeRef();
-        tmp1.Type = "string";
-        tmp1.IsNew = true;
+        ParTypeRef t1 = new ParTypeRef();
+        tmp1.Type = t1.Type = "string";
+        tmp1.IsNew = t1.IsNew = 0;
+        t1.ID = "S";
+        Print.para.add(t1);
         Print.var.put("S", tmp1);
         Root.func.put("print", Print);
 
@@ -59,8 +63,11 @@ public class TempTestScope {
         Println.Return = "void";
         Println.name = "println";
         VarTypeRef tmp2 = new VarTypeRef();
-        tmp2.Type = "string";
-        tmp2.IsNew = true;
+        ParTypeRef t2 = new ParTypeRef();
+        tmp2.Type = t2.Type = "string";
+        tmp2.IsNew = t2.IsNew = 0;
+        t2.ID = "S";
+        Println.para.add(t2);
         Println.var.put("S", tmp2);
         Root.func.put("println", Println);
 
@@ -78,10 +85,57 @@ public class TempTestScope {
         Tostring.Return = "string";
         Tostring.name = "toString";
         VarTypeRef tmp3 = new VarTypeRef();
-        tmp3.Type = "int";
-        tmp3.IsNew = true;
+        ParTypeRef t3 = new ParTypeRef();
+        tmp3.Type = t3.Type = "int";
+        tmp3.IsNew = t3.IsNew = 0;
+        t3.ID = "i";
+        Tostring.para.add(t3);
         Tostring.var.put("i", tmp3);
         Root.func.put("toString", Tostring);
+
+        ClassScope Str = new ClassScope();
+
+        FuncScope Length = new FuncScope();
+        Length.Return = "int";
+        Length.name = "length";
+        Str.func.put("length", Length);
+
+        FuncScope Substring = new FuncScope();
+        Substring.Return = "string";
+        Substring.name = "substring";
+        VarTypeRef tmp4 = new VarTypeRef();
+        ParTypeRef t4 = new ParTypeRef();
+        tmp4.Type = t4.Type = "int";
+        tmp4.IsNew = t4.IsNew = 0;
+        t4.ID = "left";
+        Substring.para.add(t4);
+        Substring.var.put("left", tmp4);
+        VarTypeRef tmp5 = new VarTypeRef();
+        ParTypeRef t5 = new ParTypeRef();
+        tmp5.Type = t5.Type = "int";
+        tmp5.IsNew = t5.IsNew = 0;
+        t5.ID = "right";
+        Substring.para.add(t5);
+        Substring.var.put("right", tmp5);
+        Str.func.put("substring", Substring);
+
+        FuncScope ParseInt = new FuncScope();
+        ParseInt.Return = "int";
+        ParseInt.name = "parseInt";
+        Str.func.put("parseInt", ParseInt);
+
+        FuncScope Ord = new FuncScope();
+        Ord.Return = "int";
+        Ord.name = "ord";
+        VarTypeRef tmp6 = new VarTypeRef();
+        ParTypeRef t6 = new ParTypeRef();
+        tmp6.Type = t6.Type = "pos";
+        tmp6.IsNew = t6.IsNew = 0;
+        Ord.para.add(t6);
+        Ord.var.put("pos", tmp6);
+        Str.func.put("ord", Ord);
+
+        Root.clas.put("string", Str);
 
 
 
@@ -120,9 +174,22 @@ public class TempTestScope {
         }
     }
 
-    String IsVar(VarNode u, Scope v){
+    Type IsVar(VarNode u, Scope v){
+        Type t = null;
         VarTypeRef tmp = v.var.get(u.ID);
-        if (tmp != null && tmp.line <= u.Location.line && tmp.column <= u.Location.column) return tmp.Type;
+        if (tmp != null &&
+                (tmp.line < u.Location.line || (tmp.line == u.Location.line && tmp.column <= u.Location.column))) {
+            if (tmp.Type.equals("int")) t = new IntType();
+            else if (tmp.Type.equals("bool")) t = new BoolType();
+            else if (tmp.Type.equals("str")) t = new ClassType("string");
+            else if (IsClass(tmp.Type) != null) t = new ClassType(tmp.Type);
+            else {
+                System.err.println(u.Location.line + " " + u.Location.column + "Class " + tmp.Type + " is not defined");
+                System.exit(1);
+            }
+            t.dim = tmp.dim;
+            return t;
+        }
         else {
             if (v instanceof GeneralScope) return null;
                 else return IsVar(u, v.parent);
@@ -137,7 +204,8 @@ public class TempTestScope {
 
     boolean IsOut(Scope v){
         if (v instanceof GeneralScope) return false;
-        else if (v.name.contains("for")) return true;
+        else if (v.name.contains("for") || v.name.contains("while") || v.name.contains("then") || v.name.contains("else"))
+            return true;
         else IsOut(v.parent);
         return false;
     }
@@ -156,6 +224,18 @@ public class TempTestScope {
         else if (v.parent != null) return IsFunc(S, v.parent);
         return null;
     }
+
+    ClassType InClass(Scope v, boolean flag){
+        ClassType tmp = null;
+        if (v instanceof  GeneralScope) return null;
+        else if (v instanceof FuncScope) {flag = true; return InClass(v.parent, true);}
+        else if (v instanceof ClassScope && flag == true) {
+            tmp = new ClassType(v.name);
+            return tmp;
+        }
+        return tmp;
+    }
+
 
     public void dfs(Node u, Scope v){
         if (u == null) return;
@@ -187,17 +267,29 @@ public class TempTestScope {
 
             tmp.dim = ((FuncDefNode) u).dim;
             tmp.Return = ((FuncDefNode) u).Return;
+            for (int i = 0; i < ((FuncDefNode) u).ParaList.size(); ++i){
+                ParTypeRef tt = new ParTypeRef();
+                tt.ID = ((FuncDefNode) u).ParaList.get(i).ID;
+                tt.dim = ((FuncDefNode) u).ParaList.get(i).dim;
+                tt.Type = ((FuncDefNode) u).ParaList.get(i).Type;
+                tt.line = ((FuncDefNode) u).ParaList.get(i).Location.line;
+                tt.column = ((FuncDefNode) u).ParaList.get(i).Location.column;
+                ((FuncScope)tmp).para.add(tt);
+            }
             ((ClassScope)v).func.put(((FuncDefNode) u).ID, tmp);
+
             for (int i = 0; i < u.size()-1; ++i){
                 dfs(u.sons(i), tmp);
             }
             for (int i = 0; i < ((FuncDefNode)u).Body.size(); ++i){
+                if (i == 50)
+                    System.out.println("!");
                 dfs(((FuncDefNode) u).Body.sons(i), tmp);
             }
             for (Object obj:tmp.var.keySet()){
                 String key = (String)obj;
                 VarTypeRef t = tmp.var.get(key);
-                t.IsNew = true;
+                t.IsNew = 0;
             }
         }
 
@@ -241,14 +333,14 @@ public class TempTestScope {
             tmp.dim = ((ParaNode) u).dim;
             tmp.Type = ((ParaNode) u).Type;
             tmp.ID = ((ParaNode) u).ID;
+            tmp.IsNew = tmp.dim;
 
             if (!v.var.isEmpty() && v.var.containsKey(tmp.ID)){
                 System.err.println(tmp.line+" "+tmp.column+"Var "+tmp.ID+" is redefined");
                 System.exit(1);
             }
 
-            if (v.parent instanceof FuncScope) tmp.IsNew = true;
-            if (((ParaNode) u).InitE) tmp.IsNew = true;
+            if (tmp.dim != 0 && ((ParaNode) u).InitE) tmp.IsNew--;
             v.var.put(tmp.ID, tmp);
         }
 
@@ -259,8 +351,12 @@ public class TempTestScope {
             tmp.name = "while"+String.valueOf(cntwhile);
             cntwhile++;
             tmp.parent = v;
-            for (int i = 0; i < ((WhileNode) u).Block.size(); ++i)
-                dfs(((WhileNode) u).Block.sons(i), tmp);
+            if (((WhileNode) u).Block == null) return;
+            if (((WhileNode) u).Block.StateList.size() == 0) dfs(((WhileNode) u).Block, tmp);
+            else {
+                for (int i = 0; i < ((WhileNode) u).Block.size(); ++i)
+                    dfs(((WhileNode) u).Block.sons(i), tmp);
+            }
             ((LocalScope)v).sons.put(tmp.name, tmp);
         }
 
@@ -273,8 +369,12 @@ public class TempTestScope {
             tmp.name = "for"+String.valueOf(cntfor);
             ((ForNode) u).name = "for"+String.valueOf(cntfor);
             cntfor++;
-            for (int i = 0; i < ((ForNode) u).Block.size(); ++i)
-                dfs(((ForNode) u).Block.sons(i), tmp);
+            if (((ForNode) u).Block == null) return;
+            if (((ForNode) u).Block.StateList.size() == 0) dfs(((ForNode) u).Block, tmp);
+            else {
+                for (int i = 0; i < ((ForNode) u).Block.size(); ++i)
+                    dfs(((ForNode) u).Block.sons(i), tmp);
+            }
             ((LocalScope)v).sons.put(tmp.name, tmp);
         }
 
@@ -286,21 +386,29 @@ public class TempTestScope {
             ((ConditionNode) u).Then.name = "then"+String.valueOf(cntthen);
             cntthen++;
             tmp1.parent = v;
-            for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
-               dfs(((ConditionNode) u).Then.StateList.get(i), tmp1);
+            if (((ConditionNode) u).Then == null) return;
+            if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, tmp1);
+            else {
+                for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
+                    dfs(((ConditionNode) u).Then.StateList.get(i), tmp1);
+            }
             ((LocalScope)v).sons.put(tmp1.name, tmp1);
             if (((ConditionNode) u).Else != null) {
                 tmp2.name = "else"+String.valueOf(cntelse);
                 ((ConditionNode) u).Else.name = "else"+String.valueOf(cntelse);
                 cntelse++;
                 tmp2.parent = v;
-                for (int i = 0; i < ((ConditionNode) u).Else.StateList.size(); ++i)
-                    dfs(((ConditionNode) u).Else.StateList.get(i), tmp2);
+                if (((ConditionNode) u).Else.StateList.size() == 0) dfs(((ConditionNode) u).Else, tmp2);
+                else {
+                    for (int i = 0; i < ((ConditionNode) u).Else.StateList.size(); ++i)
+                        dfs(((ConditionNode) u).Else.StateList.get(i), tmp2);
+                }
                 ((LocalScope) v).sons.put(tmp2.name, tmp2);
             }
         }
 
-        else if (u instanceof StateNode && !(u instanceof ExpressionNode) && !(u instanceof ListExpressionNode) && !(u instanceof JumpNode)){
+        else if (u instanceof StateNode && !(u instanceof ExpressionNode) && !(u instanceof ListExpressionNode) &&
+                !(u instanceof ListParaNode) && !(u instanceof JumpNode)){
             LocalScope tmp = new LocalScope();
             tmp.parent = v;
             tmp.name = "state"+String.valueOf(cnt);
@@ -331,15 +439,7 @@ public class TempTestScope {
         else if (u instanceof FuncDefNode) {
             Type t = new NullType();
             FuncScope tmp = ((ClassScope) v).func.get(((FuncDefNode) u).ID);
-            for (int i = 0; i < ((FuncDefNode) u).ParaList.size(); ++i){
-                Type t1 = dfs1(((FuncDefNode) u).ParaList.get(i), v);
-                VarTypeRef t2 = v.var.get(((FuncDefNode) u).ParaList.get(i).ID);
-                if (t1.dim != t2.dim || !t1.S.equals(t2.Type)) {
-                    System.err.println(u.Location.line+" "+u.Location.column+"paralist"+((FuncDefNode) u).ParaList.get(i).ID+"'s type is wrong");
-                    System.exit(1);
-                }
 
-            }
             for (int i = 0; i < ((FuncDefNode) u).Body.size(); ++i) {
                 if (((FuncDefNode) u).Body.sons(i) instanceof JumpNode
                         && ((JumpNode) ((FuncDefNode) u).Body.sons(i)).Label == Jump.Return) {
@@ -347,7 +447,8 @@ public class TempTestScope {
                 }
                 else dfs1(((FuncDefNode) u).Body.sons(i), tmp);
             }
-            if (((FuncDefNode) u).Return.equals("void")) return t;
+
+            if (((FuncDefNode) u).Return.equals("void") || ((FuncDefNode) u).ID.equals("main")) return t;
             else if (t instanceof NullType || (t.dim != ((FuncDefNode) u).dim && t.S != ((FuncDefNode)u).Return)) {
                 System.err.println(u.Location.line+" "+u.Location.column+"Function " + ((FuncDefNode) u).ID + "'s return type is wrong");
                 System.exit(1);
@@ -379,6 +480,7 @@ public class TempTestScope {
 
         else if (u instanceof ParaNode) {
             VoidType t = new VoidType();
+
             if (!((ParaNode) u).Type.equals("int") && !((ParaNode) u).Type.equals("string") && !((ParaNode) u).Type.equals("bool")) {
                 ClassScope flag = IsClass(((ParaNode) u).Type);
                 if (flag == null){
@@ -386,30 +488,44 @@ public class TempTestScope {
                     System.exit(1);
                 }
             }
+
             if (((ParaNode) u).InitE) {
                 Type tmp = dfs1(((ParaNode) u).Init, v);
-                if (!tmp.S.equals(((ParaNode) u).Type) || tmp.dim != ((ParaNode) u).dim) {
+                if (!(tmp instanceof NullType) && (!tmp.S.equals(((ParaNode) u).Type) || tmp.dim != ((ParaNode) u).dim)) {
                     System.err.println(u.Location.line+" "+u.Location.column+"var " + ((ParaNode) u).ID + "'s initialization type is wrong");
                     System.exit(1);
                 }
             }
             return t;
-        } else if (u instanceof WhileNode) {
+        }
+
+        else if (u instanceof ListParaNode){
+            Type tmp = new VoidType();
+            for (int i = 0; i < u.size(); ++i)
+                dfs1(u.sons(i), v);
+            return tmp;
+        }
+
+        else if (u instanceof WhileNode) {
             VoidType t = new VoidType();
             LocalScope tmp = ((LocalScope) v).sons.get(((WhileNode) u).name);
             if (!(dfs1(((WhileNode) u).Condition, v) instanceof BoolType)) {
                 System.err.println(u.Location.line+" "+u.Location.column+"While's condition return value is wrong");
                 System.exit(1);
             }
-            for (int i = 0; i < ((WhileNode) u).Block.size(); ++i)
-                dfs1(((WhileNode) u).Block.sons(i), tmp);
+            if (((WhileNode) u).Block == null) return t;
+            if (((WhileNode) u).Block.StateList.size() == 0) dfs1(((WhileNode) u).Block, tmp);
+            else {
+                for (int i = 0; i < ((WhileNode) u).Block.size(); ++i)
+                    dfs1(((WhileNode) u).Block.sons(i), tmp);
+            }
             return t;
         }
 
         else if (u instanceof ForNode) {
             VoidType t = new VoidType();
             LocalScope tmp = ((LocalScope) v).sons.get(((ForNode) u).name);
-            dfs1(((ForNode) u).Expr1, v);
+            if (((ForNode) u).Expr1 != null) dfs1(((ForNode) u).Expr1, v);
             if (((ForNode) u).Expr2 != null) {
                 Type tt = dfs1(((ForNode) u).Expr2, v);
                 if (!(tt instanceof BoolType)) {
@@ -417,9 +533,13 @@ public class TempTestScope {
                     System.exit(1);
                 }
             }
-            dfs1(((ForNode) u).Expr3, v);
-            for (int i = 0; i < ((ForNode) u).Block.size(); ++i)
-                dfs1(((ForNode) u).Block.sons(i), tmp);
+            if (((ForNode) u).Expr3 != null) dfs1(((ForNode) u).Expr3, v);
+            if (((ForNode) u).Block == null) return t;
+            if (((ForNode) u).Block.StateList.size() == 0) dfs1(((ForNode) u).Block, tmp);
+            else {
+                for (int i = 0; i < ((ForNode) u).Block.size(); ++i)
+                    dfs1(((ForNode) u).Block.sons(i), tmp);
+            }
             return t;
         }
 
@@ -431,13 +551,21 @@ public class TempTestScope {
             }
 
             LocalScope tmp1 = ((LocalScope) v).sons.get(((ConditionNode) u).Then.name);
-            for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
-                dfs1(((ConditionNode) u).Then.StateList.get(i), tmp1);
+            if (((ConditionNode) u).Then == null) return t;
+            if (((ConditionNode) u).Then.StateList.size() == 0) dfs1(((ConditionNode) u).Then, tmp1);
+            else {
+                for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
+                    dfs1(((ConditionNode) u).Then.StateList.get(i), tmp1);
+            }
 
             if (((ConditionNode) u).Else != null) {
                 LocalScope tmp2 = ((LocalScope) v).sons.get(((ConditionNode) u).Else.name);
-                for (int i = 0; i < ((ConditionNode) u).Else.StateList.size(); ++i)
-                    dfs1(((ConditionNode) u).Else.StateList.get(i), tmp2);
+                if (((ConditionNode) u).Else == null) return t;
+                if (((ConditionNode) u).Else.StateList.size() == 0) dfs1(((ConditionNode) u).Then, tmp2);
+                else {
+                    for (int i = 0; i < ((ConditionNode) u).Else.StateList.size(); ++i)
+                        dfs1(((ConditionNode) u).Else.StateList.get(i), tmp2);
+                }
             }
             return t;
         }
@@ -454,18 +582,22 @@ public class TempTestScope {
         else if (u instanceof AssignNode) {
             Type t1 = dfs1(((AssignNode)u).Left, v);
             Type t2 = dfs1(((AssignNode)u).Right, v);
-            if (t1.dim != t2.dim || !t1.S.equals(t2.S)) {
-                System.out.println(t1.S+" "+t1.dim+" "+t2.S+" "+t2.dim);
+            if (!(t2 instanceof NullType) && (t1.dim != t2.dim || !t1.S.equals(t2.S))) {
                 System.err.println(u.Location.line+" "+u.Location.column+" the types on both sides of the equation is different");
+                System.exit(1);
+            }
+            if (!(((AssignNode) u).Left instanceof VarNode) && !(((AssignNode) u).Left instanceof ArrNode)
+                    && !((((AssignNode) u).Left instanceof ClassNode) && ((ClassNode)((AssignNode) u).Left).Varname instanceof VarNode)){
+                System.err.println(u.Location.line+" "+u.Location.column+"this isn't a left value");
                 System.exit(1);
             }
             return t1;
         }
 
-        else if (u instanceof  Return_Int){
+        else if (u instanceof Return_Int){
             Type t1 = dfs1(((Return_Int)u).Left, v);
             Type t2 = dfs1(((Return_Int)u).Right, v);
-            if (!(t1 instanceof IntType) || !(t2 instanceof IntType)){
+            if (t1.dim != 0 || t2.dim != 0 || !t1.S.equals((t2.S))){
                 System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
                 System.exit(1);
             }
@@ -538,40 +670,35 @@ public class TempTestScope {
         }
 
         else if (u instanceof StrNode) {
-            StrType t = new StrType();
+            ClassType t = new ClassType("string");
+            t.dim = 0;
+            return t;
+        }
+
+        else if (u instanceof BoolNode) {
+            BoolType t = new BoolType();
+            t.dim = 0;
+            return t;
+        }
+
+        else if (u instanceof NullNode){
+            NullType t = new NullType();
             t.dim = 0;
             return t;
         }
 
         else if (u instanceof VarNode){
-            Type t = null;
-            String S = IsVar((VarNode) u, v);
-            if (S == null){
+            Type t = IsVar((VarNode) u, v);
+            if (t == null){
                 System.err.println(u.Location.line+" "+u.Location.column+((VarNode) u).ID+" is not defined");
                 System.exit(1);
-            }
-            else if (S.equals("int")) {
-                t = new IntType();
-            }
-            else if (S.equals("string")){
-                t = new StrType();
-            }
-            else if (S.equals("bool")){
-                t = new BoolType();
-            }
-            else {
-                if (IsClass(S) != null) t = new ClassType(S);
-                else {
-                    System.err.println(u.Location.line+" "+u.Location.column+"Class "+S+" is not defined");
-                    System.exit(1);
-                }
             }
             return t;
         }
 
         else if (u instanceof ArrNode){
             Type t = dfs1(((ArrNode) u).ID, v);
-            t.dim++;
+            t.dim--;
             Type t1 = dfs1(((ArrNode) u).Index, v);
             if (!(t1 instanceof IntType)) {
                 System.err.println(u.Location.line+" "+u.Location.column+"index shuld be integer");
@@ -583,51 +710,71 @@ public class TempTestScope {
         else if (u instanceof CreateNode){
             Type t = null;
             if (((CreateNode) u).VarTYpe.equals("int")) t = new IntType();
-            else if (((CreateNode) u).VarTYpe.equals("string")) t = new StrType();
+            else if (((CreateNode) u).VarTYpe.equals("string")) t = new ClassType("string");
             else if (((CreateNode) u).VarTYpe.equals("bool")) t = new BoolType();
             else if (IsClass(((CreateNode) u).VarTYpe) != null) t = new ClassType(((CreateNode) u).VarTYpe);
             else {
                 System.err.println(u.Location.line+" "+u.Location.column+"This type is not defined");
                 System.exit(1);
             }
+            for (int i = 0; i < u.size(); ++i)
+                dfs1(u.sons(i), v);
             t.dim = ((CreateNode) u).dim;
             return t;
         }
 
         else if (u instanceof ClassNode){
-            Type t1 = dfs1(((ClassNode) u).ID, v);
+            Type t1 = null;
             Type t2 = null;
-            if (!(t1 instanceof ClassType)) {
-                System.err.println(u.Location.line+" "+u.Location.column+"This isn't a class");
-                System.exit(1);
-            }
-            ClassScope t = IsClass(t1.S);
-            if (((ClassNode) u).Varname instanceof VarNode) {
-                VarTypeRef tt = t.var.get(((VarNode) ((ClassNode)u).Varname).ID);
-                if (tt == null) {
-                    System.err.println(u.Location.line+" "+u.Location.column+"This var is not in "+ t1.S);
+            if (((ClassNode) u).ID instanceof VarNode && ((VarNode)((ClassNode) u).ID).ID.equals("this")) {
+                t1 = InClass(v, false);
+                if (t1 == null) {
+                    System.err.println(u.Location.line+" "+u.Location.column+"this isn't in a class's function");
                     System.exit(1);
                 }
-                if (tt.Type.equals("int")) t2 = new IntType();
-                else if (tt.Type.equals("string")) t2 = new StrType();
-                else if (tt.Type.equals("bool")) t2 = new BoolType();
-                else t2 = new ClassType(tt.Type);
-                t2.dim = tt.dim;
+            }
+            else t1 = dfs1(((ClassNode) u).ID, v);
+
+
+            if (!(t1 instanceof ClassType)) {
+                Node uu = ((ClassNode) u).ID;
+                while (!(uu instanceof VarNode)) uu = ((ArrNode)uu).ID;
+                Type tt = IsVar((VarNode) uu, v);
+                if (!(tt != null && t1.dim != 0 && ((ClassNode) u).Varname instanceof MethodNode
+                        && ((MethodNode) ((ClassNode) u).Varname).FuncID.equals("size")) ) {
+                    System.err.println(u.Location.line + " " + u.Location.column + "This isn't a class");
+                    System.exit(1);
+                }
+                return t2 = new IntType();
             }
             else {
-                FuncScope tt = t.func.get(((MethodNode)((ClassNode) u).Varname).FuncID);
-                if (tt == null){
-                    System.err.println(u.Location.line+" "+u.Location.column+"This function is not in "+ t1.S);
-                    System.exit(1);
-                }
+                ClassScope t = IsClass(t1.S);
+                if (((ClassNode) u).Varname instanceof VarNode) {
+                    VarTypeRef tt = t.var.get(((VarNode) ((ClassNode) u).Varname).ID);
+                    if (tt == null) {
+                        System.err.println(u.Location.line + " " + u.Location.column + "This var is not in " + t1.S);
+                        System.exit(1);
+                    }
+                    if (tt.Type.equals("int")) t2 = new IntType();
+                    else if (tt.Type.equals("string")) t2 = new ClassType("string");
+                    else if (tt.Type.equals("bool")) t2 = new BoolType();
+                    else t2 = new ClassType(tt.Type);
+                    t2.dim = tt.dim;
+                } else {
+                    FuncScope tt = t.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
+                    if (tt == null) {
+                        System.err.println(u.Location.line + " " + u.Location.column + "This function is not in " + t1.S);
+                        System.exit(1);
+                    }
 
-                if (tt.Return.equals("int")) t2 = new IntType();
-                else if (tt.Return.equals("string")) t2 = new StrType();
-                else if (tt.Return.equals("bool")) t2 = new BoolType();
-                else t2 = new ClassType(tt.Return);
-                t2.dim = tt.dim;
+                    if (tt.Return.equals("int")) t2 = new IntType();
+                    else if (tt.Return.equals("string")) t2 = new ClassType("string");
+                    else if (tt.Return.equals("bool")) t2 = new BoolType();
+                    else t2 = new ClassType(tt.Return);
+                    t2.dim = tt.dim;
+                }
+                return t2;
             }
-            return t2;
         }
 
         else if (u instanceof MethodNode){
@@ -638,10 +785,22 @@ public class TempTestScope {
                 System.exit(1);
             }
             if (flag.Return.equals("int")) t = new IntType();
-            else if (flag.Return.equals("string")) t = new StrType();
+            else if (flag.Return.equals("string")) t = new ClassType("string");
             else if (flag.Return.equals("bool")) t = new BoolType();
+            else if (flag.Return.equals("void")) t = new VoidType();
             else t = new ClassType(flag.Return);
-            t.dim =flag.dim;
+            if (((MethodNode) u).Argument != null) {
+                for (int i = 0; i < ((MethodNode) u).Argument.size(); ++i) {
+                    Type tt = dfs1(((MethodNode) u).Argument.sons(i), v);
+                    if (tt instanceof NullType) continue;
+                    if (tt.dim != flag.para.get(i).dim || !tt.S.equals(flag.para.get(i).Type)) {
+                        System.err.println((((MethodNode) u).Argument.sons(i)).Location.line + " " +
+                                ((MethodNode) u).Argument.sons(i).Location.column + "method's paralist type is wrong");
+                        System.exit(1);
+                    }
+                }
+            }
+            t.dim = flag.dim;
             return t;
         }
         return null;
@@ -672,11 +831,6 @@ class VoidType extends Type{
     }
 }
 class NullType extends Type{}
-class StrType extends Type{
-    StrType(){
-        S = "string";
-    }
-}
 class ClassType extends Type{
     ClassType(String S) {
         this.S = S;
