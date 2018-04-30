@@ -577,7 +577,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
             if (t instanceof FuncDefNode) tmp.FuncList.add((FuncDefNode)t);
             else if (t instanceof ParaNode) tmp.ParaList.add((ParaNode)t);
             else {
-                if (tmp.Contruct != null) tmp.Contruct = (ClassConstNode)t;
+                if (tmp.Contruct == null) tmp.Contruct = (ClassConstNode)t;
             }
         }
         return tmp;

@@ -445,7 +445,13 @@ public class TempTestScope {
         else if (u instanceof FuncDefNode) {
             Type t = new NullType();
             FuncScope tmp = ((ClassScope) v).func.get(((FuncDefNode) u).ID);
-
+            if (!(((FuncDefNode) u).Return.equals("int")||((FuncDefNode) u).Return.equals("bool")
+                    ||((FuncDefNode) u).Return.equals("string") || ((FuncDefNode) u).Return.equals("void"))){
+                if (IsClass(((FuncDefNode) u).Return) == null){
+                    System.err.println(u.Location.line+" "+u.Location.column+" Function return type is wrong");
+                    System.exit(1);
+                }
+            }
             for (int i = 0; i < ((FuncDefNode) u).Body.size(); ++i) {
                 dfs1(((FuncDefNode) u).Body.sons(i), tmp);
             }
@@ -464,7 +470,7 @@ public class TempTestScope {
 
         else if (u instanceof ClassConstNode) {
             VoidType t = new VoidType();
-            FuncScope tmp = ((ClassScope) v).func.get(((FuncDefNode) u).ID);
+            FuncScope tmp = ((ClassScope) v).func.get(((ClassConstNode) u).ID);
             for (int i = 0; i < u.size(); ++i) {
                 if (u.sons(i) instanceof JumpNode && ((JumpNode) u.sons(i)).Label == Jump.Return) {
                     System.err.println(u.Location.line+" "+u.Location.column+"cannot return any value in a constructor");
@@ -488,6 +494,10 @@ public class TempTestScope {
 
             if (((ParaNode) u).InitE) {
                 Type tmp = dfs1(((ParaNode) u).Init, v);
+                if (tmp instanceof NullType && ((ParaNode) u).Type.equals("string") && ((ParaNode) u).dim == 0){
+                    System.err.println(u.Location.line+" "+u.Location.column+" string can't be assigned as null");
+                    System.exit(1);
+                }
                 if (!(tmp instanceof NullType) && (!tmp.S.equals(((ParaNode) u).Type) || tmp.dim != ((ParaNode) u).dim)) {
                     System.err.println(u.Location.line+" "+u.Location.column+"var " + ((ParaNode) u).ID + "'s initialization type is wrong");
                     System.exit(1);
@@ -558,7 +568,7 @@ public class TempTestScope {
             if (((ConditionNode) u).Else != null) {
                 LocalScope tmp2 = ((LocalScope) v).sons.get(((ConditionNode) u).Else.name);
                 if (((ConditionNode) u).Else == null) return t;
-                if (((ConditionNode) u).Else.StateList.size() == 0) dfs1(((ConditionNode) u).Then, tmp2);
+                if (((ConditionNode) u).Else.StateList.size() == 0) dfs1(((ConditionNode) u).Else, tmp2);
                 else {
                     for (int i = 0; i < ((ConditionNode) u).Else.StateList.size(); ++i)
                         dfs1(((ConditionNode) u).Else.StateList.get(i), tmp2);
@@ -583,9 +593,15 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+" the types on both sides of the equation is different");
                 System.exit(1);
             }
-            if (!(((AssignNode) u).Left instanceof VarNode) && !(((AssignNode) u).Left instanceof ArrNode)
-                    && !((((AssignNode) u).Left instanceof ClassNode) &&
-                    (((ClassNode)((AssignNode) u).Left).Varname instanceof VarNode)||((ClassNode)((AssignNode) u).Left).Varname instanceof ArrNode) ){
+            if (t1.S.equals("string") && t1.dim == 0 && t2 instanceof NullType) {
+                System.err.println(u.Location.line+" "+u.Location.column+" string can't be assigned as null");
+                System.exit(1);
+            }
+            if (((AssignNode) u).Left instanceof ClassNode) {
+                if (((ClassNode) ((AssignNode) u).Left).Varname instanceof VarNode || ((ClassNode) ((AssignNode) u).Left).Varname instanceof ArrNode)
+                    return t1;
+            }
+            else if (!(((AssignNode) u).Left instanceof VarNode) && !(((AssignNode) u).Left instanceof ArrNode)){
                 System.err.println(u.Location.line+" "+u.Location.column+"this isn't a left value");
                 System.exit(1);
             }
