@@ -180,7 +180,7 @@ public class TempTestScope {
         VarTypeRef tmp = v.var.get(u.ID);
         if (tmp != null &&
                 ((tmp.line < u.Location.line /*|| (tmp.line == u.Location.line && tmp.column <= u.Location.column)*/) ||
-                (v instanceof ClassScope))) {
+                        ((v instanceof ClassScope) && !(v instanceof GeneralScope)))) {
             if (tmp.Type.equals("int")) t = new IntType();
             else if (tmp.Type.equals("bool")) t = new BoolType();
             else if (tmp.Type.equals("str")) t = new ClassType("string");
@@ -324,11 +324,15 @@ public class TempTestScope {
 
         else if (u instanceof ClassConstNode){
             boolean IsCon = false;
+            if (!((ClassConstNode) u).ID.equals(v.name)){
+                System.err.println(u.Location.line+" "+u.Location.column+" Construction's name is wrong");
+                System.exit(1);
+            }
             FuncScope tmp = new FuncScope();
             tmp.parent = v;
             tmp.name = ((ClassConstNode) u).ID;
             tmp.dim = 0;
-            tmp.name = "void";
+            tmp.Return = "void";
             ((ClassScope)v).func.put(((ClassConstNode) u).ID, tmp);
             for (int i = 0; i < u.size(); ++i) {
                 if (u.sons(i) instanceof JumpNode && ((JumpNode) u.sons(i)).Label == Jump.Return){
