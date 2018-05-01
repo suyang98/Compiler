@@ -57,8 +57,8 @@ indexlist:'['expr?']';
 
 expr:primary                                           #expr_prim
     |methodcall                                        #expr_meth
-    |idname=expr '['index=expr']'                      #expr_arra
     |clname=expr'.'varname=expr                        #expr_clas
+    |idname=expr '['index=expr']'                      #expr_arra
     |NEW creator                                       #expr_crea
     |expr postfix=('++'|'--')                          #expr_posd
     |prefix=('++'|'--') expr                           #expr_fixd

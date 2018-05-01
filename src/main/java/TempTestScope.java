@@ -798,17 +798,7 @@ public class TempTestScope {
         else if (u instanceof ClassNode){
             Type t1 = null;
             Type t2 = null;
-//            if (((ClassNode) u).ID instanceof VarNode && ((VarNode)((ClassNode) u).ID).ID.equals("this")) {
-//                t1 = InClass(v, false);
-//                if (t1 == null) {
-//                    System.err.println(u.Location.line+" "+u.Location.column+"this isn't in a class's function");
-//                    System.exit(1);
-//                }
-//            }
-//            else
-                t1 = dfs1(((ClassNode) u).ID, v);
-
-
+            t1 = dfs1(((ClassNode) u).ID, v);
             if ((t1.dim != 0)) {
                 Node uu = ((ClassNode) u).ID;
                 while (!(uu instanceof VarNode)) uu = ((ArrNode)uu).ID;
@@ -819,10 +809,11 @@ public class TempTestScope {
                     System.exit(1);
                 }
                 return t2 = new IntType();
-            }
+            }   //a.size()
+
+
             else {
                 ClassScope t = IsClass(t1.S);
-
                 if (((ClassNode) u).Varname instanceof VarNode) {
                     VarTypeRef tt = t.var.get(((VarNode) ((ClassNode) u).Varname).ID);
                     if (tt == null) {

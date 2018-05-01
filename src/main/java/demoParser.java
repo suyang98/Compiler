@@ -1801,11 +1801,11 @@ public class demoParser extends Parser {
 						((Expr_clasContext)_localctx).clname = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(177);
-						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
+						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
 						setState(178);
 						match(T__9);
 						setState(179);
-						((Expr_clasContext)_localctx).varname = expr(17);
+						((Expr_clasContext)_localctx).varname = expr(18);
 						}
 						break;
 					case 2:
@@ -2002,7 +2002,7 @@ public class demoParser extends Parser {
 						((Expr_arraContext)_localctx).idname = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(213);
-						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
+						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
 						setState(214);
 						match(T__7);
 						setState(215);
@@ -3027,7 +3027,7 @@ public class demoParser extends Parser {
 	private boolean expr_sempred(ExprContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 16);
+			return precpred(_ctx, 17);
 		case 1:
 			return precpred(_ctx, 11);
 		case 2:
@@ -3051,7 +3051,7 @@ public class demoParser extends Parser {
 		case 11:
 			return precpred(_ctx, 1);
 		case 12:
-			return precpred(_ctx, 17);
+			return precpred(_ctx, 16);
 		case 13:
 			return precpred(_ctx, 14);
 		}
@@ -3123,8 +3123,8 @@ public class demoParser extends Parser {
 		"(\2\2\u00ac\u00b2\5\32\16\2\u00ad\u00ae\t\2\2\2\u00ae\u00b2\5\36\20\17"+
 		"\u00af\u00b0\t\3\2\2\u00b0\u00b2\5\36\20\16\u00b1\u00a8\3\2\2\2\u00b1"+
 		"\u00aa\3\2\2\2\u00b1\u00ab\3\2\2\2\u00b1\u00ad\3\2\2\2\u00b1\u00af\3\2"+
-		"\2\2\u00b2\u00e0\3\2\2\2\u00b3\u00b4\f\22\2\2\u00b4\u00b5\7\f\2\2\u00b5"+
-		"\u00df\5\36\20\23\u00b6\u00b7\f\r\2\2\u00b7\u00b8\t\4\2\2\u00b8\u00df"+
+		"\2\2\u00b2\u00e0\3\2\2\2\u00b3\u00b4\f\23\2\2\u00b4\u00b5\7\f\2\2\u00b5"+
+		"\u00df\5\36\20\24\u00b6\u00b7\f\r\2\2\u00b7\u00b8\t\4\2\2\u00b8\u00df"+
 		"\5\36\20\16\u00b9\u00ba\f\f\2\2\u00ba\u00bb\t\5\2\2\u00bb\u00df\5\36\20"+
 		"\r\u00bc\u00bd\f\13\2\2\u00bd\u00be\t\6\2\2\u00be\u00df\5\36\20\f\u00bf"+
 		"\u00c0\f\n\2\2\u00c0\u00c1\t\7\2\2\u00c1\u00df\5\36\20\13\u00c2\u00c3"+
@@ -3134,7 +3134,7 @@ public class demoParser extends Parser {
 		"\7 \2\2\u00cd\u00df\5\36\20\7\u00ce\u00cf\f\5\2\2\u00cf\u00d0\7!\2\2\u00d0"+
 		"\u00df\5\36\20\6\u00d1\u00d2\f\4\2\2\u00d2\u00d3\7\"\2\2\u00d3\u00df\5"+
 		"\36\20\5\u00d4\u00d5\f\3\2\2\u00d5\u00d6\7\b\2\2\u00d6\u00df\5\36\20\4"+
-		"\u00d7\u00d8\f\23\2\2\u00d8\u00d9\7\n\2\2\u00d9\u00da\5\36\20\2\u00da"+
+		"\u00d7\u00d8\f\22\2\2\u00d8\u00d9\7\n\2\2\u00d9\u00da\5\36\20\2\u00da"+
 		"\u00db\7\13\2\2\u00db\u00df\3\2\2\2\u00dc\u00dd\f\20\2\2\u00dd\u00df\t"+
 		"\2\2\2\u00de\u00b3\3\2\2\2\u00de\u00b6\3\2\2\2\u00de\u00b9\3\2\2\2\u00de"+
 		"\u00bc\3\2\2\2\u00de\u00bf\3\2\2\2\u00de\u00c2\3\2\2\2\u00de\u00c5\3\2"+
