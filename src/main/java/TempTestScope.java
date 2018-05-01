@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 class VarTypeRef{
     int line, column;
     String Type;
@@ -178,10 +179,12 @@ public class TempTestScope {
         Type t = null;
         VarTypeRef tmp = v.var.get(u.ID);
         if (tmp != null &&
-                (tmp.line < u.Location.line /*|| (tmp.line == u.Location.line && tmp.column <= u.Location.column)*/)) {
+                ((tmp.line < u.Location.line /*|| (tmp.line == u.Location.line && tmp.column <= u.Location.column)*/) ||
+                (v instanceof ClassScope))) {
             if (tmp.Type.equals("int")) t = new IntType();
             else if (tmp.Type.equals("bool")) t = new BoolType();
             else if (tmp.Type.equals("str")) t = new ClassType("string");
+            else if (tmp.Type.equals("null")) t = new NullType();
             else if (IsClass(tmp.Type) != null) t = new ClassType(tmp.Type);
             else {
                 System.err.println(u.Location.line + " " + u.Location.column + "Class " + tmp.Type + " is not defined");
@@ -258,6 +261,10 @@ public class TempTestScope {
 
         else if (u instanceof FuncDefNode){
             FuncScope tmp = new FuncScope();
+            if (((FuncDefNode) u).ID.equals("this")){
+                System.err.println(u.Location.line+" "+u.Location.column+" \"this\" is a reserved word");
+                System.exit(1);
+            }
             tmp.parent = v;
             tmp.name = ((FuncDefNode) u).ID;
 
@@ -333,6 +340,10 @@ public class TempTestScope {
         }
 
         else if (u instanceof ParaNode){
+            if (((ParaNode) u).ID.equals("this")){
+                System.err.println(u.Location.line+" "+u.Location.column+" \"this\" is a reserved word");
+                System.exit(1);
+            }
             ParTypeRef tmp = new ParTypeRef();
             tmp.column = u.Location.column;
             tmp.line = u.Location.line;
@@ -388,11 +399,11 @@ public class TempTestScope {
             LocalScope tmp1 = new LocalScope();
             LocalScope tmp2 = new LocalScope();
             dfs(((ConditionNode)u).Condition,v);
+            if (((ConditionNode) u).Then == null) return;
             tmp1.name = "then"+String.valueOf(cntthen);
             ((ConditionNode) u).Then.name = "then"+String.valueOf(cntthen);
             cntthen++;
             tmp1.parent = v;
-            if (((ConditionNode) u).Then == null) return;
             if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, tmp1);
             else {
                 for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
@@ -557,8 +568,8 @@ public class TempTestScope {
                 System.exit(1);
             }
 
-            LocalScope tmp1 = ((LocalScope) v).sons.get(((ConditionNode) u).Then.name);
             if (((ConditionNode) u).Then == null) return t;
+            LocalScope tmp1 = ((LocalScope) v).sons.get(((ConditionNode) u).Then.name);
             if (((ConditionNode) u).Then.StateList.size() == 0) dfs1(((ConditionNode) u).Then, tmp1);
             else {
                 for (int i = 0; i < ((ConditionNode) u).Then.StateList.size(); ++i)
@@ -608,10 +619,20 @@ public class TempTestScope {
             return t1;
         }
 
-        else if (u instanceof Return_Int){
+        else if (u instanceof AddNode){
             Type t1 = dfs1(((Return_Int)u).Left, v);
             Type t2 = dfs1(((Return_Int)u).Right, v);
             if (t1.dim != 0 || t2.dim != 0 || !t1.S.equals((t2.S)) || (!t1.S.equals("int") && !t1.S.equals("string"))){
+                System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
+                System.exit(1);
+            }
+            return t1;
+        }
+
+        else if (u instanceof Return_Int){
+            Type t1 = dfs1(((Return_Int)u).Left, v);
+            Type t2 = dfs1(((Return_Int)u).Right, v);
+            if (t1.dim != 0 || t2.dim != 0 || !t1.S.equals((t2.S)) || !t1.S.equals("int")){
                 System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
                 System.exit(1);
             }
@@ -646,6 +667,16 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
                 System.exit(1);
             }
+
+            if (((PosNode) u).InnerNode instanceof ClassNode) {
+                if (((ClassNode) ((PosNode) u).InnerNode).Varname instanceof VarNode || ((ClassNode) ((PosNode) u).InnerNode).Varname instanceof ArrNode)
+                    return t;
+            }
+            else if (!(((PosNode) u).InnerNode instanceof VarNode) && !(((PosNode) u).InnerNode instanceof ArrNode)){
+                System.err.println(u.Location.line+" "+u.Location.column+"this isn't a left value, can't ++");
+                System.exit(1);
+            }
+
             return t;
         }
 
@@ -718,7 +749,12 @@ public class TempTestScope {
 
         else if (u instanceof VarNode){
             if (((VarNode) u).ID.equals("this")) {
-                return InClass(v, false);
+                ClassType t1 = InClass(v, false);
+                if (t1 == null) {
+                    System.err.println(u.Location.line+" "+u.Location.column+"this isn't in a class's function");
+                    System.exit(1);
+                }
+                else return t1;
             }
             Type t = IsVar((VarNode) u, v);
             if (t == null){
@@ -758,17 +794,18 @@ public class TempTestScope {
         else if (u instanceof ClassNode){
             Type t1 = null;
             Type t2 = null;
-            if (((ClassNode) u).ID instanceof VarNode && ((VarNode)((ClassNode) u).ID).ID.equals("this")) {
-                t1 = InClass(v, false);
-                if (t1 == null) {
-                    System.err.println(u.Location.line+" "+u.Location.column+"this isn't in a class's function");
-                    System.exit(1);
-                }
-            }
-            else t1 = dfs1(((ClassNode) u).ID, v);
+//            if (((ClassNode) u).ID instanceof VarNode && ((VarNode)((ClassNode) u).ID).ID.equals("this")) {
+//                t1 = InClass(v, false);
+//                if (t1 == null) {
+//                    System.err.println(u.Location.line+" "+u.Location.column+"this isn't in a class's function");
+//                    System.exit(1);
+//                }
+//            }
+//            else
+                t1 = dfs1(((ClassNode) u).ID, v);
 
 
-            if (!(t1 instanceof ClassType)) {
+            if ((t1.dim != 0)) {
                 Node uu = ((ClassNode) u).ID;
                 while (!(uu instanceof VarNode)) uu = ((ArrNode)uu).ID;
                 Type tt = IsVar((VarNode) uu, v);
