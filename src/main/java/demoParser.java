@@ -1343,12 +1343,10 @@ public class demoParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			{
 			setState(172);
 			match(T__7);
 			setState(173);
 			match(T__8);
-			}
 			}
 		}
 		catch (RecognitionException re) {

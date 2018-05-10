@@ -52,7 +52,7 @@ exprlist:expr(','expr)*;
 methodcall:funcid'('exprlist?')';
 
 creator:vartype('('')')? indexlist* indexem*;
-indexem : ('['']');
+indexem : '['']';
 indexlist:'['expr']';
 
 expr:primary                                           #expr_prim

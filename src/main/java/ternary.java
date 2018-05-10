@@ -3,8 +3,10 @@ import java.util.List;
 
 public class ternary {
 
+    int cnt = 0;
+
     enum Opcode {
-        // add, sub, mul, div, load, store, if, goto, call, return, phi ...
+     //   add, sub, mul, div, load, store, if, goto, call, return, phi
     }
 
     class Src{
@@ -13,8 +15,8 @@ public class ternary {
 
     class Tern {
         Opcode op;
-        Src src1;
-        Src src2;
+        String src1;
+        String src2;
         Tern prev, next;
     }
 

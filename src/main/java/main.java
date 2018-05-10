@@ -22,7 +22,7 @@ public class main{
         TempTestAst test = new TempTestAst();
         Node Root = buildASTVistor.visit(tree);
 //        test.dfs(Root);
-        System.out.println();
+//        System.out.println();
 
 //        System.out.println("Scope");
         TempTestScope BuildScope = new TempTestScope();
