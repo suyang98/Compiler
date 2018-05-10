@@ -176,8 +176,9 @@ abstract class InfixExpressionNode extends ExpressionNode {
     }
 }
 
-class Return_Int extends InfixExpressionNode{}
 class Return_Bool extends InfixExpressionNode{}
+class Return_Bool_Str extends InfixExpressionNode{}
+class Return_Int extends InfixExpressionNode{}
 
 class AddNode extends Return_Int {
 }
@@ -200,22 +201,22 @@ class LShNode extends Return_Int {
 class RShNode extends Return_Int {
 }
 
-class GreNode extends Return_Bool {
+class GreNode extends Return_Bool_Str {
 }
 
-class GAENode extends Return_Bool {
+class GAENode extends Return_Bool_Str {
 }
 
-class LesNode extends Return_Bool {
+class LesNode extends Return_Bool_Str {
 }
 
-class LAENode extends Return_Bool {
+class LAENode extends Return_Bool_Str {
 }
 
-class EquNode extends Return_Bool {
+class EquNode extends Return_Bool_Str {
 }
 
-class NEqNode extends Return_Bool {
+class NEqNode extends Return_Bool_Str {
 }
 
 class AAnNode extends Return_Int {
