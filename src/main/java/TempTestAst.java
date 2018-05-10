@@ -712,7 +712,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
         tmp.ID = (ExpressionNode) visit(ctx.idname);
         tmp.Index = (ExpressionNode) visit(ctx.index);
-        if (tmp.ID instanceof CreateNode){
+        if (tmp.ID instanceof CreateNode && !ctx.idname.getText().contains("(")){
             System.exit(1);
         }
         return tmp;
