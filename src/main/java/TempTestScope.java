@@ -662,8 +662,8 @@ public class TempTestScope {
 
         else if (u instanceof Return_Bool_Str){
             BoolType t = new BoolType();
-            Type t1 = dfs1(((Return_Bool) u).Left, v);
-            Type t2 = dfs1(((Return_Bool) u).Right, v);
+            Type t1 = dfs1(((Return_Bool_Str) u).Left, v);
+            Type t2 = dfs1(((Return_Bool_Str) u).Right, v);
             if (!t1.S.equals(t2.S) || t1.dim != t2.dim) {
                 System.err.println(u.Location.line+" "+u.Location.column+"different type can't be compared");
                 System.exit(1);
