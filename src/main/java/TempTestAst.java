@@ -734,8 +734,8 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         CreateNode tmp = new CreateNode();
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
         tmp.VarTYpe = ctx.vartype().getText();
-        tmp.dim = ctx.indexlist().size();
-        for (int i = 0; i < tmp.dim; ++i)
+        tmp.dim = ctx.indexlist().size()+ctx.indexem().size();
+        for (int i = 0; i < ctx.indexlist().size(); ++i)
             if (ctx.indexlist(i).expr() != null) tmp.Index.add((ExpressionNode) visit(ctx.indexlist(i).expr()));
         return tmp;
     }

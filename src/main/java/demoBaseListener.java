@@ -315,6 +315,18 @@ public class demoBaseListener implements demoListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIndexem(demoParser.IndexemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIndexem(demoParser.IndexemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterIndexlist(demoParser.IndexlistContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -51,9 +51,9 @@ exprlist:expr(','expr)*;
 
 methodcall:funcid'('exprlist?')';
 
-creator:vartype indexlist*;
-
-indexlist:'['expr?']';
+creator:vartype('('')')? indexlist* indexem*;
+indexem : ('['']');
+indexlist:'['expr']';
 
 expr:primary                                           #expr_prim
     |methodcall                                        #expr_meth

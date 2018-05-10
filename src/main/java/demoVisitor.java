@@ -176,6 +176,12 @@ public interface demoVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreator(demoParser.CreatorContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link demoParser#indexem}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIndexem(demoParser.IndexemContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link demoParser#indexlist}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

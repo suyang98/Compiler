@@ -191,6 +191,13 @@ public class demoBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements d
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitIndexem(demoParser.IndexemContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitIndexlist(demoParser.IndexlistContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

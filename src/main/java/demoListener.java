@@ -289,6 +289,16 @@ public interface demoListener extends ParseTreeListener {
 	 */
 	void exitCreator(demoParser.CreatorContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link demoParser#indexem}.
+	 * @param ctx the parse tree
+	 */
+	void enterIndexem(demoParser.IndexemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link demoParser#indexem}.
+	 * @param ctx the parse tree
+	 */
+	void exitIndexem(demoParser.IndexemContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link demoParser#indexlist}.
 	 * @param ctx the parse tree
 	 */

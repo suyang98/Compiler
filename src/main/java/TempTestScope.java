@@ -1,8 +1,5 @@
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 class VarTypeRef{
@@ -44,6 +41,9 @@ public class TempTestScope {
     int cntthen = 0;
     int cntelse = 0;
     int cnt = 0;
+
+    List<String> keyword = Arrays.asList("bool","int","string","null","void","true","false","if","for", "while","break","continue","return","new","class","this");
+
 
     TempTestScope(){
         Root.name =  "General";
@@ -261,8 +261,8 @@ public class TempTestScope {
 
         else if (u instanceof FuncDefNode){
             FuncScope tmp = new FuncScope();
-            if (((FuncDefNode) u).ID.equals("this")){
-                System.err.println(u.Location.line+" "+u.Location.column+" \"this\" is a reserved word");
+            if (keyword.contains(((FuncDefNode) u).ID)){
+                System.err.println(u.Location.line+" "+u.Location.column+" \""+((FuncDefNode) u).ID+"\" is a reserved word");
                 System.exit(1);
             }
             tmp.parent = v;
@@ -313,6 +313,11 @@ public class TempTestScope {
 
             if (!((GeneralScope)v).clas.isEmpty() && ((GeneralScope)v).clas.containsKey(tmp.name)) {
                 System.err.println(u.Location.line+" "+u.Location.column+" "+"Class "+v.name+" is redefined");
+                System.exit(1);
+            }
+
+            if (keyword.contains(((ClassDefNode) u).ID)|| ((ClassDefNode) u).ID.equals("main")){
+                System.err.println(u.Location.line+" "+u.Location.column+" \""+((ClassDefNode) u).ID+"\" is a reserved word");
                 System.exit(1);
             }
 
@@ -594,6 +599,7 @@ public class TempTestScope {
 
         else if (u instanceof StateNode && !(u instanceof ExpressionNode) && !(u instanceof JumpNode)) {
             VoidType t = new VoidType();
+            if (v == null) return t;
             LocalScope tmp = ((LocalScope) v).sons.get(((StateNode) u).name);
             for (int i = 0; i < u.size(); ++i) {
                 dfs1(u.sons(i), tmp);
