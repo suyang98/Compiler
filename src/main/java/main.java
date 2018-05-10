@@ -3,13 +3,14 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 
-public class main {
+public class main{
     public static void main(String[] args) throws Exception{
         InputStream is = new FileInputStream("program.txt");
         ANTLRInputStream input = new ANTLRInputStream(is);
         demoLexer lexer = new demoLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         demoParser parser = new demoParser(tokens);
+        parser.setErrorHandler(new BailErrorStrategy());
         ParseTree tree = parser.prog();
 
 //        System.out.println("LISP:");
