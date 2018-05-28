@@ -29,6 +29,17 @@ public class main{
         BuildScope.dfs(Root, BuildScope.Root);
 //        BuildScope.dfs2(BuildScope.Root);
         BuildScope.dfs1(Root, BuildScope.Root);
+        BuildScope.put_this();
+
+        ternary ir = new ternary();
+        ir.General = BuildScope.Root;
+        ir.dfs(Root, null);
+        ir.alloc(); //把tern都转好（待做）
+
+        mayfinal fin = new mayfinal();
+        fin.root = ir.root;
+        fin.transform();
+
     }
 }
 

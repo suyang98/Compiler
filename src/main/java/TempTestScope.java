@@ -3,10 +3,13 @@ import java.util.*;
 
 
 class VarTypeRef{
+    ParaNode u;
+    reg IR_name = new reg();
     int line, column;
     String Type;
-    int dim;
-    int IsNew = 1000;
+    int dim = 0;
+    List<ExpressionNode> index = new ArrayList<>();
+
 }
 class ParTypeRef extends VarTypeRef{
     String ID;
@@ -16,21 +19,23 @@ class ParTypeRef extends VarTypeRef{
 class Scope {
     Scope parent;
     String name;
-    Map<String, VarTypeRef> var = new HashMap<>();
+    String IR_name;
+    Map<String, VarTypeRef> var = new LinkedHashMap<>();
 }
 
 class ClassScope extends Scope{
-    Map<String, FuncScope> func = new HashMap<>();
+    Map<String, FuncScope> func = new LinkedHashMap<>();
 }
 class GeneralScope extends ClassScope{
-    Map<String, ClassScope> clas = new HashMap<>();
+    Map<String, ClassScope> clas = new LinkedHashMap<>();
 }
 class LocalScope extends Scope{
-    Map<String, LocalScope> sons = new HashMap<>();
+    Map<String, LocalScope> sons = new LinkedHashMap<>();
 }
 class FuncScope extends LocalScope{
     List<ParTypeRef> para = new ArrayList<>();
     String Return;
+    String Return_IR_name;
     int dim = 0;
 }
 
@@ -54,7 +59,6 @@ public class TempTestScope {
         VarTypeRef tmp1 = new VarTypeRef();
         ParTypeRef t1 = new ParTypeRef();
         tmp1.Type = t1.Type = "string";
-        tmp1.IsNew = t1.IsNew = 0;
         t1.ID = "S";
         Print.para.add(t1);
         Print.var.put("S", tmp1);
@@ -66,7 +70,6 @@ public class TempTestScope {
         VarTypeRef tmp2 = new VarTypeRef();
         ParTypeRef t2 = new ParTypeRef();
         tmp2.Type = t2.Type = "string";
-        tmp2.IsNew = t2.IsNew = 0;
         t2.ID = "S";
         Println.para.add(t2);
         Println.var.put("S", tmp2);
@@ -88,7 +91,6 @@ public class TempTestScope {
         VarTypeRef tmp3 = new VarTypeRef();
         ParTypeRef t3 = new ParTypeRef();
         tmp3.Type = t3.Type = "int";
-        tmp3.IsNew = t3.IsNew = 0;
         t3.ID = "i";
         Tostring.para.add(t3);
         Tostring.var.put("i", tmp3);
@@ -107,14 +109,12 @@ public class TempTestScope {
         VarTypeRef tmp4 = new VarTypeRef();
         ParTypeRef t4 = new ParTypeRef();
         tmp4.Type = t4.Type = "int";
-        tmp4.IsNew = t4.IsNew = 0;
         t4.ID = "left";
         Substring.para.add(t4);
         Substring.var.put("left", tmp4);
         VarTypeRef tmp5 = new VarTypeRef();
         ParTypeRef t5 = new ParTypeRef();
         tmp5.Type = t5.Type = "int";
-        tmp5.IsNew = t5.IsNew = 0;
         t5.ID = "right";
         Substring.para.add(t5);
         Substring.var.put("right", tmp5);
@@ -131,7 +131,6 @@ public class TempTestScope {
         VarTypeRef tmp6 = new VarTypeRef();
         ParTypeRef t6 = new ParTypeRef();
         tmp6.Type = t6.Type = "pos";
-        tmp6.IsNew = t6.IsNew = 0;
         Ord.para.add(t6);
         Ord.var.put("pos", tmp6);
         Str.func.put("ord", Ord);
@@ -140,6 +139,23 @@ public class TempTestScope {
 
 
 
+    }
+
+    public void put_this(){
+        for (Object obj: Root.clas.keySet()){
+            String key = (String) obj;
+            ClassScope tmp = Root.clas.get(key);
+            for (Object ob: tmp.func.keySet()){
+                FuncScope t = tmp.func.get(ob);
+                ParTypeRef tmp1 = new ParTypeRef();
+                VarTypeRef tmp2 = new VarTypeRef();
+                tmp1.ID = "this";
+                tmp1.Type = tmp2.Type = tmp.name;
+                tmp1.line = tmp1.column = tmp2.line = tmp2.column = 0;
+                t.var.put("this", tmp2);
+                t.para.add(tmp1);
+            }
+        }
     }
 
     public void dfs2(Scope v){
@@ -295,14 +311,11 @@ public class TempTestScope {
                 dfs(u.sons(i), tmp);
             }
             for (int i = 0; i < ((FuncDefNode)u).Body.size(); ++i){
-                if (i == 50)
-                    System.out.println("!");
                 dfs(((FuncDefNode) u).Body.sons(i), tmp);
             }
             for (Object obj:tmp.var.keySet()){
                 String key = (String)obj;
                 VarTypeRef t = tmp.var.get(key);
-                t.IsNew = 0;
             }
         }
 
@@ -359,14 +372,13 @@ public class TempTestScope {
             tmp.dim = ((ParaNode) u).dim;
             tmp.Type = ((ParaNode) u).Type;
             tmp.ID = ((ParaNode) u).ID;
-            tmp.IsNew = tmp.dim;
+            tmp.u = (ParaNode)u;
 
             if (!v.var.isEmpty() && v.var.containsKey(tmp.ID)){
                 System.err.println(tmp.line+" "+tmp.column+"Var "+tmp.ID+" is redefined");
                 System.exit(1);
             }
 
-            if (tmp.dim != 0 && ((ParaNode) u).InitE) tmp.IsNew--;
             v.var.put(tmp.ID, tmp);
         }
 
@@ -453,7 +465,7 @@ public class TempTestScope {
             NullType t = new NullType();
             return t;
         }
-
+        u.V = v;
         if (u instanceof ProgNode) {
             for (int i = 0; i < u.size(); ++i) {
                 dfs1(u.sons(i), v);
@@ -475,7 +487,7 @@ public class TempTestScope {
             for (int i = 0; i < ((FuncDefNode) u).Body.size(); ++i) {
                 dfs1(((FuncDefNode) u).Body.sons(i), tmp);
             }
-
+            u.V = tmp;
             return t;
         }
 
@@ -485,6 +497,7 @@ public class TempTestScope {
             for (int i = 0; i < ((ClassDefNode) u).State.size(); ++i) {
                 dfs1(((ClassDefNode) u).State.sons(i), tmp);
             }
+            u.V = tmp;
             return t;
         }
 
@@ -497,6 +510,7 @@ public class TempTestScope {
                     System.exit(1);
                 }
                 dfs1(u.sons(i), tmp);
+                u.V = tmp;
             }
             return t;
         }
@@ -806,8 +820,9 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+"This type is not defined");
                 System.exit(1);
             }
-            for (int i = 0; i < u.size(); ++i)
+            for (int i = 0; i < u.size(); ++i) {
                 dfs1(u.sons(i), v);
+            }
             t.dim = ((CreateNode) u).dim;
             return t;
         }
@@ -826,7 +841,7 @@ public class TempTestScope {
                     System.exit(1);
                 }
                 return t2 = new IntType();
-            }   //a.size()
+            }
 
 
             else {
@@ -865,6 +880,7 @@ public class TempTestScope {
                         System.exit(1);
                     }
 
+                    ((MethodNode) ((ClassNode) u).Varname).InClass = t1.S;
                     if (tt.Return.equals("int")) t2 = new IntType();
                     else if (tt.Return.equals("string")) t2 = new ClassType("string");
                     else if (tt.Return.equals("bool")) t2 = new BoolType();

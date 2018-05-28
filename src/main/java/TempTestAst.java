@@ -19,6 +19,7 @@ abstract class Node {
     abstract int size();
     abstract Node sons(int i);
     location Location;
+    Scope V;
     Node(){
         this.Location = new location();
     }
@@ -34,6 +35,9 @@ class ProgNode extends Node {
     int size(){
         return ClassList.size()+FuncList.size()+ParaList.size();
     }
+    int para_size(){
+        return ParaList.size();
+    }
     Node sons(int i){
         if (i >= 0 && i < FuncList.size()) return FuncList.get(i);
         else {
@@ -42,6 +46,7 @@ class ProgNode extends Node {
             else return ParaList.get(i - ClassList.size());
         }
     }
+
 
 }
 
@@ -135,6 +140,7 @@ class ParaNode extends StateNode {
     Node sons(int i){
         return Init;
     }
+
 }
 
 class ListParaNode extends StateNode {
@@ -152,6 +158,8 @@ class ListParaNode extends StateNode {
 
 
 abstract class ExpressionNode extends StateNode {
+    public Opcode op;
+    public boolean Is_Return = false;
 }
 
 class ListExpressionNode extends StateNode{
@@ -181,64 +189,120 @@ class Return_Bool_Str extends InfixExpressionNode{}
 class Return_Int extends InfixExpressionNode{}
 
 class AddNode extends Return_Int {
+    AddNode(){
+        op = Opcode.add;
+    }
 }
 
 class SubNode extends Return_Int {
+    SubNode(){
+        op = Opcode.sub;
+    }
 }
 
 class MulNode extends Return_Int {
+    MulNode() {
+        op = Opcode.imul;
+    }
 }
 
 class DivNode extends Return_Int {
+    DivNode() {
+        op = Opcode.div;
+    }
 }
 
 class ModNode extends Return_Int {
+    ModNode() {
+        op = Opcode.mod;
+    }
 }
 
 class LShNode extends Return_Int {
+    LShNode() {
+        op = Opcode.sal;
+    }
 }
 
 class RShNode extends Return_Int {
+    RShNode() {
+        op = Opcode.sar;
+    }
 }
 
 class GreNode extends Return_Bool_Str {
+    GreNode() {
+        op = Opcode.setg;
+    }
 }
 
 class GAENode extends Return_Bool_Str {
+    GAENode() {
+        op = Opcode.setge;
+    }
 }
 
 class LesNode extends Return_Bool_Str {
+    LesNode() {
+        op = Opcode.setl;
+    }
 }
 
 class LAENode extends Return_Bool_Str {
+    LAENode() {
+        op = Opcode.setle;
+    }
 }
 
 class EquNode extends Return_Bool_Str {
+    EquNode() {
+        op = Opcode.sete;
+    }
 }
 
 class NEqNode extends Return_Bool_Str {
+    NEqNode() {
+        op = Opcode.setne;
+    }
 }
 
 class AAnNode extends Return_Int {
+    AAnNode() {
+        op = Opcode.and;
+    }
 }
 
 class AXoNode extends Return_Int {
+    AXoNode() {
+        op = Opcode.xor;
+    }
 }
 
 class AOrNode extends Return_Int {
+    AOrNode() {
+        op = Opcode.or;
+    }
 }
 
 class LAnNode extends Return_Bool {
+    LAnNode() {
+        op = Opcode.and;
+    }
 }
 
 class LOrNode extends Return_Bool {
+    LOrNode() {
+        op = Opcode.or;
+    }
 }
 
 class AssignNode extends InfixExpressionNode{
+    AssignNode() {
+        op = Opcode.mov;
+    }
 }
 
-class PreNode extends ExpressionNode
-{
+class PreNode extends ExpressionNode {
     public ExpressionNode InnerNode;
     void print(){
         System.out.println(this.getClass());
@@ -252,22 +316,36 @@ class PreNode extends ExpressionNode
 }
 
 class PreIncNode extends PreNode { //++i
+    PreIncNode() {
+        op = Opcode.inc;
+    }
 }
 
 class PreDecNode extends PreNode {
+    PreDecNode() {
+        op = Opcode.dec;
+    }
 }
 
 class LNoNode extends PreNode {
+    LNoNode() {
+        op = Opcode.not;
+    }
 }
 
 class ANoNode extends PreNode {
+    ANoNode() {
+        op = Opcode.not;
+    }
 }
 
 class MinNode extends PreNode{
+    MinNode() {
+        op = Opcode.neg;
+    }
 }
 
-class PosNode extends ExpressionNode
-{
+class PosNode extends ExpressionNode {
     public ExpressionNode InnerNode;
     void print(){
         System.out.println(this.getClass());
@@ -281,9 +359,15 @@ class PosNode extends ExpressionNode
 }
 
 class PosIncNode extends PosNode { //i++
+    PosIncNode() {
+        op = Opcode.inc;
+    }
 }
 
 class PosDecNode extends PosNode {
+    PosDecNode() {
+        op = Opcode.dec;
+    }
 }
 
 class NumberNode extends ExpressionNode {
@@ -358,6 +442,7 @@ class CreateNode extends ExpressionNode {
     public String VarTYpe;
     public int dim;
     public List<ExpressionNode> Index = new ArrayList<ExpressionNode>();
+    public Node arr;
     void print(){
         System.out.println("Creator "+VarTYpe);
     }
@@ -385,6 +470,7 @@ class ClassNode extends ExpressionNode {
 }
 
 class MethodNode extends ExpressionNode {
+    public String InClass = null;
     public String FuncID;
     public ListExpressionNode Argument;
     void print(){
@@ -549,6 +635,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         else {
             tmp.InitE = true;
             tmp.Init = (ExpressionNode) visit(ctx.expr());
+            if (tmp.Init instanceof CreateNode) ((CreateNode) tmp.Init).arr = tmp;
         }
         return tmp;
     }
@@ -626,6 +713,15 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public ExpressionNode visitStat_expr(demoParser.Stat_exprContext ctx){
         ExpressionNode tmp = (ExpressionNode) visit(ctx.expr());
+        if (tmp instanceof AssignNode) ((AssignNode) tmp).Right.Is_Return = true;
+        else if (tmp instanceof InfixExpressionNode)  ((InfixExpressionNode) tmp).Right.Is_Return = ((InfixExpressionNode) tmp).Left.Is_Return = true;
+        else if (tmp instanceof PosNode) ((PosNode) tmp).InnerNode.Is_Return = true;
+        else if (tmp instanceof PreNode) ((PreNode) tmp).InnerNode.Is_Return = true;
+        else if (tmp instanceof ArrNode) ((ArrNode) tmp).Index.Is_Return = true;
+        else if (tmp instanceof CreateNode){
+            for (int i = 0; i < ((CreateNode) tmp).Index.size(); ++i)
+                ((CreateNode) tmp).Index.get(i).Is_Return = true;
+        }
         return tmp;
     }
 
@@ -747,7 +843,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public PosNode visitExpr_posd(demoParser.Expr_posdContext ctx){
         PosNode tmp = null;
-        if (ctx.postfix.getText() == "++") tmp = new PosIncNode();
+        if (ctx.postfix.getText().equals("++")) tmp = new PosIncNode();
         else tmp = new PosDecNode();
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
         tmp.InnerNode = (ExpressionNode) visit(ctx.expr());
@@ -852,6 +948,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         AssignNode tmp = new AssignNode();
         tmp.Left = (ExpressionNode) visit(ctx.left);
         tmp.Right = (ExpressionNode) visit(ctx.right);
+        if (tmp.Right instanceof CreateNode) ((CreateNode) tmp.Right).arr = tmp.Left;
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
         return tmp;
     }

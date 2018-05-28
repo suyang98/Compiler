@@ -51,6 +51,9 @@ exprlist:expr(','expr)*;
 
 methodcall:funcid'('exprlist?')';
 
+
+creator:vartype'('')'
+       |vartype
 creator:vartype('('')')? indexlist* indexem*;
 indexem : '['']';
 indexlist:'['expr']';
@@ -82,7 +85,6 @@ primary:NULL                                #primary_null
        |Bool                               #primary_bool
        |'('expr')'                          #primary_parens
        |varid                               #primary_var
-//       |exprbuilt                           #primary_built
 ;
 
 
