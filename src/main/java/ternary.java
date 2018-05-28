@@ -173,6 +173,7 @@ public class ternary {
 
     void alloc(){
         //printcontext();
+        System.out.println("\n");
         add_all();
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -368,9 +369,9 @@ public class ternary {
 
     tnode dfs(Node u, BasicBlock v){
         if (u == null) return null;
-        if (u instanceof StateNode && !label.empty()){
-            v = label.pop();
-        }
+//        if (u instanceof StateNode && !label.empty()){
+//            v = label.pop();
+//        }
 
         if (u instanceof ProgNode){
             for (int i = 0; i < ((ProgNode) u).para_size(); ++i){
@@ -398,8 +399,13 @@ public class ternary {
             else  tmp.FuncName = u.V.IR_name;
             root.Blocks.put(tmp.FuncName, tmp);
             tmp.name = tmp.FuncName;
+            v = tmp;
             for (int i = 0; i < ((ClassConstNode) u).Body.size(); ++i){
-                dfs(((FuncDefNode) u).Body.sons(i), tmp);
+                Node tt = ((ClassConstNode) u).Body.sons(i);
+                dfs(tt, v);
+                if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                    v = label.pop();
+                }
             }
             u.V.name = tmp.FuncName;
             return null;
@@ -422,8 +428,13 @@ public class ternary {
             else tmp.FuncName = u.V.IR_name;
             root.Blocks.put(tmp.FuncName, tmp);
             tmp.name = tmp.FuncName;
+            v = tmp;
             for (int i = 0; i < ((FuncDefNode)u).Body.size(); ++i){
-                dfs(((FuncDefNode) u).Body.sons(i), tmp);
+                Node tt = ((FuncDefNode) u).Body.sons(i);
+                dfs(tt, v);
+                if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                    v = label.pop();
+                }
             }
             if (((FuncDefNode)u).ID.equals("main")){
                 root.start = tmp;
@@ -679,8 +690,14 @@ public class ternary {
                 tt2.IR_name = tmp3.src1.contxt;
                 if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, btmp1);
                 else {
-                    for (int i = 0; i < ((ConditionNode) u).Then.size(); ++i)
-                        dfs(((ConditionNode) u).Then.sons(i), btmp1);
+                    BasicBlock ttt = btmp1;
+                    for (int i = 0; i < ((ConditionNode) u).Then.size(); ++i) {
+                        Node tt = ((ConditionNode) u).Then.sons(i);
+                        dfs(tt, ttt);
+                        if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                            ttt = label.pop();
+                        }
+                    }
                 }
                 Tern tmp4 = new Tern();
                 tmp4.op = Opcode.jmp;
@@ -689,8 +706,14 @@ public class ternary {
                 btmp1.content.add(tmp4);
                 if (((ConditionNode) u).Else.StateList.size() == 0) dfs(((ConditionNode) u).Else, btmp2);
                 else{
-                    for (int i = 0; i < ((ConditionNode) u).Else.size(); ++i)
-                        dfs(((ConditionNode) u).Else.sons(i), btmp2);
+                    BasicBlock ttt = btmp2;
+                    for (int i = 0; i < ((ConditionNode) u).Else.size(); ++i) {
+                        Node tt = ((ConditionNode) u).Else.sons(i);
+                        dfs(tt, ttt);
+                        if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                            ttt = label.pop();
+                        }
+                    }
                 }
                 label.push(btmp3);
                 return null;
@@ -720,8 +743,15 @@ public class ternary {
                 tmp3.src1.contxt = btmp3.name;
                 if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, btmp1);
                 else {
-                    for (int i = 0; i < ((ConditionNode) u).Then.size(); ++i)
-                        dfs(((ConditionNode) u).Then.sons(i), btmp1);
+                    BasicBlock ttt = btmp1;
+                    for (int i = 0; i < ((ConditionNode) u).Then.size(); ++i) {
+                        Node tt = ((ConditionNode) u).Then.sons(i);
+                        dfs(tt, ttt);
+                        if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                            ttt = label.pop();
+                        }
+                    }
+
                 }
                 label.push(btmp3);
                 return null;
@@ -751,8 +781,14 @@ public class ternary {
                 tt2.IR_name = ((reg) tmp3.src1).contxt;
                 if (((ConditionNode) u).Else.StateList.size() == 0) dfs(((ConditionNode) u).Else, btmp2);
                 else{
-                    for (int i = 0; i < ((ConditionNode) u).Else.size(); ++i)
-                        dfs(((ConditionNode) u).Else.sons(i), btmp2);
+                    BasicBlock ttt = btmp2;
+                    for (int i = 0; i < ((ConditionNode) u).Else.size(); ++i) {
+                        Node tt = ((ConditionNode) u).Else.sons(i);
+                        dfs(tt, ttt);
+                        if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                            ttt = label.pop();
+                        }
+                    }
                 }
                 label.push(btmp3);
                 return null;
@@ -842,8 +878,13 @@ public class ternary {
             t2.content.add(tt);
             if (((WhileNode) u).Block.StateList.size() == 0) dfs(((WhileNode) u).Block, t1);
             else {
-                for (int i = 0; i < ((WhileNode) u).Block.size(); ++i)
-                    dfs(((WhileNode) u).Block.sons(i), t1);
+                for (int i = 0; i < ((WhileNode) u).Block.size(); ++i) {
+                    Node temp = ((WhileNode) u).Block.sons(i);
+                    dfs(temp, t1);
+                    if (temp instanceof ForNode || temp instanceof WhileNode || temp instanceof ConditionNode){
+                        t1 = label.pop();
+                    }
+                }
             }
 
             Break.pop();
@@ -905,8 +946,13 @@ public class ternary {
             dfs(((ForNode) u).Expr3, t2);
             if (((ForNode) u).Block.StateList.size() == 0) dfs(((ForNode) u).Block, t1);
             else{
-                for (int i = 0; i < ((ForNode) u).Block.size(); ++i)
-                    dfs(((ForNode) u).Block.sons(i), t1);
+                for (int i = 0; i < ((ForNode) u).Block.size(); ++i) {
+                    Node tt = ((ForNode) u).Block.sons(i);
+                    dfs(tt, t1);
+                    if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
+                        t1 = label.pop();
+                    }
+                }
             }
 
             Break.pop();
