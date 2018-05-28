@@ -34,7 +34,7 @@ public class main{
         ternary ir = new ternary();
         ir.General = BuildScope.Root;
         ir.dfs(Root, null);
-        ir.alloc(); //把tern都转好（待做）
+        ir.alloc();
 
         mayfinal fin = new mayfinal();
         fin.root = ir.root;
