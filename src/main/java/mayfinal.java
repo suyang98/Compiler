@@ -1,6 +1,19 @@
 public class mayfinal {
     IR root;
     void transform(){
+        for (Object obj : root.Blocks.keySet())
+            System.out.println("global\t" + obj);
+        for (int i = 0; i < root.gen_var.content.size(); ++i)
+            System.out.println("global\t" + root.gen_var.content.get(i).src1.contxt);
+
+        System.out.println("extern\tputs");
+
+
+        System.out.println("section .data");
+
+
+        System.out.println("section .text");
+
         for (Object key: root.Blocks.keySet()){
             FuncBlock ftmp = root.Blocks.get(key);
             int tmp = 8;
@@ -10,19 +23,7 @@ public class mayfinal {
                 tmp = tmp + 8;
             }
 
-            System.out.println("\n");
-            for (Object obj : root.Blocks.keySet())
-                System.out.println("global\t" + obj);
-            for (int i = 0; i < root.gen_var.content.size(); ++i)
-                System.out.println("global\t" + root.gen_var.content.get(i).src1.contxt);
 
-            System.out.println("extern\tputs");
-
-
-            System.out.println("section .data");
-
-
-            System.out.println("section .text");
 
             print_dfs(ftmp, ftmp);
 

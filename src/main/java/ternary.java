@@ -466,8 +466,8 @@ public class ternary {
         else if (u instanceof GreNode){
             Tern tmp = new Tern();
             tmp.op = Opcode.cmp;
-            tmp.src1 = dfs(((EquNode) u).Left, v);
-            tmp.src2 = dfs(((EquNode) u).Right, v);
+            tmp.src1 = dfs(((GreNode) u).Left, v);
+            tmp.src2 = dfs(((GreNode) u).Right, v);
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setg;
             tmp2.src1 = new reg();
@@ -486,8 +486,8 @@ public class ternary {
         else if (u instanceof GAENode){
             Tern tmp = new Tern();
             tmp.op = Opcode.cmp;
-            tmp.src1 = dfs(((EquNode) u).Left, v);
-            tmp.src2 = dfs(((EquNode) u).Right, v);
+            tmp.src1 = dfs(((GAENode) u).Left, v);
+            tmp.src2 = dfs(((GAENode) u).Right, v);
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setge;
             tmp2.src1 = new reg();
@@ -506,8 +506,8 @@ public class ternary {
         else if (u instanceof LesNode){
             Tern tmp = new Tern();
             tmp.op = Opcode.cmp;
-            tmp.src1 = dfs(((EquNode) u).Left, v);
-            tmp.src2 = dfs(((EquNode) u).Right, v);
+            tmp.src1 = dfs(((LesNode) u).Left, v);
+            tmp.src2 = dfs(((LesNode) u).Right, v);
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setl;
             tmp2.src1 = new reg();
@@ -526,8 +526,8 @@ public class ternary {
         else if (u instanceof LAENode){
             Tern tmp = new Tern();
             tmp.op = Opcode.cmp;
-            tmp.src1 = dfs(((EquNode) u).Left, v);
-            tmp.src2 = dfs(((EquNode) u).Right, v);
+            tmp.src1 = dfs(((LAENode) u).Left, v);
+            tmp.src2 = dfs(((LAENode) u).Right, v);
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setle;
             tmp2.src1 = new reg();
@@ -567,8 +567,8 @@ public class ternary {
         else if (u instanceof NEqNode){
             Tern tmp = new Tern();
             tmp.op = Opcode.cmp;
-            tmp.src1 = dfs(((EquNode) u).Left, v);
-            tmp.src2 = dfs(((EquNode) u).Right, v);
+            tmp.src1 = dfs(((NEqNode) u).Left, v);
+            tmp.src2 = dfs(((NEqNode) u).Right, v);
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setne;
             tmp2.src1 = new reg();
@@ -715,7 +715,7 @@ public class ternary {
                 tmp2.src1 = new labn();
                 tmp2.src1.contxt = btmp1.name;
                 LocalScope tt1 = ((LocalScope)u.V).sons.get(((ConditionNode) u).Then.name);
-                tt1.IR_name = ((reg) tmp2.src1).contxt;
+                tt1.IR_name = tmp2.src1.contxt;
                 tmp3.src1 = new labn();
                 tmp3.src1.contxt = btmp3.name;
                 if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, btmp1);
@@ -828,7 +828,8 @@ public class ternary {
             Break.push(tmp3);
             Tern t = new Tern();
             t.op = Opcode.jmp;
-            ((reg)t.src1).contxt = tmp2;
+            t.src1 = new labn();
+            t.src1.contxt = tmp2;
             v.content.add(t);
             Tern ttt = new Tern();
             ttt.op = Opcode.test;
@@ -836,7 +837,8 @@ public class ternary {
             t2.content.add(ttt);
             Tern tt = new Tern();
             tt.op = Opcode.jnz;
-            ((reg)tt.src1).contxt = tmp1;
+            tt.src1 = new labn();
+            tt.src1.contxt = tmp1;
             t2.content.add(tt);
             if (((WhileNode) u).Block.StateList.size() == 0) dfs(((WhileNode) u).Block, t1);
             else {
@@ -891,8 +893,8 @@ public class ternary {
                 ttt.src1 = ttt.src2 = dfs(((ForNode) u).Expr2, t3);
                 t3.content.add(ttt);
                 tt2.op = Opcode.jnz;
-                tt2.src1 = new reg();
-                ((reg)tt2.src1).contxt = tmp1;
+                tt2.src1 = new labn();
+                tt2.src1.contxt = tmp1;
                 t3.content.add(tt2);
             }
             else {
@@ -1055,11 +1057,11 @@ public class ternary {
                             Tern tmp = new Tern();
                             if (i < 6) {
                                 tmp.op = Opcode.mov;
-                                tmp.src1 = dfs(((MethodNode) u).Argument.sons(i), v);
-                                tmp.src2 = new reg();
-                                ((reg) tmp.src2).contxt = r.param(i);
-                                ((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src2;
-                                stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src2;
+                                tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                                tmp.src1 = new reg();
+                                ((reg) tmp.src1).contxt = r.param(i);
+                                ((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
+                                stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
                                 cnt++;
                             } else {
                                 tmp.op = Opcode.push;
@@ -1074,11 +1076,11 @@ public class ternary {
                             Tern tmp = new Tern();
                             if (i < 6) {
                                 tmp.op = Opcode.mov;
-                                tmp.src1 = dfs(((MethodNode) u).Argument.sons(i), v);
-                                tmp.src2 = new reg();
-                                ((reg) tmp.src2).contxt = r.param(i);
-                                ((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src2;
-                                stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src2;
+                                tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                                tmp.src1 = new reg();
+                                ((reg) tmp.src1).contxt = r.param(i);
+                                ((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
+                                stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
                                 cnt++;
                             } else {
                                 tmp.op = Opcode.push;
@@ -1099,8 +1101,8 @@ public class ternary {
                         for (int i = 0; i < ((MethodNode) u).Argument.size(); ++i) {
                             Tern tmp = new Tern();
                             tmp.op = Opcode.mov;
-                            tmp.src1 = dfs(((MethodNode) u).Argument.sons(i), v);
-                            tmp.src2 = ((FuncScope) stmp).para.get(i).IR_name;
+                            tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                            tmp.src1 = ((FuncScope) stmp).para.get(i).IR_name;
                             v.content.add(tmp);
                         }
                     }
@@ -1108,8 +1110,8 @@ public class ternary {
                         for (int i = 0; i < ((MethodNode) u).Argument.size()-1; ++i) {
                             Tern tmp = new Tern();
                             tmp.op = Opcode.mov;
-                            tmp.src1 = dfs(((MethodNode) u).Argument.sons(i), v);
-                            tmp.src2 = ((FuncScope) stmp).para.get(i).IR_name;
+                            tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                            tmp.src1 = ((FuncScope) stmp).para.get(i).IR_name;
                             v.content.add(tmp);
                         }
                     }
