@@ -231,9 +231,7 @@ class RShNode extends Return_Int {
 }
 
 class GreNode extends Return_Bool_Str {
-    GreNode() {
-        op = Opcode.setg;
-    }
+    GreNode() { op = Opcode.setg; }
 }
 
 class GAENode extends Return_Bool_Str {

@@ -258,7 +258,7 @@ public class ternary {
                 || u.op == Opcode.and || u.op == Opcode.or || u.op == Opcode.xor) {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
             if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.use.add((reg) u.src2);
-            if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.def.add((reg) u.src2);
+            if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.def.add((reg) u.src1);
         }
         if (u.op == Opcode.malloc){
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
@@ -593,19 +593,25 @@ public class ternary {
                 v.content.add(tmp);
             }
             else {
+                if (tmp.src1 instanceof imm){
+                    tnode t = tmp.src1;
+                    tmp.src1 = tmp.src2;
+                    tmp.src2 = t;
+                }
                 Tern tmp0 = new Tern();
                 tmp0.op = Opcode.mov;
-                tmp0.src1 = tmp.src2;
-                tmp0.src2 = new reg();
-                ((reg) tmp0.src2).contxt = "%v" + String.valueOf(cnt);
+                tmp0.src2 = tmp.src2;
+                tmp0.src1 = new reg();
+                ((reg) tmp0.src1).contxt = "%v" + String.valueOf(cnt);
                 cnt++;
                 tmp.op = ((InfixExpressionNode) u).op;
-                tmp.src2 = tmp0.src2;
+                tmp.src2 = tmp.src1;
+                tmp.src1 = tmp0.src1;
                 v.content.add(tmp0);
                 v.content.add(tmp);
             }
             if (flag) {v.content.add(flag_tern); flag_tern = null; flag = false;}
-            return tmp.src2;
+            return tmp.src1;
         }
 
         else if (u instanceof PosNode){
@@ -644,9 +650,9 @@ public class ternary {
 
             if (((ConditionNode) u).Then != null && ((ConditionNode) u).Else != null) {
                 Tern tmp2 = new Tern();
-                tmp2.op = Opcode.jz;
+                tmp2.op = Opcode.jnz;
                 Tern tmp3 = new Tern();
-                tmp3.op = Opcode.jnz;
+                tmp3.op = Opcode.jz;
                 v.content.add(tmp2);
                 v.content.add(tmp3);
                 BasicBlock btmp1 = new BasicBlock();
@@ -691,9 +697,9 @@ public class ternary {
             }
             else if (((ConditionNode) u).Then != null && ((ConditionNode) u).Else == null){
                 Tern tmp2 = new Tern();
-                tmp2.op = Opcode.jz;
+                tmp2.op = Opcode.jnz;
                 Tern tmp3 = new Tern();
-                tmp3.op = Opcode.jnz;
+                tmp3.op = Opcode.jz;
                 v.content.add(tmp2);
                 v.content.add(tmp3);
                 BasicBlock btmp1 = new BasicBlock();
@@ -722,9 +728,9 @@ public class ternary {
             }
             else {
                 Tern tmp2 = new Tern();
-                tmp2.op = Opcode.jz;
+                tmp2.op = Opcode.jnz;
                 Tern tmp3 = new Tern();
-                tmp3.op = Opcode.jnz;
+                tmp3.op = Opcode.jz;
                 v.content.add(tmp2);
                 v.content.add(tmp3);
                 BasicBlock btmp2 = new BasicBlock();
@@ -829,7 +835,7 @@ public class ternary {
             ttt.src1 = ttt.src2 = dfs(((WhileNode) u).Condition, t2);
             t2.content.add(ttt);
             Tern tt = new Tern();
-            tt.op = Opcode.jz;
+            tt.op = Opcode.jnz;
             ((reg)tt.src1).contxt = tmp1;
             t2.content.add(tt);
             if (((WhileNode) u).Block.StateList.size() == 0) dfs(((WhileNode) u).Block, t1);
@@ -884,7 +890,7 @@ public class ternary {
                 ttt.op = Opcode.test;
                 ttt.src1 = ttt.src2 = dfs(((ForNode) u).Expr2, t3);
                 t3.content.add(ttt);
-                tt2.op = Opcode.jz;
+                tt2.op = Opcode.jnz;
                 tt2.src1 = new reg();
                 ((reg)tt2.src1).contxt = tmp1;
                 t3.content.add(tt2);
@@ -928,7 +934,7 @@ public class ternary {
                 tmp1.op = Opcode.mov;
                 tmp1.src2 = dfs(((JumpNode) u).Return, v);
                 tmp1.src1 = new reg();
-                ((reg)tmp1.src1).contxt = "rax";//((FuncScope)u.V).Return_IR_name;
+                ((reg)tmp1.src1).contxt = "rax";//init may not defined ((FuncScope)u.V).Return_IR_name;
                 v.content.add(tmp1);
                 Tern tmp3 = new Tern();
                 tmp3.op = Opcode.leave;
