@@ -928,7 +928,7 @@ public class ternary {
                 tmp1.op = Opcode.mov;
                 tmp1.src2 = dfs(((JumpNode) u).Return, v);
                 tmp1.src1 = new reg();
-                ((reg)tmp1.src1).contxt = "rax";//到时候注意初值可能没赋((FuncScope)u.V).Return_IR_name;
+                ((reg)tmp1.src1).contxt = "rax";//((FuncScope)u.V).Return_IR_name;
                 v.content.add(tmp1);
                 Tern tmp3 = new Tern();
                 tmp3.op = Opcode.leave;
