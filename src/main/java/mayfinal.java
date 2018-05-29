@@ -3,14 +3,15 @@ public class mayfinal {
     void transform(){
         for (Object obj : root.Blocks.keySet())
             System.out.println("global\t" + obj);
-        for (int i = 0; i < root.gen_var.content.size(); ++i)
-            System.out.println("global\t" + root.gen_var.content.get(i).src1.contxt);
+        for (int i = 0; i < root.GV.size(); ++i)
+            System.out.println("global\t" + root.GV.get(i));
 
         System.out.println("extern\tputs");
 
 
         System.out.println("section .data");
-
+        for (int i = 0; i < root.GV.size(); ++i)
+            System.out.println(root.GV.get(i)+":\tdq\t0");
 
         System.out.println("section .text");
 
@@ -19,8 +20,10 @@ public class mayfinal {
             int tmp = 8;
             for (Object obj:ftmp.var.keySet()){
                 reg t = ftmp.var.get(obj);
-                t.memory = "rbp-"+String.valueOf(tmp);
-                tmp = tmp + 8;
+                if (t.memory == null) {
+                    t.memory = "rbp-" + String.valueOf(tmp);
+                    tmp = tmp + 8;
+                }
             }
 
 
@@ -37,6 +40,10 @@ public class mayfinal {
             System.out.print("\tpush\trbp\n");
             System.out.print("\tmov\trbp, rsp\n");
             System.out.print("\tsub\trsp, " + f.var_num*8+"\n");
+        }
+        if (tmp.name.equals("main")){
+            for (int i = 0; i < root.gen_var.content.size(); ++i)
+                root.gen_var.content.get(i).print(root.gen_var);
         }
         for (int i = 0; i < tmp.content.size(); ++i)
             tmp.content.get(i).print(f);
