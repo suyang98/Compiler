@@ -1,4 +1,4 @@
-import java.security.Key;
+
 import java.util.*;
 
 
@@ -8,6 +8,7 @@ class VarTypeRef{
     int line, column;
     String Type;
     int dim = 0;
+    int num;
     List<ExpressionNode> index = new ArrayList<>();
 
 }
@@ -338,6 +339,9 @@ public class TempTestScope {
             for (int i = 0; i < ((ClassDefNode) u).State.size(); ++i) {
                 dfs(((ClassDefNode) u).State.sons(i), tmp);
             }
+            for (int i = 0; i < ((ClassDefNode) u).State.ParaList.size(); ++i)
+                tmp.var.get(((ClassDefNode) u).State.ParaList.get(i).ID).num = i;
+
         }
 
         else if (u instanceof ClassConstNode){

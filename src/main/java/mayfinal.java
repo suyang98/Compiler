@@ -7,7 +7,7 @@ public class mayfinal {
             System.out.println("global\t" + root.GV.get(i));
 
         System.out.println("extern\tputs");
-
+        System.out.println("extern\tmalloc");
 
         System.out.println("section .data");
         for (int i = 0; i < root.GV.size(); ++i)

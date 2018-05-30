@@ -607,6 +607,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         else {
             tmp.InitE = true;
             tmp.Init = (ExpressionNode) visit(ctx.expr());
+            if (tmp.Init instanceof CreateNode) ((CreateNode) tmp.Init).arr = tmp;
         }
         return tmp;
     }
