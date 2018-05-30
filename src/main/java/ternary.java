@@ -1,8 +1,8 @@
 import java.util.*;
 
 enum Opcode {
-    malloc, mov, add, sub, imul, div, mod, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
-    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, mov_add, push, pop, leave, test
+    malloc, mov, add, sub, imul, idiv, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
+    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, mov_add, push, pop, leave, test, cdq
 }
 
 
@@ -642,7 +642,41 @@ public class ternary {
                 tmp.op = ((InfixExpressionNode) u).op;
                 v.content.add(tmp);
             }
-            else {
+            else if (u instanceof DivNode) {
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.mov;
+                tmp1.src1 = new reg();
+                tmp1.src1.contxt = "rax";
+                tmp1.src2 = tmp.src1;
+                v.content.add(tmp1);
+                Tern tmp2 = new Tern();
+                tmp2.op = Opcode.cdq;
+                v.content.add(tmp2);
+                tmp.op = Opcode.idiv;
+                tmp.src1 = tmp.src2;
+                tmp.src2 = null;
+                v.content.add(tmp);
+                return tmp1.src1;
+            }
+            else if (u instanceof ModNode) {
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.mov;
+                tmp1.src1 = new reg();
+                tmp1.src1.contxt = "rax";
+                tmp1.src2 = tmp.src1;
+                v.content.add(tmp1);
+                Tern tmp2 = new Tern();
+                tmp2.op = Opcode.cdq;
+                v.content.add(tmp2);
+                tmp.op = Opcode.idiv;
+                tmp.src1 = tmp.src2;
+                tmp.src2 = null;
+                v.content.add(tmp);
+                reg t = new reg();
+                t.contxt = "rdx";
+                return t;
+            }
+            else{
                 if (tmp.src1 instanceof imm){
                     tnode t = tmp.src1;
                     tmp.src1 = tmp.src2;

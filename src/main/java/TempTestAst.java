@@ -208,13 +208,13 @@ class MulNode extends Return_Int {
 
 class DivNode extends Return_Int {
     DivNode() {
-        op = Opcode.div;
+        op = Opcode.idiv;
     }
 }
 
 class ModNode extends Return_Int {
     ModNode() {
-        op = Opcode.mod;
+        op = Opcode.idiv;
     }
 }
 
