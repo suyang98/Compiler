@@ -85,7 +85,7 @@ class Tern {
         if (op == Opcode.store){
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
                 ((reg)src2).reg = "rcx";
-                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src2.contxt).memory + "]");
+                System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + f.var.get(src2.contxt).memory + "]");
             }
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
                 System.out.println("\tmov\trax,["+f.var.get(src1.contxt).memory+"]");
@@ -225,7 +225,7 @@ public class ternary {
 
     void alloc(){
         //printcontext();
-        System.out.println("\n");
+        //System.out.println("\n");
         add_all();
         for (int i = 0; i < root.gen_var.content.size(); ++i)
             use_def(root.gen_var.content.get(i), root.gen_var);
@@ -303,7 +303,7 @@ public class ternary {
     void use_def(Tern u, FuncBlock f){
         if (u.src1 != null && u.src1 instanceof reg && (u.src1.contxt.indexOf("%") != -1)) f.var.put(u.src1.contxt, (reg)u.src1);
         if (u.src2 != null && u.src2 instanceof reg && (u.src2.contxt.indexOf("%") != -1)) f.var.put(u.src2.contxt, (reg)u.src2);
-        if (u.op == Opcode.mov || u.op == Opcode.store || u.op == Opcode.load) {
+        if (u.op == Opcode.mov || u.op == Opcode.movzx || u.op == Opcode.store || u.op == Opcode.load) {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.def.add((reg) u.src1);
             if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.use.add((reg) u.src2);
         }
@@ -625,7 +625,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -645,7 +645,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -665,7 +665,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -685,7 +685,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -706,7 +706,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -726,7 +726,7 @@ public class ternary {
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.movzx;
             tmp3.src1 = new reg();
-            tmp3.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
             tmp3.src2 = tmp2.src1;
             v.content.add(tmp);
             v.content.add(tmp2);
@@ -744,8 +744,6 @@ public class ternary {
                     if ((((AssignNode) u).Left instanceof ArrNode) ||
                             ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
                         //arr_arr
-
-
 //                        Tern tmp1 = new Tern();
 //                        tmp1.op = Opcode.load;
 //                        tmp1.src1 = new reg();
@@ -1243,7 +1241,7 @@ public class ternary {
             v.content.add(tmp);
             Tern tmp0 = new Tern();
             tmp0.op = Opcode.add;
-            tmp0.src1 = tmp.src2;
+            tmp0.src1 = tmp.src1;
             tmp0.src2 = dfs(((ArrNode) u).Index,v);
             v.content.add(tmp0);
             Tern tmp1 = new Tern();
