@@ -1,8 +1,8 @@
 import java.util.*;
 
 enum Opcode {
-    malloc, mov, add, sub, imul, idiv, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
-    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, mov_add, push, pop, leave, test, cdq
+    mov, add, sub, imul, idiv, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
+    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, load, store, push, pop, leave, test, cdq
 }
 
 
@@ -82,55 +82,73 @@ class Tern {
     Map<String, reg> in = new HashMap<>();
     Map<String, reg> out = new HashMap<>();
     void print(FuncBlock f){
-        if (des != null) {
-        //mov_add
-            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {((reg)src1).reg = "rax";}
-            if (des instanceof reg && des.contxt.indexOf("%") != -1) {((reg)des).reg = "rcx";}
-            if (((reg)src1).Is_Point) System.out.println("\tmov\t[" + ((reg)src1).reg + "],[" + f.var.get(src1.contxt).memory + "]");
-            else System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
-
-            System.out.println("\tmov\t" + ((reg)des).reg + ",[" + ((reg) src1).reg +"+"+ src2.contxt+"]");
-
-            if (((reg)des).Is_Point) {
-                System.out.println("\tlea\trbx,["+f.var.get(des.contxt).memory+"]");
-                System.out.println("\tmov\t[rbx],"+((reg)des).reg);
+        if (op == Opcode.store){
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                ((reg)src2).reg = "rcx";
+                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src2.contxt).memory + "]");
             }
-            else System.out.println("\tmov\t[" + f.var.get(des.contxt).memory +"]," + ((reg)des).reg);
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                System.out.println("\tmov\trax,["+f.var.get(src1.contxt).memory+"]");
+            }
+
+            System.out.print("\tmov\t");
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.print("qword[rax],");((reg)src1).reg = "rax";}
+            else {System.out.print("qword["+src1.contxt +"],"); }
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {System.out.println("rcx");}
+            else System.out.println(src2.contxt);
+
         }
+        else if (op == Opcode.load){
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                System.out.println("\tmov\trcx,["+f.var.get(src2.contxt).memory + "]");
+            }
+
+            System.out.print("\tmov\t");
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.print("rax,");((reg)src1).reg = "rax";}
+            else {System.out.print(""+src1.contxt +","); }
+
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {System.out.println("[rcx]");((reg)src2).reg = "rcx";}
+            else System.out.println("[" + src2.contxt + "]");
+
+            for (int i = 0; i < def.size(); ++i){
+                reg tmp = f.var.get(def.get(i).contxt);
+                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                else {
+                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                }
+            }
+        }
+
         else if (src2 != null) {
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rcx";
             for (int i = 0; i < use.size(); ++i){
                 reg tmp = f.var.get(use.get(i).contxt);
                 if (use.get(i).contxt.equals(src1.contxt)) {
-                    if (((reg)src1).Is_Point) System.out.println("\tmov\t[" + ((reg)src1).reg + "],[" + tmp.memory + "]");
-                    else System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
+                    System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
                 }
                 else {
-                    if (((reg)src2).Is_Point) System.out.println("\tmov\t[" + ((reg)src2).reg + "],[" + tmp.memory + "]");
-                    else System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
+                    System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
                 }
             }
-            System.out.print("\t"+op +"\t");
-            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.print("rax,");((reg)src1).reg = "rax";}
-            else {System.out.print(src1.contxt +","); }
-            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {System.out.println("rcx");((reg)src2).reg = "rcx";}
-            else System.out.println(src2.contxt);
+            {
+                System.out.print("\t" + op + "\t");
+                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                    System.out.print("rax,");
+                    ((reg) src1).reg = "rax";
+                } else System.out.print("" + src1.contxt + ",");
+
+                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                    System.out.println("rcx");
+                    ((reg) src2).reg = "rcx";
+                } else System.out.println(src2.contxt);
+            }
+
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                if (def.get(i).contxt.equals(src1.contxt)) {
-                    if (((reg)src1).Is_Point){
-                        System.out.println("\tlea\trbx,["+tmp.memory+"]");
-                        System.out.println("\tmov\t[rbx],"+((reg)src1).reg);
-                    }
-                    else System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
-                }
+                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
                 else {
-                    if (((reg)src2).Is_Point){
-                        System.out.println("\tlea\trbx,["+ tmp.memory+"]");
-                        System.out.println("\tmov\t[rbx],"+((reg)src2).reg);
-                    }
-                    else System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src2).reg);
+                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
                 }
             }
 
@@ -139,19 +157,14 @@ class Tern {
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             for (int i = 0; i < use.size(); ++i){
                 reg tmp = f.var.get(use.get(i).contxt);
-                if (((reg)src1).Is_Point) System.out.println("\tmov\t[" + ((reg)src1).reg + "],[" + tmp.memory + "]");
-                else System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
+                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
             }
             System.out.print("\t"+op +"\t");
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.println("rax");((reg)src1).reg = "rax";}
             else {System.out.println(src1.contxt); }
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                if (((reg)src1).Is_Point){
-                    System.out.println("\tlea\trbx,["+tmp.memory+"]");
-                    System.out.println("\tmov\t[rbx],"+((reg)src1).reg);
-                }
-                else System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
             }
         }
         else System.out.println("\t" + op);
@@ -177,10 +190,6 @@ class strn extends tnode{
 
 class labn extends tnode{}
 
-class mem extends tnode{
-    reg r;
-}
-
 public class ternary {
     IR root = new IR();
     int cnt = 0;
@@ -192,6 +201,7 @@ public class ternary {
     Stack<String> Break = new Stack<>();
     GeneralScope General;
     Register r;
+    BasicBlock Arr;
 
     reg find_var(String ID, Scope v){
         reg tmp = null;
@@ -214,7 +224,7 @@ public class ternary {
     }
 
     void alloc(){
-        printcontext();
+        //printcontext();
         System.out.println("\n");
         add_all();
         for (int i = 0; i < root.gen_var.content.size(); ++i)
@@ -293,12 +303,7 @@ public class ternary {
     void use_def(Tern u, FuncBlock f){
         if (u.src1 != null && u.src1 instanceof reg && (u.src1.contxt.indexOf("%") != -1)) f.var.put(u.src1.contxt, (reg)u.src1);
         if (u.src2 != null && u.src2 instanceof reg && (u.src2.contxt.indexOf("%") != -1)) f.var.put(u.src2.contxt, (reg)u.src2);
-        if (u.op == Opcode.mov_add) {
-            if (u.des instanceof reg && u.des.contxt.indexOf("%") != -1) u.def.add((reg) u.des);
-            if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
-            if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.use.add((reg) u.src2);
-        }
-        if (u.op == Opcode.mov) {
+        if (u.op == Opcode.mov || u.op == Opcode.store || u.op == Opcode.load) {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.def.add((reg) u.src1);
             if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.use.add((reg) u.src2);
         }
@@ -371,34 +376,120 @@ public class ternary {
     }
 
     tnode define_arr(CreateNode u, BasicBlock v, int i){
-//        Tern tmp1 = new Tern();
-//        tmp1.op = Opcode.add;
-//        tmp1.src1 = dfs(u.Index.get(i), v);
-//        tmp1.src2 = new imm();
-//        tmp1.src2.contxt = "1";
-//        v.content.add(tmp1);
-//        Tern tmp4 = new Tern();
-//        tmp4.op = Opcode.imul;
-//        tmp4.src1 = tmp1.src1;
-//        tmp4.src2 = new imm();
-//        tmp4.src2.contxt = "8";
-//        v.content.add(tmp4);
-//        Tern tmp2 = new Tern();
-//        tmp2.op = Opcode.mov;
-//        tmp2.src1 = new reg();
-//        tmp2.src1.contxt = "rdi";
-//        tmp2.src2 = tmp1.src1;
-//        v.content.add(tmp2);
-//        Tern tmp3 = new Tern();
-//        tmp3.op = Opcode.call;
-//        tmp3.src1 = new reg();
-//        tmp3.src1.contxt = "malloc";
-//        Tern tmp5 = new Tern();
-//        tmp5.op = Opcode.lea;
-//        tmp5.src1 =
-//        tmp5.src2 = tmp1.src1;
-//        if (i+1 < u.Index.size()) define_arr(u, , i+1);
-        return null;
+        Tern tmp0 = new Tern();
+        tmp0.op = Opcode.mov;
+        tmp0.src2 = dfs(u.Index.get(i), v);
+        tmp0.src1 = new reg();
+        tmp0.src1.contxt = "%v" + String.valueOf(cnt++);
+        v.content.add(tmp0);
+        Tern tmp1 = new Tern();
+        tmp1.op = Opcode.add;
+        tmp1.src1 = tmp0.src1;
+        tmp1.src2 = new imm();
+        tmp1.src2.contxt = "1";
+        v.content.add(tmp1);
+        Tern tmp2 = new Tern();
+        tmp2.op = Opcode.imul;
+        tmp2.src1 = tmp1.src1;
+        tmp2.src2 = new imm();
+        tmp2.src2.contxt = "8";
+        v.content.add(tmp2);
+        Tern tmp3 = new Tern();
+        tmp3.op = Opcode.mov;
+        tmp3.src1 = new reg();
+        tmp3.src1.contxt = "rdi";
+        tmp3.src2 = tmp2.src1;
+        v.content.add(tmp3);
+        Tern tmp4 = new Tern();
+        tmp4.op = Opcode.call;
+        tmp4.src1 = new reg();
+        tmp4.src1.contxt = "malloc";
+        v.content.add(tmp4);
+
+        Tern tmp5 = new Tern();
+        tmp5.op = Opcode.store;
+        tmp5.src1 = new reg();
+        tmp5.src1.contxt = "rax";
+        tmp5.src2 = tmp0.src2;
+        v.content.add(tmp5);
+
+        Tern tmp6 = new Tern();
+        tmp6.op = Opcode.mov;
+        tmp6.src1 = new reg();
+        tmp6.src1.contxt = "%v" + String.valueOf(cnt++);
+        tmp6.src2 = new reg();
+        tmp6.src2.contxt = "rax";
+        v.content.add(tmp6);
+        Tern t = new Tern();
+        t.op = Opcode.add;
+        t.src1 = tmp6.src1;
+        t.src2 = new imm();
+        t.src2.contxt = "8";
+        v.content.add(t);
+
+        if (i+1 < u.Index.size()){
+            Tern tmp = new Tern();
+            tmp.op = Opcode.mov;
+            tmp.src1 = new reg();
+            tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+            tmp.src2 = tmp6.src1;
+            v.content.add(tmp);
+            Tern tmp7 = new Tern();
+            tmp7.op = Opcode.mov;
+            tmp7.src1 = new reg();
+            tmp7.src1.contxt = "%v" + String.valueOf(cnt++);
+            tmp7.src2 = new imm();
+            tmp7.src2.contxt = "0";
+            v.content.add(tmp7);
+            BasicBlock t1 = new BasicBlock();
+            t1.name = "for" + String.valueOf(bcnt++);
+            BasicBlock t2 = new BasicBlock();
+            t2.name = "L" + String.valueOf(bcnt++);
+            v.Next = t1;
+            t1.Next = t2;
+            Tern tmp8 = new Tern();
+            tmp8.op = Opcode.add;
+            tmp8.src1 = tmp.src1;
+            tmp8.src2 = new imm();
+            tmp8.src2.contxt = "8";
+            t1.content.add(tmp8);
+            Tern tmp9 = new Tern();
+            tmp9.op = Opcode.store;
+            tmp9.src1 = tmp.src1;
+            tmp9.src2 = define_arr(u, t1, i+1);
+            t1.content.add(tmp9);
+
+
+            Tern tmp10 = new Tern();
+            tmp10.op = Opcode.cmp;
+            tmp10.src1 = tmp7.src1;
+            tmp10.src2 = tmp0.src2;
+            Tern tmp11 = new Tern();
+            tmp11.op = Opcode.setl;
+            tmp11.src1 = new reg();
+            tmp11.src1.contxt = "al"; //"%v" + String.valueOf(cnt);cnt++;
+            Tern tmp12 = new Tern();
+            tmp12.op = Opcode.movzx;
+            tmp12.src1 = new reg();
+            tmp12.src1.contxt = "rax"; //"%v" + String.valueOf(cnt);cnt++;
+            tmp12.src2 = tmp2.src1;
+            Tern tmp13 = new Tern();
+            tmp13.op = Opcode.test;
+            tmp13.src1 = tmp13.src2 = new reg();
+            tmp13.src1.contxt = "rax";
+            Tern tmp14 = new Tern();
+            tmp14.op = Opcode.jnz;
+            tmp14.src1 = new labn();
+            tmp14.src1.contxt = t1.name;
+            t2.content.add(tmp10);
+            t2.content.add(tmp11);
+            t2.content.add(tmp12);
+            t2.content.add(tmp13);
+            t2.content.add(tmp14);
+            Arr = t2;
+        }
+
+        return tmp6.src1;
     }
 
     tnode dfs(Node u, BasicBlock v){
@@ -481,35 +572,44 @@ public class ternary {
         }
 
         else if (u instanceof ParaNode){
-            if (u.V instanceof GeneralScope){
-                if (((ParaNode) u).InitE) {
-                    Tern tmp = new Tern();
-                    tmp.op = Opcode.mov;
-                    tmp.src1 = new reg();
-                    tmp.src1.contxt = "%v"+((ParaNode) u).ID + String.valueOf(cnt);
+            Tern t = new Tern();
+            if (((ParaNode) u).InitE /*&& !(((ParaNode) u).Init instanceof CreateNode)*/) {
+                if (((ParaNode) u).Init instanceof ArrNode ||
+                        (((ParaNode) u).Init instanceof ClassNode && !(((ClassNode) ((ParaNode) u).Init).Varname instanceof MethodNode))){
+                    t.op = Opcode.load;
+                    t.src1 = new reg();
+                    ((reg) t.src1).contxt = "%v"+((ParaNode) u).ID + String.valueOf(cnt);
                     cnt++;
-                    ((reg) tmp.src1).memory = ((ParaNode) u).ID;
-                    u.V.var.get(((ParaNode) u).ID).IR_name.memory = ((reg) tmp.src1).memory;
-                    u.V.var.get(((ParaNode) u).ID).IR_name.contxt = ((reg) tmp.src1).contxt;
-                    tmp.src2 = dfs(((ParaNode) u).Init, v);
-                    v.content.add(tmp);
+                    u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
+                    t.src2 = dfs(((ParaNode) u).Init, v);
+                    v.content.add(t);
                 }
-                root.GV.add(((ParaNode) u).ID);
-            }
-            else if (((ParaNode) u).InitE /*&& !(((ParaNode) u).Init instanceof CreateNode)*/) {
-                Tern t = new Tern();
-                t.op = Opcode.mov;
-                t.src1 = new reg();
-                ((reg) t.src1).contxt = "%v"+((ParaNode) u).ID + String.valueOf(cnt);
-                cnt++;
-                u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
-                t.src2 = dfs(((ParaNode) u).Init, v);
-                v.content.add(t);
+                else {
+                    t.op = Opcode.mov;
+                    t.src1 = new reg();
+                    ((reg) t.src1).contxt = "%v"+((ParaNode) u).ID + String.valueOf(cnt);
+                    cnt++;
+                    u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
+                    t.src2 = dfs(((ParaNode) u).Init, v);
+                    if (Arr != null) {v = Arr; Arr = null;}
+                    v.content.add(t);
+                }
+
+
+                if (u.V instanceof GeneralScope){
+                    ((reg) t.src1).memory = ((ParaNode) u).ID;
+                    u.V.var.get(((ParaNode) u).ID).IR_name.memory = ((reg) t.src1).memory;
+                    u.V.var.get(((ParaNode) u).ID).IR_name.contxt = ((reg) t.src1).contxt;
+                    root.GV.add(((ParaNode) u).ID);
+                }
                 return null;
             }
             else {
                 u.V.var.get(((ParaNode) u).ID).IR_name.contxt = "%v" +((ParaNode) u).ID + String.valueOf(cnt);
                 cnt++;
+                if (u.V instanceof GeneralScope){
+                    root.GV.add(((ParaNode) u).ID);
+                }
             }
         }
 
@@ -639,10 +739,72 @@ public class ternary {
             tmp.src2 = dfs(((InfixExpressionNode) u).Right, v);
             tmp.src1 = dfs(((InfixExpressionNode) u).Left, v);
             if (u instanceof AssignNode) {
-                tmp.op = ((InfixExpressionNode) u).op;
-                v.content.add(tmp);
+                if ((((AssignNode) u).Right instanceof ArrNode) ||
+                        ((((AssignNode) u).Right instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Right).Varname instanceof MethodNode))){
+                    if ((((AssignNode) u).Left instanceof ArrNode) ||
+                            ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
+                        //arr_arr
+
+
+//                        Tern tmp1 = new Tern();
+//                        tmp1.op = Opcode.load;
+//                        tmp1.src1 = new reg();
+//                        tmp1.src1.contxt = "%v" + String.valueOf(cnt++);
+//                        tmp1.src2 = tmp.src2;
+//                        v.content.add(tmp1);
+                        v.content.set(v.content.size()-1, tmp);
+                        tmp.op = Opcode.store;
+                        tmp.src1 = v.content.get(v.content.size()-2).src1;
+                        return null;
+                    }
+                    else {
+                        //reg_arr
+                        //tmp.op = Opcode.load;
+                        tmp.op = Opcode.mov;
+                        v.content.add(tmp);
+                        return null;
+                    }
+                }
+                else{
+                    if ((((AssignNode) u).Left instanceof ArrNode) ||
+                            ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
+                        //arr_reg
+                        v.content.set(v.content.size()-1, tmp);
+                        tmp.op = Opcode.store;
+                        tmp.src1 = v.content.get(v.content.size()-2).src1;
+                        return null;
+                    }
+                    else {
+                        //reg_reg
+                        tmp.op = Opcode.mov;
+                        v.content.add(tmp);
+                        return null;
+                    }
+                }
             }
-            else if (u instanceof DivNode) {
+//            if (((InfixExpressionNode) u).Right instanceof ArrNode ||
+//                    ((((InfixExpressionNode) u).Right instanceof ClassNode) && !(((ClassNode) ((InfixExpressionNode) u).Right).Varname instanceof  MethodNode)){
+//                Tern tt = new Tern();
+//                tt.op = Opcode.load;
+//                tt.src2 = tmp.src2;
+//                tt.src1 = new reg();
+//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
+//                v.content.add(tt);
+//                tmp.src2 = tt.src1;
+//            }
+//
+//            if (((InfixExpressionNode) u).Left instanceof ArrNode ||
+//                    ((((InfixExpressionNode) u).Left instanceof ClassNode) && !(((ClassNode) ((InfixExpressionNode) u).Left).Varname instanceof  MethodNode)){
+//                Tern tt = new Tern();
+//                tt.op = Opcode.load;
+//                tt.src2 = tmp.src1;
+//                tt.src1 = new reg();
+//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
+//                v.content.add(tt);
+//                tmp.src1 = tt.src1;
+//            }
+
+            if (u instanceof DivNode) {
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.mov;
                 tmp1.src1 = new reg();
@@ -701,6 +863,16 @@ public class ternary {
         else if (u instanceof PosNode){
             Tern tmp = new Tern();
             tmp.src1 = dfs(((PosNode) u).InnerNode, v);
+//            if (((PosNode) u).InnerNode instanceof ArrNode ||
+//                    ((((PosNode) u).InnerNode instanceof ClassNode) && !(((ClassNode) ((PosNode) u).InnerNode).Varname instanceof  MethodNode))){
+//                Tern tt = new Tern();
+//                tt.op = Opcode.load;
+//                tt.src2 = tmp.src1;
+//                tt.src1 = new reg();
+//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
+//                v.content.add(tt);
+//                tmp.src1 = tt.src1;
+//            }
             if (((PosNode) u).op == Opcode.dec || ((PosNode) u).op == Opcode.inc) {
                 if (((PosNode) u).Is_Return) {
                     flag = true;
@@ -719,6 +891,16 @@ public class ternary {
         else if (u instanceof PreNode){
             Tern tmp = new Tern();
             tmp.src1 = dfs(((PreNode) u).InnerNode, v);
+//            if (((PosNode) u).InnerNode instanceof ArrNode ||
+//                    ((((PosNode) u).InnerNode instanceof ClassNode) && !(((ClassNode) ((PosNode) u).InnerNode).Varname instanceof  MethodNode)){
+//                Tern tt = new Tern();
+//                tt.op = Opcode.load;
+//                tt.src2 = tmp.src1;
+//                tt.src1 = new reg();
+//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
+//                v.content.add(tt);
+//                tmp.src1 = tt.src1;
+//            }
             tmp.op = ((PreNode) u).op;
             v.content.add(tmp);
             if (flag) {v.content.add(flag_tern); flag_tern = null; flag = false;}
@@ -1053,19 +1235,25 @@ public class ternary {
         }
 
         else if (u instanceof ArrNode){
+            Tern tmp = new Tern();
+            tmp.op = Opcode.mov;
+            tmp.src1 = new reg();
+            tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+            tmp.src2 = dfs(((ArrNode) u).ID, v);
+            v.content.add(tmp);
+            Tern tmp0 = new Tern();
+            tmp0.op = Opcode.add;
+            tmp0.src1 = tmp.src2;
+            tmp0.src2 = dfs(((ArrNode) u).Index,v);
+            v.content.add(tmp0);
             Tern tmp1 = new Tern();
-            tmp1.op = Opcode.mov_add;
-            tmp1.src1 = dfs(((ArrNode) u).ID, v);
-            tmp1.src2 = dfs(((ArrNode) u).Index, v);
-            tmp1.des = new reg();
-            ((reg) tmp1.des).contxt = "%v" + String.valueOf(cnt);
-            cnt++;
+            tmp1.op = Opcode.load;
+            tmp1.src2 = tmp0.src1;
+            tmp1.src1 = new reg();
+            tmp1.src1.contxt = "%v" + String.valueOf(cnt++);
             v.content.add(tmp1);
             if (flag) {v.content.add(flag_tern); flag_tern = null; flag = false;}
-            reg tmp2 = new reg();
-            tmp2.contxt = tmp1.des.contxt;
-            tmp2.Is_Point = true;
-            return tmp2;
+            return tmp1.src1;
         }
 
         else if (u instanceof CreateNode){
@@ -1111,16 +1299,19 @@ public class ternary {
             }
             VarTypeRef temp = find_var_type(((VarNode) t).ID, u.V);
             if (temp.dim - d > 0 && ((ClassNode) u).Varname instanceof MethodNode && ((MethodNode) ((ClassNode) u).Varname).FuncID.equals("size")){
-                Tern tmp = new Tern();
-                tmp.op = Opcode.mov;
-                tmp.src1 = new reg();
-                tmp.src1.contxt = "%v" + String.valueOf(cnt);
-                cnt++;
-                tmp.src2 = new mem();
-                ((mem) tmp.src2).r = (reg) dfs(((ClassNode) u).ID, v);
-                tmp.src2.contxt = "-8";
-                v.content.add(tmp);
-                return tmp.src1;
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.sub;
+                tmp1.src1 = dfs(((ClassNode) u).ID, v);
+                tmp1.src2 = new imm();
+                tmp1.src2.contxt = "8";
+                Tern tmp2 = new Tern();
+                tmp2.op = Opcode.load;
+                tmp2.src1 = new reg();
+                tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp2.src2 = tmp1.src1;
+                v.content.add(tmp1);
+                v.content.add(tmp2);
+                return tmp2.src1;
             }
             else {
                 ClassScope ttt = General.clas.get(temp.Type);
@@ -1144,19 +1335,26 @@ public class ternary {
                     return tt;
                 }
                 else if (((ClassNode) u).Varname instanceof VarNode){
+                    Tern tmp = new Tern();
+                    tmp.op = Opcode.mov;
+                    tmp.src1 = new reg();
+                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                    tmp.src2 = dfs(((ClassNode) u).ID, v);
+                    v.content.add(tmp);
+
                     Tern tmp1 = new Tern();
-                    tmp1.op = Opcode.mov_add;
-                    tmp1.src1 = dfs(((ClassNode) u).ID, v);
+                    tmp1.op = Opcode.add;
+                    tmp1.src1 = tmp.src1;
                     tmp1.src2 = new imm();
                     tmp1.src2.contxt = String.valueOf(ttt.var.get(((VarNode) ((ClassNode) u).Varname).ID).num * 8);
-                    tmp1.des = new reg();
-                    ((reg) tmp1.des).contxt = "%v" + String.valueOf(cnt);
-                    cnt++;
+                    Tern tmp2 = new Tern();
+                    tmp2.op = Opcode.load;
+                    tmp2.src1 = new reg();
+                    tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
+                    tmp2.src2 = tmp1.src1;
                     v.content.add(tmp1);
-                    reg tmp2 = new reg();
-                    tmp2.contxt = tmp1.des.contxt;
-                    tmp2.Is_Point = true;
-                    return tmp2;
+                    v.content.add(tmp2);
+                    return tmp2.src1;
                 }
             }
         }

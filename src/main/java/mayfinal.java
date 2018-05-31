@@ -45,8 +45,9 @@ public class mayfinal {
             for (int i = 0; i < root.gen_var.content.size(); ++i)
                 root.gen_var.content.get(i).print(root.gen_var);
         }
-        for (int i = 0; i < tmp.content.size(); ++i)
+        for (int i = 0; i < tmp.content.size(); ++i) {
             tmp.content.get(i).print(f);
+        }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f);
         }
