@@ -220,13 +220,13 @@ class ModNode extends Return_Int {
 
 class LShNode extends Return_Int {
     LShNode() {
-        op = Opcode.sal;
+        op = Opcode.sar;
     }
 }
 
 class RShNode extends Return_Int {
     RShNode() {
-        op = Opcode.sar;
+        op = Opcode.sal;
     }
 }
 

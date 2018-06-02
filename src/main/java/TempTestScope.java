@@ -64,6 +64,11 @@ public class TempTestScope {
         Print.para.add(t1);
         Print.var.put("S", tmp1);
         Root.func.put("print", Print);
+        Print.IR_name = "print";
+        Print.para.get(0).IR_name = new reg();
+        Print.para.get(0).IR_name.contxt = "rdi";
+        Print.var.get("S").IR_name = Print.para.get(0).IR_name;
+        Print.Return_IR_name = "%fprint";
 
         FuncScope Println = new FuncScope();
         Println.Return = "void";
@@ -75,16 +80,25 @@ public class TempTestScope {
         Println.para.add(t2);
         Println.var.put("S", tmp2);
         Root.func.put("println", Println);
+        Println.IR_name = "println";
+        Println.para.get(0).IR_name = new reg();
+        Println.para.get(0).IR_name.contxt = "rdi";
+        Println.var.get("S").IR_name = Println.para.get(0).IR_name;
+        Println.Return_IR_name = "%fprintln";
 
         FuncScope Getstring = new FuncScope();
         Getstring.Return = "string";
         Getstring.name = "getString";
         Root.func.put("getString", Getstring);
+        Getstring.IR_name = "getString";
+        Getstring.Return_IR_name = "%fgetstring";
 
         FuncScope Getint = new FuncScope();
         Getint.Return = "int";
         Getint.name = "getInt";
         Root.func.put("getInt", Getint);
+        Getint.IR_name = "getint";
+        Getint.Return_IR_name = "%fgetint";
 
         FuncScope Tostring = new FuncScope();
         Tostring.Return = "string";
@@ -96,6 +110,12 @@ public class TempTestScope {
         Tostring.para.add(t3);
         Tostring.var.put("i", tmp3);
         Root.func.put("toString", Tostring);
+        Tostring.IR_name = "tostring";
+        Tostring.para.get(0).IR_name = new reg();
+        Tostring.para.get(0).IR_name.contxt = "rdi";
+        Tostring.var.get("i").IR_name = Tostring.para.get(0).IR_name;
+        Tostring.Return_IR_name = "%ftostring";
+
 
         ClassScope Str = new ClassScope();
 
