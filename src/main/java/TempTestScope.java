@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 
@@ -66,7 +65,7 @@ public class TempTestScope {
         Root.func.put("print", Print);
         Print.IR_name = "print";
         Print.para.get(0).IR_name = new reg();
-        Print.para.get(0).IR_name.contxt = "rdi";
+        Print.para.get(0).IR_name.contxt = "%vs_1";
         Print.var.get("S").IR_name = Print.para.get(0).IR_name;
         Print.Return_IR_name = "%fprint";
 
@@ -82,7 +81,7 @@ public class TempTestScope {
         Root.func.put("println", Println);
         Println.IR_name = "println";
         Println.para.get(0).IR_name = new reg();
-        Println.para.get(0).IR_name.contxt = "rdi";
+        Println.para.get(0).IR_name.contxt = "%vs_2";
         Println.var.get("S").IR_name = Println.para.get(0).IR_name;
         Println.Return_IR_name = "%fprintln";
 
@@ -112,7 +111,7 @@ public class TempTestScope {
         Root.func.put("toString", Tostring);
         Tostring.IR_name = "tostring";
         Tostring.para.get(0).IR_name = new reg();
-        Tostring.para.get(0).IR_name.contxt = "rdi";
+        Tostring.para.get(0).IR_name.contxt = "%vi_1";
         Tostring.var.get("i").IR_name = Tostring.para.get(0).IR_name;
         Tostring.Return_IR_name = "%ftostring";
 
@@ -123,6 +122,8 @@ public class TempTestScope {
         Length.Return = "int";
         Length.name = "length";
         Str.func.put("length", Length);
+        Length.IR_name = "length";
+        Length.Return_IR_name = "%flength";
 
         FuncScope Substring = new FuncScope();
         Substring.Return = "string";
@@ -131,30 +132,44 @@ public class TempTestScope {
         ParTypeRef t4 = new ParTypeRef();
         tmp4.Type = t4.Type = "int";
         t4.ID = "left";
+        tmp4.IR_name = t4.IR_name = new reg();
+        t4.IR_name.contxt = "%vleft";
         Substring.para.add(t4);
         Substring.var.put("left", tmp4);
         VarTypeRef tmp5 = new VarTypeRef();
         ParTypeRef t5 = new ParTypeRef();
         tmp5.Type = t5.Type = "int";
         t5.ID = "right";
+        tmp5.IR_name = t5.IR_name = new reg();
+        t5.IR_name.contxt = "%vright";
         Substring.para.add(t5);
         Substring.var.put("right", tmp5);
         Str.func.put("substring", Substring);
+        Substring.Return = "substring";
+        Substring.Return_IR_name = "%fsub";
+
 
         FuncScope ParseInt = new FuncScope();
         ParseInt.Return = "int";
         ParseInt.name = "parseInt";
         Str.func.put("parseInt", ParseInt);
+        ParseInt.Return = "parseint";
+        ParseInt.Return_IR_name = "%fparse";
 
         FuncScope Ord = new FuncScope();
         Ord.Return = "int";
         Ord.name = "ord";
         VarTypeRef tmp6 = new VarTypeRef();
         ParTypeRef t6 = new ParTypeRef();
-        tmp6.Type = t6.Type = "pos";
+        tmp6.Type = t6.Type = "int";
+        t6.ID = "pos";
+        tmp6.IR_name = t6.IR_name = new reg();
+        t6.IR_name.contxt = "%vpos";
         Ord.para.add(t6);
         Ord.var.put("pos", tmp6);
         Str.func.put("ord", Ord);
+        Ord.Return = "ord";
+        Ord.Return_IR_name = "%ford";
 
         Root.clas.put("string", Str);
 
@@ -173,8 +188,10 @@ public class TempTestScope {
                 tmp1.ID = "this";
                 tmp1.Type = tmp2.Type = tmp.name;
                 tmp1.line = tmp1.column = tmp2.line = tmp2.column = 0;
+                tmp1.IR_name = tmp2.IR_name = new reg();
+                tmp1.IR_name.contxt = "%vthis";
                 t.var.put("this", tmp2);
-                t.para.add(tmp1);
+                t.para.add(0, tmp1);
             }
         }
     }

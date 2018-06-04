@@ -127,6 +127,127 @@ public class mayfinal {
         System.out.print("\tpop rbp\n");
         System.out.print("\tret\n");
 
+        //string.length
+        System.out.print("string.length:\n");
+        System.out.print("\tpush    rbp\n");
+        System.out.print("\tmov     rbp, rsp\n");
+        System.out.print("\tmov     qword [rbp-18H], rdi\n");
+        System.out.print("\tmov     dword [rbp-4H], 0\n");
+        System.out.print("\tjmp     Llen_002\n");
+        System.out.print("Llen_001:  add     dword [rbp-4H], 1\n");
+        System.out.print("Llen_002:  mov     eax, dword [rbp-4H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\ttest    al, al\n");
+        System.out.print("\tjnz     Llen_001\n");
+        System.out.print("\tmov     eax, dword [rbp-4H]\n");
+        System.out.print("\tpop     rbp\n");
+        System.out.print("\tret\n");
+
+
+        //string.substring
+        System.out.print("string.substring:\n");
+        System.out.print("\tpush rbp\n");
+        System.out.print("\tmov rbp,rsp\n");
+        System.out.print("\tpush rdi\n");
+        System.out.print("\tpush rsi\n");
+        System.out.print("\tmov rdi,rdx\n");
+        System.out.print("\tsub rdi,rsi\n");
+        System.out.print("\tadd rdi,1\n");
+        System.out.print("\tpush rdi\n");
+        System.out.print("\tadd rdi,9\n");
+        System.out.print("\tcall malloc\n");
+        System.out.print("\tpop rdx\n");
+        System.out.print("\tmov [rax],rdx\n");
+        System.out.print("\tadd rax,8\n");
+        System.out.print("\tpop rsi\n");
+        System.out.print("\tpop rdi\n");
+        System.out.print("\tadd rsi,rdi\n");
+        System.out.print("\tmov rdi,rax\n");
+        System.out.print("\tpush rdx\n");
+        System.out.print("\tpush rax\n");
+        System.out.print("\tcall memcpy\n");
+        System.out.print("\tpop rax\n");
+        System.out.print("\tpop rdx\n");
+        System.out.print("\tmov qword[rax+rdx],0\n");
+        System.out.print("\tmov rsp,rbp\n");
+        System.out.print("\tpop rbp\n");
+        System.out.print("\tret\n");
+        System.out.print("\n");
+
+        //string.parseInt
+        System.out.print("string.parseInt:\n");
+        System.out.print("\tpush    rbp\n");
+        System.out.print("\tmov     rbp, rsp\n");
+        System.out.print("\tsub     rsp, 32\n");
+        System.out.print("\tmov     qword [rbp-18H], rdi\n");
+        System.out.print("\tmov     edi, 256\n");
+        System.out.print("\tcall    malloc\n");
+        System.out.print("\tmov     qword [rbp-8H], rax\n");
+        System.out.print("\tmov     dword [rbp-10H], 0\n");
+        System.out.print("\tmov     dword [rbp-0CH], 0\n");
+        System.out.print("\tjmp     Lpar_002\n");
+        System.out.print("Lpar_001:  add     dword [rbp-10H], 1\n");
+        System.out.print("Lpar_002:  mov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\ttest    al, al\n");
+        System.out.print("\tjz      Lpar_004\n");
+        System.out.print("\tmov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\ttest    al, al\n");
+        System.out.print("\tjs      Lpar_001\n");
+        System.out.print("\tmov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\tcmp     al, 57\n");
+        System.out.print("\tjg      Lpar_001\n");
+        System.out.print("\tjmp     Lpar_004\n");
+        System.out.print("Lpar_003:  mov     edx, dword [rbp-0CH]\n");
+        System.out.print("\tmov     eax, edx\n");
+        System.out.print("\tshl     eax, 2\n");
+        System.out.print("\tadd     eax, edx\n");
+        System.out.print("\tadd     eax, eax\n");
+        System.out.print("\tmov     ecx, eax\n");
+        System.out.print("\tmov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\tmovsx   eax, al\n");
+        System.out.print("\tadd     eax, ecx\n");
+        System.out.print("\tsub     eax, 48\n");
+        System.out.print("\tmov     dword [rbp-0CH], eax\n");
+        System.out.print("\tadd     dword [rbp-10H], 1\n");
+        System.out.print("Lpar_004:  mov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\tcmp     al, 47\n");
+        System.out.print("\tjle     Lpar_005\n");
+        System.out.print("\tmov     eax, dword [rbp-10H]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\tcmp     al, 57\n");
+        System.out.print("\tjle     Lpar_003\n");
+        System.out.print("Lpar_005:  mov     eax, dword [rbp-0CH]\n");
+        System.out.print("\tleave\n");
+        System.out.print("\tret\n");
+
+
+
 
         int tmp = 8;
         for (Object obj:root.gen_var.var.keySet()){
@@ -137,7 +258,7 @@ public class mayfinal {
             }
         }
         root.gen_var.name = "_general";
-        print_dfs(root.gen_var, root.gen_var);
+        print_dfs(root.gen_var, root.gen_var, 0);
         System.out.print("\tmov\trsp, rbp\n");
         System.out.print("\tpop\trbp\n");
         System.out.print("\tret\n");
@@ -156,31 +277,39 @@ public class mayfinal {
 
 
 
-            print_dfs(ftmp, ftmp);
+            print_dfs(ftmp, ftmp, 0);
 
 
         }
     }
 
-    void print_dfs(BasicBlock tmp, FuncBlock f){
+    void print_dfs(BasicBlock tmp, FuncBlock f, int c){
         System.out.println(tmp.name+":");
         if (tmp.name.equals(f.name)) {
             System.out.print("\tpush\trbp\n");
             System.out.print("\tmov\trbp, rsp\n");
-            System.out.print("\tsub\trsp, " + f.var_num*8+"\n");
+            if (f.var_num % 2 == 1) System.out.print("\tsub\trsp, " + f.var_num*8+"\n");
+            else System.out.print("\tsub\trsp, " + (f.var_num+1)*8+"\n");
         }
         if (tmp.name.equals("main")){
             System.out.print("\tcall\t _general\n");
 
 
-
-
         }
+
         for (int i = 0; i < tmp.content.size(); ++i) {
+            if (tmp.content.get(i).op == Opcode.push) c++;
+            if (tmp.content.get(i).op == Opcode.pop) c--;
+            if (tmp.content.get(i).op == Opcode.call && c % 2 == 1){
+                System.out.println("\tpush\trcx");
+            }
             tmp.content.get(i).print(f);
+            if (tmp.content.get(i).op == Opcode.call && c % 2 == 1){
+                System.out.println("\tpop\trcx");
+            }
         }
         if (tmp.Next != null){
-            print_dfs(tmp.Next, f);
+            print_dfs(tmp.Next, f, c);
         }
 //        if (tmp.name.equals(f.name)) {
 //            System.out.print("\tmov\trsp, rbp\n");
