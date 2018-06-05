@@ -2,7 +2,7 @@ import java.util.*;
 
 enum Opcode {
     mov, add, sub, imul, idiv, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
-    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, load, store, push, pop, leave, test, cdq
+    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, load, store, push, pop, leave, test, cdq, cqo
 }
 
 
@@ -80,6 +80,17 @@ class Tern {
     Map<String, reg> in = new HashMap<>();
     Map<String, reg> out = new HashMap<>();
     void print(FuncBlock f){
+        if (op == Opcode.idiv) {
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1){
+                ((reg) src1).reg = "rcx";
+                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
+                System.out.println("\tidiv\t" + ((reg)src1).reg);
+            }
+            else {
+                System.out.println("\tidiv\t" + src1.contxt);
+            }
+            return;
+        }
         if (op == Opcode.store){
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
                 ((reg)src2).reg = "rcx";
@@ -883,18 +894,27 @@ public class ternary {
 //            }
 
             if (u instanceof DivNode) {
+                if (tmp.src2.contxt.equals("rax") || tmp.src2 instanceof imm){
+                    Tern t = new Tern();
+                    t.op = Opcode.mov;
+                    t.src1 = new reg();
+                    t.src1.contxt = "%v" + String.valueOf(cnt++);
+                    t.src2 = tmp.src2;
+                    v.content.add(t);
+                    tmp.src2 = t.src1;
+                }
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.mov;
                 tmp1.src1 = new reg();
                 tmp1.src1.contxt = "rax";
                 tmp1.src2 = tmp.src1;
-                v.content.add(tmp1);
                 Tern tmp2 = new Tern();
-                tmp2.op = Opcode.cdq;
-                v.content.add(tmp2);
+                tmp2.op = Opcode.cqo;
                 tmp.op = Opcode.idiv;
                 tmp.src1 = tmp.src2;
                 tmp.src2 = null;
+                v.content.add(tmp1);
+                v.content.add(tmp2);
                 v.content.add(tmp);
                 while (flag_tern.size() != 0){
                     v.content.add(flag_tern.pop());
@@ -902,6 +922,15 @@ public class ternary {
                 return tmp1.src1;
             }
             else if (u instanceof ModNode) {
+                if (tmp.src2.contxt.equals("rax") || tmp.src2 instanceof imm){
+                    Tern t = new Tern();
+                    t.op = Opcode.mov;
+                    t.src1 = new reg();
+                    t.src1.contxt = "%v" + String.valueOf(cnt++);
+                    t.src2 = tmp.src2;
+                    v.content.add(t);
+                    tmp.src2 = t.src1;
+                }
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.mov;
                 tmp1.src1 = new reg();
@@ -909,7 +938,7 @@ public class ternary {
                 tmp1.src2 = tmp.src1;
                 v.content.add(tmp1);
                 Tern tmp2 = new Tern();
-                tmp2.op = Opcode.cdq;
+                tmp2.op = Opcode.cqo;
                 v.content.add(tmp2);
                 tmp.op = Opcode.idiv;
                 tmp.src1 = tmp.src2;
@@ -1255,7 +1284,8 @@ public class ternary {
             }
             else {
                 tt2.op = Opcode.jmp;
-                ((reg)tt2.src1).contxt = tmp1;
+                tt2.src1 = new labn();
+                tt2.src1.contxt = tmp1;
                 t3.content.add(tt2);
             }
             dfs(((ForNode) u).Expr3, t2);
@@ -1288,7 +1318,8 @@ public class ternary {
             if (((JumpNode) u).Label == Jump.Break){
                 Tern tmp = new Tern();
                 tmp.op = Opcode.jmp;
-                ((reg)tmp.src1).contxt = Break.peek();
+                tmp.src1 = new labn();
+                tmp.src1.contxt = Break.peek();
                 v.content.add(tmp);
                 return null;
             }
