@@ -965,6 +965,15 @@ public class ternary {
         else if (u instanceof PosNode){
             Tern tmp = new Tern();
             tmp.src1 = dfs(((PosNode) u).InnerNode, v);
+            if (tmp.src1 instanceof imm){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
 //            if (((PosNode) u).InnerNode instanceof ArrNode ||
 //                    ((((PosNode) u).InnerNode instanceof ClassNode) && !(((ClassNode) ((PosNode) u).InnerNode).Varname instanceof  MethodNode))){
 //                Tern tt = new Tern();
@@ -995,6 +1004,15 @@ public class ternary {
         else if (u instanceof PreNode){
             Tern tmp = new Tern();
             tmp.src1 = dfs(((PreNode) u).InnerNode, v);
+            if (tmp.src1 instanceof imm){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
 //            if (((PosNode) u).InnerNode instanceof ArrNode ||
 //                    ((((PosNode) u).InnerNode instanceof ClassNode) && !(((ClassNode) ((PosNode) u).InnerNode).Varname instanceof  MethodNode)){
 //                Tern tt = new Tern();
