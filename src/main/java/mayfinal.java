@@ -26,8 +26,21 @@ public class mayfinal {
         System.out.println("\nsection .data");
         for (int i = 0; i < root.GV.size(); ++i)
             System.out.println(root.GV.get(i)+":\tdq\t0");
-        for (Object key:root.signal.keySet())
-            System.out.println(key+":\tdb\t"+root.signal.get(key)+",0,0");
+        for (Object key:root.signal.keySet()){
+            System.out.print(key+":");
+            String str = root.signal.get(key);
+            for (int i = 1; i < str.length()-1; ++i){
+                if (i + 1 < str.length()-1 && str.charAt(i) == '\\'){
+                    switch (str.charAt(++i)){
+                        case '\\' : System.out.print("\n\tdb\t" + 92);break;
+                        case 'n'  : System.out.print("\n\tdb\t" + 10);break;
+                        case '\"' : System.out.print("\n\tdb\t" + 34);break;
+                    }
+                }
+                else System.out.print("\n\tdb\t\"" + root.signal.get(key).charAt(i)+"\"");
+            }
+            System.out.println(",0,0");
+        }
 
 
 
