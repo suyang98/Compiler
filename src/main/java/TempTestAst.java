@@ -456,6 +456,7 @@ class CreateNode extends ExpressionNode {
 class ClassNode extends ExpressionNode {
     public ExpressionNode ID;
     public ExpressionNode Varname;
+    public String InClass;
     void print(){
         System.out.println("Class ");
     }

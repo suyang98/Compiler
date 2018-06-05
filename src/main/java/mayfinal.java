@@ -383,15 +383,7 @@ public class mayfinal {
         }
 
         for (int i = 0; i < tmp.content.size(); ++i) {
-            if (tmp.content.get(i).op == Opcode.push) c++;
-            if (tmp.content.get(i).op == Opcode.pop) c--;
-            if (tmp.content.get(i).op == Opcode.call && c % 2 == 1){
-                System.out.println("\tpush\trcx");
-            }
             tmp.content.get(i).print(f);
-            if (tmp.content.get(i).op == Opcode.call && c % 2 == 1){
-                System.out.println("\tpop\trcx");
-            }
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);

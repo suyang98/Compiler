@@ -918,8 +918,6 @@ public class TempTestScope {
                 }
                 return t2 = new IntType();
             }
-
-
             else {
                 ClassScope t = IsClass(t1.S);
                 if (((ClassNode) u).Varname instanceof VarNode) {
@@ -932,6 +930,7 @@ public class TempTestScope {
                     else if (tt.Type.equals("string")) t2 = new ClassType("string");
                     else if (tt.Type.equals("bool")) t2 = new BoolType();
                     else t2 = new ClassType(tt.Type);
+                    ((ClassNode) u).InClass = t1.S;
                     t2.dim = tt.dim;
                 }
                 else if (((ClassNode) u).Varname instanceof ArrNode){

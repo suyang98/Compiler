@@ -218,23 +218,24 @@ public class ternary {
     BasicBlock Arr;
     int c = 0;
 
-    reg find_var(String ID, Scope v){
+    reg find_var(String ID, Scope v, Node u){
         reg tmp = null;
-        if (v.var.size()!= 0 && v.var.get(ID) != null) tmp = v.var.get(ID).IR_name;
+        if (v.var.size()!= 0 && v.var.get(ID) != null
+                && v.var.get(ID).line <= u.Location.line) tmp = v.var.get(ID).IR_name;
         if (tmp != null) {
             return tmp;
         }
-        else if (v.parent!=null) return find_var(ID, v.parent);
+        else if (v.parent!=null) return find_var(ID, v.parent, u);
         else return null;
     }
 
-    VarTypeRef find_var_type(String ID, Scope v){
+    VarTypeRef find_var_type(String ID, Scope v, Node u){
         VarTypeRef tmp = null;
         if (v.var.size()!= 0) tmp = v.var.get(ID);
         if (tmp != null) {
             return tmp;
         }
-        else if (v.parent!=null) return find_var_type(ID, v.parent);
+        else if (v.parent!=null) return find_var_type(ID, v.parent, u);
         else return null;
     }
 
@@ -646,6 +647,7 @@ public class ternary {
                 cnt++;
                 if (u.V instanceof GeneralScope){
                     root.GV.add(((ParaNode) u).ID);
+                    u.V.var.get(((ParaNode) u).ID).IR_name.memory = ((ParaNode) u).ID;
                 }
             }
         }
@@ -1296,7 +1298,8 @@ public class ternary {
             if (((JumpNode) u).Label == Jump.Continue) {
                 Tern tmp = new Tern();
                 tmp.op = Opcode.jmp;
-                ((reg)tmp.src1).contxt = Continue.peek();
+                tmp.src1 = new labn();
+                tmp.src1.contxt = Continue.peek();
                 v.content.add(tmp);
                 return null;
             }
@@ -1354,7 +1357,7 @@ public class ternary {
         }
 
         else if (u instanceof VarNode){
-            return find_var(((VarNode) u).ID, u.V);
+            return find_var(((VarNode) u).ID, u.V, u);
         }
 
         else if (u instanceof ArrNode){
@@ -1427,31 +1430,14 @@ public class ternary {
             else return define_arr((CreateNode) u, v, 0);
         }
 
-        else if (u instanceof ClassNode){
-            Node t = ((ClassNode) u).ID;
-            int d = 0;
-            while (!(t instanceof VarNode)){
-                t = ((ArrNode)t).ID;
-                d += 1;
-            }
-            VarTypeRef temp = find_var_type(((VarNode) t).ID, u.V);
-            if (temp.dim - d > 0 && ((ClassNode) u).Varname instanceof MethodNode && ((MethodNode) ((ClassNode) u).Varname).FuncID.equals("size")){
+        else if (u instanceof ClassNode) {
+            if (((ClassNode) u).Varname instanceof MethodNode && ((MethodNode)((ClassNode) u).Varname).FuncID.equals("size")) {
                 Tern tmp = new Tern();
-                if (((ClassNode) u).ID instanceof ArrNode){
-                    tmp.op = Opcode.mov;
-                    tmp.src1 = new reg();
-                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                    tmp.src2 = dfs(((ClassNode) u).ID, v);
-                    v.content.add(tmp);
-                }
-                else {
-                    tmp.op = Opcode.mov;
-                    tmp.src1 = new reg();
-                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                    tmp.src2 = dfs(((ClassNode) u).ID, v);
-                    v.content.add(tmp);
-                }
-
+                tmp.op = Opcode.mov;
+                tmp.src1 = new reg();
+                tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp.src2 = dfs(((ClassNode) u).ID, v);
+                v.content.add(tmp);
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.sub;
                 tmp1.src1 = tmp.src1;
@@ -1466,50 +1452,126 @@ public class ternary {
                 v.content.add(tmp2);
                 return tmp2.src1;
             }
-            else {
-                ClassScope ttt = General.clas.get(temp.Type);
-                if (((ClassNode) u).Varname instanceof MethodNode) {
-                    FuncScope ft = ttt.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
-                    ((MethodNode) ((ClassNode) u).Varname).InClass = temp.Type;
+            else if (((ClassNode) u).Varname instanceof MethodNode){
+                Tern tmp = new Tern();
+                tmp.op = Opcode.mov;
+                tmp.src1 = new reg();
+                tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp.src2 = dfs(((ClassNode) u).ID, v);
+//                if (((ClassNode) u).ID instanceof ArrNode || ((ClassNode) u).ID instanceof ClassNode){
+//                    v.content.set(v.content.size()-1, tmp);
+//                    tmp.src2 = v.content.get(v.content.size()-2).src1;
+//                }
+//                else
+                v.content.add(tmp);
 
-                    Tern tmp = new Tern();
-                    tmp.op = Opcode.mov;
-                    tmp.src1 = new reg();
-                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                    tmp.src2 = dfs(((ClassNode) u).ID, v);
-                    if (((ClassNode) u).ID instanceof ArrNode){
-                        v.content.set(v.content.size()-1, tmp);
-                        tmp.src2 = v.content.get(v.content.size()-2).src1;
-                    }
-                    else v.content.add(tmp);
+                tnode tt = dfs(((ClassNode) u).Varname, v);
+                return tt;
 
-                    tnode tt = dfs(((ClassNode) u).Varname, v);
-                    return tt;
-                }
-                else if (((ClassNode) u).Varname instanceof VarNode){
-                    Tern tmp = new Tern();
-                    tmp.op = Opcode.mov;
-                    tmp.src1 = new reg();
-                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                    tmp.src2 = dfs(((ClassNode) u).ID, v);
-                    v.content.add(tmp);
+            }
+            else if (((ClassNode) u).Varname instanceof VarNode){
+                ClassScope ttt = General.clas.get(((ClassNode) u).InClass);
+                Tern tmp = new Tern();
+                tmp.op = Opcode.mov;
+                tmp.src1 = new reg();
+                tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp.src2 = dfs(((ClassNode) u).ID, v);
+                v.content.add(tmp);
 
-                    Tern tmp1 = new Tern();
-                    tmp1.op = Opcode.add;
-                    tmp1.src1 = tmp.src1;
-                    tmp1.src2 = new imm();
-                    tmp1.src2.contxt = String.valueOf(ttt.var.get(((VarNode) ((ClassNode) u).Varname).ID).num * 8);
-                    Tern tmp2 = new Tern();
-                    tmp2.op = Opcode.load;
-                    tmp2.src1 = new reg();
-                    tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
-                    tmp2.src2 = tmp1.src1;
-                    v.content.add(tmp1);
-                    v.content.add(tmp2);
-                    return tmp2.src1;
-                }
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.add;
+                tmp1.src1 = tmp.src1;
+                tmp1.src2 = new imm();
+                tmp1.src2.contxt = String.valueOf(ttt.var.get(((VarNode) ((ClassNode) u).Varname).ID).num * 8);
+                Tern tmp2 = new Tern();
+                tmp2.op = Opcode.load;
+                tmp2.src1 = new reg();
+                tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp2.src2 = tmp1.src1;
+                v.content.add(tmp1);
+                v.content.add(tmp2);
+                return tmp2.src1;
             }
         }
+
+
+
+//        else if (u instanceof ClassNode){
+//            Node t = ((ClassNode) u).ID;
+//            int d = 0;
+//            if (t instanceof ClassNode) {
+//            }
+//
+//            while (!(t instanceof VarNode)){
+//                t = ((ArrNode)t).ID;
+//                d += 1;
+//            }
+//            VarTypeRef temp = find_var_type(((VarNode) t).ID, u.V);
+//            if (temp.dim - d > 0 && ((ClassNode) u).Varname instanceof MethodNode && ((MethodNode) ((ClassNode) u).Varname).FuncID.equals("size")){
+//                Tern tmp = new Tern();
+//                    tmp.op = Opcode.mov;
+//                    tmp.src1 = new reg();
+//                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+//                    tmp.src2 = dfs(((ClassNode) u).ID, v);
+//                    v.content.add(tmp);
+//                Tern tmp1 = new Tern();
+//                tmp1.op = Opcode.sub;
+//                tmp1.src1 = tmp.src1;
+//                tmp1.src2 = new imm();
+//                tmp1.src2.contxt = "8";
+//                Tern tmp2 = new Tern();
+//                tmp2.op = Opcode.load;
+//                tmp2.src1 = new reg();
+//                tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
+//                tmp2.src2 = tmp1.src1;
+//                v.content.add(tmp1);
+//                v.content.add(tmp2);
+//                return tmp2.src1;
+//            }
+//            else {
+//                ClassScope ttt = General.clas.get(temp.Type);
+//                if (((ClassNode) u).Varname instanceof MethodNode) {
+//                    FuncScope ft = ttt.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
+//                    ((MethodNode) ((ClassNode) u).Varname).InClass = temp.Type;
+//
+//                    Tern tmp = new Tern();
+//                    tmp.op = Opcode.mov;
+//                    tmp.src1 = new reg();
+//                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+//                    tmp.src2 = dfs(((ClassNode) u).ID, v);
+//                    if (((ClassNode) u).ID instanceof ArrNode){
+//                        v.content.set(v.content.size()-1, tmp);
+//                        tmp.src2 = v.content.get(v.content.size()-2).src1;
+//                    }
+//                    else v.content.add(tmp);
+//
+//                    tnode tt = dfs(((ClassNode) u).Varname, v);
+//                    return tt;
+//                }
+//                else if (((ClassNode) u).Varname instanceof VarNode){
+//                    Tern tmp = new Tern();
+//                    tmp.op = Opcode.mov;
+//                    tmp.src1 = new reg();
+//                    tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+//                    tmp.src2 = dfs(((ClassNode) u).ID, v);
+//                    v.content.add(tmp);
+//
+//                    Tern tmp1 = new Tern();
+//                    tmp1.op = Opcode.add;
+//                    tmp1.src1 = tmp.src1;
+//                    tmp1.src2 = new imm();
+//                    tmp1.src2.contxt = String.valueOf(ttt.var.get(((VarNode) ((ClassNode) u).Varname).ID).num * 8);
+//                    Tern tmp2 = new Tern();
+//                    tmp2.op = Opcode.load;
+//                    tmp2.src1 = new reg();
+//                    tmp2.src1.contxt = "%v" + String.valueOf(cnt++);
+//                    tmp2.src2 = tmp1.src1;
+//                    v.content.add(tmp1);
+//                    v.content.add(tmp2);
+//                    return tmp2.src1;
+//                }
+//            }
+//        }
 
         else if (u instanceof MethodNode){
             Scope stmp;
