@@ -39,7 +39,8 @@ public class mayfinal {
                 }
                 else System.out.print("\n\tdb\t\"" + root.signal.get(key).charAt(i)+"\"");
             }
-            System.out.println(",0,0");
+            if (str.length() == 2) System.out.println("\tdb\t\"\",0,0");
+            else System.out.println(",0,0");
         }
 
 
