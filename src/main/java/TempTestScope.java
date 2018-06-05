@@ -258,7 +258,7 @@ public class TempTestScope {
         Type t = null;
         VarTypeRef tmp = v.var.get(u.ID);
         if (tmp != null &&
-                ((tmp.line < u.Location.line /*|| (tmp.line == u.Location.line && tmp.column <= u.Location.column)*/) ||
+                ((tmp.line < u.Location.line || (tmp.line == u.Location.line && tmp.column <= u.Location.column)) ||
                         ((v instanceof ClassScope) && !(v instanceof GeneralScope)))) {
             if (tmp.Type.equals("int")) t = new IntType();
             else if (tmp.Type.equals("bool")) t = new BoolType();
@@ -550,8 +550,15 @@ public class TempTestScope {
                     System.exit(1);
                 }
             }
+            boolean ff = false;
             for (int i = 0; i < ((FuncDefNode) u).Body.size(); ++i) {
                 dfs1(((FuncDefNode) u).Body.sons(i), tmp);
+                if (((FuncDefNode) u).Body.sons(i) instanceof JumpNode && ((JumpNode) ((FuncDefNode) u).Body.sons(i)).Label == Jump.Return) ff = true;
+            }
+            if (!ff) {
+                JumpNode tt = new JumpNode();
+                tt.Label = Jump.Return;
+                ((FuncDefNode) u).Body.StateList.add(tt);
             }
             u.V = tmp;
             return t;

@@ -25,8 +25,8 @@ public class Register {
     String param(int i){
         if (i == 0) return "rdi";
         else if (i == 1) return "rsi";
-        else if (i == 2) return "r10";
-        else if (i == 3) return "r11";
+        else if (i == 2) return "rdx";
+        else if (i == 3) return "rcx";
         else if (i == 4) return "r8";
         else if (i == 5) return "r9";
         else return null;
