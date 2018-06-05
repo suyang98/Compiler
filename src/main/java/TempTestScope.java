@@ -145,7 +145,7 @@ public class TempTestScope {
         Substring.para.add(t5);
         Substring.var.put("right", tmp5);
         Str.func.put("substring", Substring);
-        Substring.Return = "substring";
+        Substring.IR_name = "substring";
         Substring.Return_IR_name = "%fsub";
 
 
@@ -153,7 +153,7 @@ public class TempTestScope {
         ParseInt.Return = "int";
         ParseInt.name = "parseInt";
         Str.func.put("parseInt", ParseInt);
-        ParseInt.Return = "parseint";
+        ParseInt.IR_name = "parseint";
         ParseInt.Return_IR_name = "%fparse";
 
         FuncScope Ord = new FuncScope();
@@ -168,10 +168,35 @@ public class TempTestScope {
         Ord.para.add(t6);
         Ord.var.put("pos", tmp6);
         Str.func.put("ord", Ord);
-        Ord.Return = "ord";
+        Ord.IR_name = "ord";
         Ord.Return_IR_name = "%ford";
 
         Root.clas.put("string", Str);
+
+        FuncScope Add = new FuncScope();
+        Add.Return = "string";
+        Add.name = "_add";
+        VarTypeRef tmp7 = new VarTypeRef();
+        ParTypeRef t7 = new ParTypeRef();
+        tmp7.Type = t7.Type = "string";
+        t7.ID = "S1";
+        Add.para.add(t7);
+        Add.var.put("S1", tmp7);
+        VarTypeRef tmp8 = new VarTypeRef();
+        ParTypeRef t8 = new ParTypeRef();
+        tmp8.Type = t8.Type = "string";
+        t8.ID = "S2";
+        Add.para.add(t8);
+        Add.var.put("S2", tmp8);
+        Root.func.put("_add", Add);
+        Add.IR_name = "_add";
+        Add.para.get(0).IR_name = new reg();
+        Add.para.get(0).IR_name.contxt = "%va_1";
+        Add.var.get("S1").IR_name = Print.para.get(0).IR_name;
+        Add.para.get(1).IR_name = new reg();
+        Add.para.get(1).IR_name.contxt = "%va_2";
+        Add.var.get("S2").IR_name = Print.para.get(0).IR_name;
+        Add.Return_IR_name = "%fadd";
 
 
 
@@ -691,6 +716,7 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+"this type can't do this operation");
                 System.exit(1);
             }
+            if (t1.S.equals("string")) ((AddNode) u).flag = true;
             return t1;
         }
 
@@ -712,6 +738,7 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+"different type can't be compared");
                 System.exit(1);
             }
+            if (t1.S.equals("string")) ((Return_Bool_Str)u).flag = true;
             return t;
         }
 
@@ -723,6 +750,7 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+"different type can't be compared");
                 System.exit(1);
             }
+            if (t1.S.equals("string")) ((Return_Bool_Str) u).flag = true;
             return t;
         }
 

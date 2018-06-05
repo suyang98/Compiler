@@ -172,6 +172,7 @@ class ListExpressionNode extends StateNode{
 abstract class InfixExpressionNode extends ExpressionNode {
     public ExpressionNode Left;
     public ExpressionNode Right;
+    public boolean flag = false;
     void print(){
         System.out.println(this.getClass());
     }

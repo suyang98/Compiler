@@ -7,9 +7,7 @@ enum Opcode {
 
 
 class IR {
-    BasicBlock start;
     List<String> GV= new ArrayList();
-    Map<String, String> ST = new HashMap<>();
     Map<String, FuncBlock> Blocks = new HashMap<>();
     Map<String, BasicBlock> All = new HashMap<>();
     FuncBlock gen_var = new FuncBlock();
@@ -473,6 +471,7 @@ public class ternary {
             t1.name = "_for" + String.valueOf(bcnt++);
             BasicBlock t2 = new BasicBlock();
             t2.name = "_L" + String.valueOf(bcnt++);
+            if (v.Next != null) t2.Next = v.Next;
             v.Next = t1;
             t1.Next = t2;
             Tern tmp9 = new Tern();
@@ -795,6 +794,14 @@ public class ternary {
         }
 
         else if (u instanceof InfixExpressionNode){
+            if (((InfixExpressionNode) u).flag) {
+                MethodNode temp = new MethodNode();
+                temp.Argument = new ListExpressionNode();
+                temp.Argument.list.add(((InfixExpressionNode) u).Left);
+                temp.Argument.list.add(((InfixExpressionNode) u).Right);
+                temp.FuncID = "_"+((InfixExpressionNode) u).op.toString();
+                return dfs(temp, v);
+            }
             Tern tmp = new Tern();
             tmp.src2 = dfs(((InfixExpressionNode) u).Right, v);
             tmp.src1 = dfs(((InfixExpressionNode) u).Left, v);
@@ -992,9 +999,20 @@ public class ternary {
 
         else if (u instanceof ConditionNode) {
             if (((ConditionNode) u).Then == null && ((ConditionNode) u).Else == null) return null;
+            BasicBlock f = null;
+            if (v.Next != null) f = v.Next;
             Tern tmp1 = new Tern();
             tmp1.op = Opcode.test;
             tmp1.src1 = tmp1.src2 = dfs(((ConditionNode) u).Condition, v);
+            if (tmp1.src1 instanceof imm) {
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp1.src1;
+                tmp1.src1 = tmp1.src2 = t.src1;
+                v.content.add(t);
+            }
             v.content.add(tmp1);
 
             if (((ConditionNode) u).Then != null && ((ConditionNode) u).Else != null) {
@@ -1053,6 +1071,7 @@ public class ternary {
                         }
                     }
                 }
+                if (f != null) btmp3.Next = f;
                 label.push(btmp3);
                 return null;
             }
@@ -1091,6 +1110,7 @@ public class ternary {
                     }
 
                 }
+                if (f != null) btmp3.Next = f;
                 label.push(btmp3);
                 return null;
             }
@@ -1128,6 +1148,7 @@ public class ternary {
                         }
                     }
                 }
+                if (f != null) btmp3.Next = f;
                 label.push(btmp3);
                 return null;
             }
@@ -1298,6 +1319,7 @@ public class ternary {
             imm tmp = new imm();
             if (((BoolNode) u).S.equals("true")) tmp.contxt = "1";
             else if (((BoolNode) u).S.equals("false"))tmp.contxt = "0";
+            return tmp;
         }
 
         else if (u instanceof StrNode){
@@ -1401,9 +1423,8 @@ public class ternary {
                     tmp.op = Opcode.mov;
                     tmp.src1 = new reg();
                     tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                    dfs(((ClassNode) u).ID, v);
-                    tmp.src2 = v.content.get(v.content.size()-2).src1;
-                    v.content.set(v.content.size()-1, tmp);
+                    tmp.src2 = dfs(((ClassNode) u).ID, v);
+                    v.content.add(tmp);
                 }
                 else {
                     tmp.op = Opcode.mov;
@@ -1431,7 +1452,7 @@ public class ternary {
                 ClassScope ttt = General.clas.get(temp.Type);
                 if (((ClassNode) u).Varname instanceof MethodNode) {
                     FuncScope ft = ttt.func.get(((MethodNode) ((ClassNode) u).Varname).FuncID);
-                    ((MethodNode) ((ClassNode) u).Varname).InClass = ((ClassNode) u).name;
+                    ((MethodNode) ((ClassNode) u).Varname).InClass = temp.Type;
 
                     Tern tmp = new Tern();
                     tmp.op = Opcode.mov;
@@ -1475,39 +1496,39 @@ public class ternary {
         else if (u instanceof MethodNode){
             Scope stmp;
             if (((MethodNode) u).InClass == null) stmp = General.func.get(((MethodNode) u).FuncID);
-                else stmp = General.clas.get(((MethodNode) u).InClass).func.get(((MethodNode) u).name);
+                else stmp = General.clas.get(((MethodNode) u).InClass).func.get(((MethodNode) u).FuncID);
 
             List<tnode> paralist = new ArrayList<>();
 
             Tern t = new Tern();
             //if (stmp.IR_name == null) {
-                if (((MethodNode) u).Argument != null){
-                    if (((MethodNode) u).InClass == null) {
-                        for (int i = 0; i < ((MethodNode) u).Argument.size(); ++i){
-                            Tern tmp = new Tern();
-                            tmp.op = Opcode.mov;
-                            tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
-                            tmp.src1 = new reg();
-                            tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                            paralist.add(tmp.src1);
-                            //((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
-                            //stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
-                            v.content.add(tmp);
-                        }
+                if (((MethodNode) u).InClass == null) {
+                    if (((MethodNode) u).Argument != null)
+                    for (int i = 0; i < ((MethodNode) u).Argument.size(); ++i){
+                        Tern tmp = new Tern();
+                        tmp.op = Opcode.mov;
+                        tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                        tmp.src1 = new reg();
+                        tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                        paralist.add(tmp.src1);
+                        //((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
+                        //stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
+                        v.content.add(tmp);
                     }
-                    else {
-                        paralist.add(v.content.get(v.content.size()-1).src1);
-                        for (int i = 1; i < ((MethodNode) u).Argument.size(); ++i){
-                            Tern tmp = new Tern();
-                            tmp.op = Opcode.mov;
-                            tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
-                            tmp.src1 = new reg();
-                            tmp.src1.contxt = "%v" + String.valueOf(cnt++);
-                            paralist.add(tmp.src1);
-                            //((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
-                            //stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
-                            v.content.add(tmp);
-                        }
+                }
+                else {
+                    paralist.add(v.content.get(v.content.size()-1).src1);
+                    if (((MethodNode) u).Argument != null)
+                    for (int i = 0; i < ((MethodNode) u).Argument.size(); ++i){
+                        Tern tmp = new Tern();
+                        tmp.op = Opcode.mov;
+                        tmp.src2 = dfs(((MethodNode) u).Argument.sons(i), v);
+                        tmp.src1 = new reg();
+                        tmp.src1.contxt = "%v" + String.valueOf(cnt++);
+                        paralist.add(tmp.src1);
+                        //((FuncScope) stmp).para.get(i).IR_name = (reg) tmp.src1;
+                        //stmp.var.get(((FuncScope) stmp).para.get(i).ID).IR_name = (reg) tmp.src1;
+                        v.content.add(tmp);
                     }
                 }
                 //stmp.IR_name = stmp.name + String.valueOf(bcnt++);

@@ -127,8 +127,8 @@ public class mayfinal {
         System.out.print("\tpop rbp\n");
         System.out.print("\tret\n");
 
-        //string.length
-        System.out.print("string.length:\n");
+        //length
+        System.out.print("length:\n");
         System.out.print("\tpush    rbp\n");
         System.out.print("\tmov     rbp, rsp\n");
         System.out.print("\tmov     qword [rbp-18H], rdi\n");
@@ -147,8 +147,8 @@ public class mayfinal {
         System.out.print("\tret\n");
 
 
-        //string.substring
-        System.out.print("string.substring:\n");
+        //substring
+        System.out.print("substring:\n");
         System.out.print("\tpush rbp\n");
         System.out.print("\tmov rbp,rsp\n");
         System.out.print("\tpush rdi\n");
@@ -177,8 +177,8 @@ public class mayfinal {
         System.out.print("\tret\n");
         System.out.print("\n");
 
-        //string.parseInt
-        System.out.print("string.parseInt:\n");
+        //parseInt
+        System.out.print("parseInt:\n");
         System.out.print("\tpush    rbp\n");
         System.out.print("\tmov     rbp, rsp\n");
         System.out.print("\tsub     rsp, 32\n");
@@ -245,6 +245,91 @@ public class mayfinal {
         System.out.print("Lpar_005:  mov     eax, dword [rbp-0CH]\n");
         System.out.print("\tleave\n");
         System.out.print("\tret\n");
+
+
+        //ord
+        System.out.print("ord:\n");
+        System.out.print("\tpush    rbp\n");
+        System.out.print("\tmov     rbp, rsp\n");
+        System.out.print("\tmov     qword [rbp-18H], rdi\n");
+        System.out.print("\tmov     dword [rbp-1CH], esi\n");
+        System.out.print("\tmov     eax, dword [rbp-1CH]\n");
+        System.out.print("\tmovsxd  rdx, eax\n");
+        System.out.print("\tmov     rax, qword [rbp-18H]\n");
+        System.out.print("\tadd     rax, rdx\n");
+        System.out.print("\tmovzx   eax, byte [rax]\n");
+        System.out.print("\tmovsx   eax, al\n");
+        System.out.print("\tmov     dword [rbp-4H], eax\n");
+        System.out.print("\tmov     eax, dword [rbp-4H]\n");
+        System.out.print("\tpop     rbp\n");
+        System.out.print("\tret\n");
+
+        //add
+        System.out.println("_add:");
+        System.out.println("\tpush    rbp");
+        System.out.println("\tmov     rbp, rsp");
+        System.out.println("\tsub     rsp, 32");
+        System.out.println("\tmov     qword [rbp-18H], rdi");
+        System.out.println("\tmov     qword [rbp-20H], rsi");
+        System.out.println("\tmov     edi, 256");
+        System.out.println("\tcall    malloc");
+        System.out.println("\tmov     qword [rbp-8H], rax");
+        System.out.println("\tmov     dword [rbp-10H], 0");
+        System.out.println("\tmov     dword [rbp-0CH], 0");
+        System.out.println("\tjmp     sjtulc_002");
+        System.out.println("sjtulc_001:");
+        System.out.println("\tmov     eax, dword [rbp-10H]");
+        System.out.println("\tmovsxd  rdx, eax");
+        System.out.println("\tmov     rax, qword [rbp-8H]");
+        System.out.println("\tadd     rdx, rax");
+        System.out.println("\tmov     eax, dword [rbp-10H]");
+        System.out.println("\tmovsxd  rcx, eax");
+        System.out.println("\tmov     rax, qword [rbp-18H]");
+        System.out.println("\tadd     rax, rcx");
+        System.out.println("\tmovzx   eax, byte [rax]");
+        System.out.println("\tmov     byte [rdx], al");
+        System.out.println("\tadd     dword [rbp-10H], 1");
+        System.out.println("sjtulc_002:");
+        System.out.println("\tmov     eax, dword [rbp-10H]");
+        System.out.println("\tmovsxd  rdx, eax");
+        System.out.println("\tmov     rax, qword [rbp-18H]");
+        System.out.println("\tadd     rax, rdx");
+        System.out.println("\tmovzx   eax, byte [rax]");
+        System.out.println("\ttest    al, al");
+        System.out.println("\tjnz     sjtulc_001");
+        System.out.println("\tjmp     sjtulc_004");
+        System.out.println("sjtulc_003:");
+        System.out.println("\tmov     edx, dword [rbp-0CH]");
+        System.out.println("\tmov     eax, dword [rbp-10H]");
+        System.out.println("\tadd     eax, edx");
+        System.out.println("\tmovsxd  rdx, eax");
+        System.out.println("\tmov     rax, qword [rbp-8H]");
+        System.out.println("\tadd     rdx, rax");
+        System.out.println("\tmov     eax, dword [rbp-0CH]");
+        System.out.println("\tmovsxd  rcx, eax");
+        System.out.println("\tmov     rax, qword [rbp-20H]");
+        System.out.println("\tadd     rax, rcx");
+        System.out.println("\tmovzx   eax, byte [rax]");
+        System.out.println("\tmov     byte [rdx], al");
+        System.out.println("\tadd     dword [rbp-0CH], 1");
+        System.out.println("sjtulc_004:");
+        System.out.println("\tmov     eax, dword [rbp-0CH]");
+        System.out.println("\tmovsxd  rdx, eax");
+        System.out.println("\tmov     rax, qword [rbp-20H]");
+        System.out.println("\tadd     rax, rdx");
+        System.out.println("\tmovzx   eax, byte [rax]");
+        System.out.println("\ttest    al, al");
+        System.out.println("\tjnz     sjtulc_003");
+        System.out.println("\tmov     edx, dword [rbp-10H]");
+        System.out.println("\tmov     eax, dword [rbp-0CH]");
+        System.out.println("\tadd     eax, edx");
+        System.out.println("\tmovsxd  rdx, eax");
+        System.out.println("\tmov     rax, qword [rbp-8H]");
+        System.out.println("\tadd     rax, rdx");
+        System.out.println("\tmov     byte [rax], 0");
+        System.out.println("\tmov     rax, qword [rbp-8H]");
+        System.out.println("\tleave");
+        System.out.println("\tret");
 
 
 
