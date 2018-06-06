@@ -148,7 +148,15 @@ class Tern {
                     System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
                 }
             }
-            {
+            if (op == Opcode.cmp && src1 instanceof imm) {
+                System.out.println("\tmov\trax," + src1.contxt);
+                System.out.print("\tcmp\trax,");
+                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                    System.out.println("rbx");
+                    ((reg) src2).reg = "rbx";
+                } else System.out.println(src2.contxt);
+            }
+            else {
                 System.out.print("\t" + op + "\t");
                 if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
                     System.out.print("rax,");
@@ -595,8 +603,11 @@ public class ternary {
             for (int i = ((FuncScope)u.V).para.size()-1; i >= 0 ; --i){
                 Tern t = new Tern();
                 if (i >= 6){
-                    t.op = Opcode.pop;
+                    t.op = Opcode.mov;
                     t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
+                    t.src2 = new reg();
+                    ((reg) t.src2).memory = "rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8);
+                    ((reg) t.src2).contxt = "[rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8) + "]";
                 }
                 else {
                     t.op = Opcode.mov;
@@ -662,6 +673,15 @@ public class ternary {
                     u.V.var.get(((ParaNode) u).ID).IR_name.memory = "_" + ((ParaNode) u).ID;
                 }
             }
+        }
+
+        else if (u instanceof Return_Bool_Str && ((Return_Bool_Str) u).flag){
+            MethodNode temp = new MethodNode();
+            temp.Argument = new ListExpressionNode();
+            temp.Argument.list.add(((InfixExpressionNode) u).Left);
+            temp.Argument.list.add(((InfixExpressionNode) u).Right);
+            temp.FuncID = "_"+((InfixExpressionNode) u).op.toString();
+            return dfs(temp, v);
         }
 
         else if (u instanceof GreNode){
@@ -1750,7 +1770,7 @@ public class ternary {
                     Tern tmp = new Tern();
                     tmp.op = Opcode.push;
                     tmp.src1 = new reg();
-                    tmp.src1.contxt = "reg";
+                    tmp.src1.contxt = "rdi";
                     v.content.add(tmp);
             }
             for (int i = 0; i < ((FuncScope) stmp).para.size(); ++i){
@@ -1766,13 +1786,6 @@ public class ternary {
                     tmp0.src1 = paralist.get(i);
                 }
                 v.content.add(tmp0);
-            }
-            if (((FuncScope) stmp).para.size() > 6 && ((FuncScope) stmp).para.size() % 2 ==1){
-                Tern tmp = new Tern();
-                tmp.op = Opcode.pop;
-                tmp.src1 = new reg();
-                tmp.src1.contxt = "reg";
-                v.content.add(tmp);
             }
 
             Tern tmp = new Tern();
@@ -1790,6 +1803,22 @@ public class ternary {
             t.src2 = new reg();
             t.src2.contxt = "rax";
             v.content.add(t);
+
+            for (int i = 6; i < ((FuncScope) stmp).para.size(); ++i){
+                Tern tt = new Tern();
+                tt.op = Opcode.pop;
+                tt.src1 = new reg();
+                tt.src1.contxt = "rax";
+                v.content.add(tt);
+            }
+
+            if (((FuncScope) stmp).para.size() > 6 && ((FuncScope) stmp).para.size() % 2 ==1){
+                Tern tt = new Tern();
+                tt.op = Opcode.pop;
+                tt.src1 = new reg();
+                tt.src1.contxt = "rax";
+                v.content.add(tt);
+            }
 
 //            if (((FuncScope) ftmp).para != null){
 //                int tt = (6 < ((FuncScope) ftmp).para.size()) ? 6 : ((FuncScope) ftmp).para.size();

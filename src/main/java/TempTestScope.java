@@ -1,3 +1,4 @@
+
 import java.util.*;
 
 
@@ -192,12 +193,136 @@ public class TempTestScope {
         Add.IR_name = "_add";
         Add.para.get(0).IR_name = new reg();
         Add.para.get(0).IR_name.contxt = "%va_1";
-        Add.var.get("S1").IR_name = Print.para.get(0).IR_name;
+        Add.var.get("S1").IR_name = Add.para.get(0).IR_name;
         Add.para.get(1).IR_name = new reg();
         Add.para.get(1).IR_name.contxt = "%va_2";
-        Add.var.get("S2").IR_name = Print.para.get(0).IR_name;
+        Add.var.get("S2").IR_name = Add.para.get(0).IR_name;
         Add.Return_IR_name = "%fadd";
 
+        FuncScope Setl = new FuncScope();
+        Setl.Return = "bool";
+        Setl.name = "_setl";
+        VarTypeRef tmp9 = new VarTypeRef();
+        ParTypeRef t9 = new ParTypeRef();
+        tmp9.Type = t9.Type = "string";
+        t9.ID = "S1";
+        Setl.para.add(t9);
+        Setl.var.put("S1", tmp9);
+        VarTypeRef tmp10 = new VarTypeRef();
+        ParTypeRef t10 = new ParTypeRef();
+        tmp10.Type = t10.Type = "string";
+        t10.ID = "S2";
+        Setl.para.add(t10);
+        Setl.var.put("S2", tmp10);
+        Root.func.put("_setl", Setl);
+        Setl.IR_name = "_setl";
+        Setl.para.get(0).IR_name = new reg();
+        Setl.para.get(0).IR_name.contxt = "%va_3";
+        Setl.var.get("S1").IR_name = Setl.para.get(0).IR_name;
+        Setl.para.get(1).IR_name = new reg();
+        Setl.para.get(1).IR_name.contxt = "%va_4";
+        Setl.var.get("S2").IR_name = Setl.para.get(0).IR_name;
+        Setl.Return_IR_name = "%fsetl";
+
+        FuncScope Setg = new FuncScope();
+        Setg.Return = "bool";
+        Setg.name = "_setg";
+        VarTypeRef tmp11 = new VarTypeRef();
+        ParTypeRef t11 = new ParTypeRef();
+        tmp11.Type = t11.Type = "string";
+        t11.ID = "S1";
+        Setg.para.add(t11);
+        Setg.var.put("S1", tmp11);
+        VarTypeRef tmp12 = new VarTypeRef();
+        ParTypeRef t12 = new ParTypeRef();
+        tmp12.Type = t12.Type = "string";
+        t12.ID = "S2";
+        Setg.para.add(t12);
+        Setg.var.put("S2", tmp12);
+        Root.func.put("_setg", Setg);
+        Setg.IR_name = "_setg";
+        Setg.para.get(0).IR_name = new reg();
+        Setg.para.get(0).IR_name.contxt = "%va_5";
+        Setg.var.get("S1").IR_name = Setg.para.get(0).IR_name;
+        Setg.para.get(1).IR_name = new reg();
+        Setg.para.get(1).IR_name.contxt = "%va_6";
+        Setg.var.get("S2").IR_name = Setg.para.get(0).IR_name;
+        Setg.Return_IR_name = "%setg";
+
+        FuncScope Sete = new FuncScope();
+        Sete.Return = "bool";
+        Sete.name = "_sete";
+        VarTypeRef tmp13 = new VarTypeRef();
+        ParTypeRef t13 = new ParTypeRef();
+        tmp13.Type = t13.Type = "string";
+        t13.ID = "S1";
+        Sete.para.add(t13);
+        Sete.var.put("S1", tmp13);
+        VarTypeRef tmp14 = new VarTypeRef();
+        ParTypeRef t14 = new ParTypeRef();
+        tmp14.Type = t14.Type = "string";
+        t14.ID = "S2";
+        Sete.para.add(t14);
+        Sete.var.put("S2", tmp14);
+        Root.func.put("_sete", Sete);
+        Sete.IR_name = "_sete";
+        Sete.para.get(0).IR_name = new reg();
+        Sete.para.get(0).IR_name.contxt = "%va_7";
+        Sete.var.get("S1").IR_name = Sete.para.get(0).IR_name;
+        Sete.para.get(1).IR_name = new reg();
+        Sete.para.get(1).IR_name.contxt = "%va_8";
+        Sete.var.get("S2").IR_name = Sete.para.get(0).IR_name;
+        Sete.Return_IR_name = "%sete";
+
+        FuncScope Setle = new FuncScope();
+        Setle.Return = "bool";
+        Setle.name = "_setle";
+        VarTypeRef tmp15 = new VarTypeRef();
+        ParTypeRef t15 = new ParTypeRef();
+        tmp15.Type = t15.Type = "string";
+        t15.ID = "S1";
+        Setle.para.add(t15);
+        Setle.var.put("S1", tmp15);
+        VarTypeRef tmp16 = new VarTypeRef();
+        ParTypeRef t16 = new ParTypeRef();
+        tmp16.Type = t16.Type = "string";
+        t16.ID = "S2";
+        Setle.para.add(t16);
+        Setle.var.put("S2", tmp16);
+        Root.func.put("_setle", Setle);
+        Setle.IR_name = "_setle";
+        Setle.para.get(0).IR_name = new reg();
+        Setle.para.get(0).IR_name.contxt = "%va_9";
+        Setle.var.get("S1").IR_name = Setle.para.get(0).IR_name;
+        Setle.para.get(1).IR_name = new reg();
+        Setle.para.get(1).IR_name.contxt = "%va_10";
+        Setle.var.get("S2").IR_name = Setle.para.get(0).IR_name;
+        Setle.Return_IR_name = "%setle";
+
+        FuncScope Setge = new FuncScope();
+        Setge.Return = "bool";
+        Setge.name = "_setge";
+        VarTypeRef tmp17 = new VarTypeRef();
+        ParTypeRef t17 = new ParTypeRef();
+        tmp17.Type = t17.Type = "string";
+        t17.ID = "S1";
+        Setge.para.add(t17);
+        Setge.var.put("S1", tmp17);
+        VarTypeRef tmp18 = new VarTypeRef();
+        ParTypeRef t18 = new ParTypeRef();
+        tmp18.Type = t18.Type = "string";
+        t18.ID = "S2";
+        Setge.para.add(t18);
+        Setge.var.put("S2", tmp18);
+        Root.func.put("_setge", Setge);
+        Setge.IR_name = "_setge";
+        Setge.para.get(0).IR_name = new reg();
+        Setge.para.get(0).IR_name.contxt = "%va_11";
+        Setge.var.get("S1").IR_name = Setge.para.get(0).IR_name;
+        Setge.para.get(1).IR_name = new reg();
+        Setge.para.get(1).IR_name.contxt = "%va_12";
+        Setge.var.get("S2").IR_name = Setge.para.get(0).IR_name;
+        Setge.Return_IR_name = "%setge";
 
 
     }
@@ -954,6 +1079,10 @@ public class TempTestScope {
                         System.err.println(u.Location.line + " " + u.Location.column + "This function is not in " + t1.S);
                         System.exit(1);
                     }
+
+                    if (((MethodNode) ((ClassNode) u).Varname).Argument != null)
+                    for (int i = 0; i < ((MethodNode) ((ClassNode) u).Varname).Argument.list.size(); ++i)
+                        dfs1(((MethodNode) ((ClassNode) u).Varname).Argument.list.get(i), v);
 
                     ((MethodNode) ((ClassNode) u).Varname).InClass = t1.S;
                     if (tt.Return.equals("int")) t2 = new IntType();
