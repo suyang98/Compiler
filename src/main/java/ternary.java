@@ -657,6 +657,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((GreNode) u).Left, v);
             tmp.src2 = dfs(((GreNode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setg;
             tmp2.src1 = new reg();
@@ -680,6 +698,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((GAENode) u).Left, v);
             tmp.src2 = dfs(((GAENode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setge;
             tmp2.src1 = new reg();
@@ -703,6 +739,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((LesNode) u).Left, v);
             tmp.src2 = dfs(((LesNode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setl;
             tmp2.src1 = new reg();
@@ -726,6 +780,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((LAENode) u).Left, v);
             tmp.src2 = dfs(((LAENode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setle;
             tmp2.src1 = new reg();
@@ -750,6 +822,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((EquNode) u).Left, v);
             tmp.src2 = dfs(((EquNode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.sete;
             tmp2.src1 = new reg();
@@ -773,6 +863,24 @@ public class ternary {
             tmp.op = Opcode.cmp;
             tmp.src1 = dfs(((NEqNode) u).Left, v);
             tmp.src2 = dfs(((NEqNode) u).Right, v);
+            if (tmp.src1 instanceof reg && tmp.src1.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src1;
+                v.content.add(t);
+                tmp.src1 = t.src1;
+            }
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%v" + String.valueOf(cnt++);
+                t.src2 = tmp.src2;
+                v.content.add(t);
+                tmp.src2 = t.src1;
+            }
             Tern tmp2 = new Tern();
             tmp2.op = Opcode.setne;
             tmp2.src1 = new reg();
@@ -1033,8 +1141,16 @@ public class ternary {
 //                v.content.add(tt);
 //                tmp.src1 = tt.src1;
 //            }
-            tmp.op = ((PreNode) u).op;
-            v.content.add(tmp);
+            if (u instanceof LNoNode){
+                tmp.op = Opcode.xor;
+                v.content.add(tmp);
+                tmp.src2 = new imm();
+                tmp.src2.contxt = "1";
+            }
+            else {
+                tmp.op = ((PreNode) u).op;
+                v.content.add(tmp);
+            }
             while (flag_tern.size() != 0){
                 v.content.add(flag_tern.pop());
             }

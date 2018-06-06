@@ -327,9 +327,7 @@ class PreDecNode extends PreNode {
 }
 
 class LNoNode extends PreNode {
-    LNoNode() {
-        op = Opcode.not;
-    }
+    LNoNode() { op = Opcode.not; }
 }
 
 class ANoNode extends PreNode {
