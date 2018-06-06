@@ -12,7 +12,7 @@ public class mayfinal {
         System.out.println("global\ttostring");
         System.out.println("global\ttranstring");
         for (int i = 0; i < root.GV.size(); ++i)
-            System.out.println("global\t" + root.GV.get(i));
+            System.out.println("global\t_" + root.GV.get(i));
 
         System.out.println("");
         System.out.println("extern\tmalloc");
@@ -25,7 +25,7 @@ public class mayfinal {
 
         System.out.println("\nsection .data");
         for (int i = 0; i < root.GV.size(); ++i)
-            System.out.println(root.GV.get(i)+":\tdq\t0");
+            System.out.println("_" + root.GV.get(i)+":\tdq\t0");
         for (Object key:root.signal.keySet()){
             System.out.print(key+":");
             String str = root.signal.get(key);

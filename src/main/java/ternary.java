@@ -240,8 +240,8 @@ public class ternary {
     }
 
     void alloc(){
-        //printcontext();
-        //System.out.println("\n");
+        printcontext();
+        System.out.println("\n");
         add_all();
         //flow(root.gen_var);
         for (int i = 0; i < root.gen_var.content.size(); ++i)
@@ -399,30 +399,42 @@ public class ternary {
 
     }
 
-    tnode define_arr(CreateNode u, BasicBlock v, int i){
+    tnode define_arr(CreateNode u, BasicBlock v, int i, int l){
         Tern tmp0 = new Tern();
         tmp0.op = Opcode.mov;
         tmp0.src2 = dfs(u.Index.get(i), v);
         tmp0.src1 = new reg();
         tmp0.src1.contxt = "%v" + String.valueOf(cnt++);
         v.content.add(tmp0);
+
+        Tern tmp2 = new Tern();
+        if (i != u.Index.size()-1) {
+            tmp2.op = Opcode.imul;
+            tmp2.src1 = tmp0.src1;
+            tmp2.src2 = new imm();
+            tmp2.src2.contxt = "8";
+            v.content.add(tmp2);
+        }
+        else {
+            tmp2.op = Opcode.imul;
+            tmp2.src1 = tmp0.src1;
+            tmp2.src2 = new imm();
+            tmp2.src2.contxt = Integer.toString(l);
+            v.content.add(tmp2);
+        }
+
         Tern tmp1 = new Tern();
         tmp1.op = Opcode.add;
-        tmp1.src1 = tmp0.src1;
+        tmp1.src1 = tmp2.src1;
         tmp1.src2 = new imm();
-        tmp1.src2.contxt = "1";
+        tmp1.src2.contxt = "8";
         v.content.add(tmp1);
-        Tern tmp2 = new Tern();
-        tmp2.op = Opcode.imul;
-        tmp2.src1 = tmp1.src1;
-        tmp2.src2 = new imm();
-        tmp2.src2.contxt = "8";
-        v.content.add(tmp2);
+
         Tern tmp3 = new Tern();
         tmp3.op = Opcode.mov;
         tmp3.src1 = new reg();
         tmp3.src1.contxt = "rdi";
-        tmp3.src2 = tmp2.src1;
+        tmp3.src2 = tmp1.src1;
         v.content.add(tmp3);
         Tern tmp4 = new Tern();
         tmp4.op = Opcode.call;
@@ -473,7 +485,7 @@ public class ternary {
             Tern tmp9 = new Tern();
             tmp9.op = Opcode.store;
             tmp9.src1 = tmp.src1;
-            tmp9.src2 = define_arr(u, t1, i+1);
+            tmp9.src2 = define_arr(u, t1, i+1, l);
             t1.content.add(tmp9);
             Tern tmp8 = new Tern();
             tmp8.op = Opcode.add;
@@ -634,7 +646,7 @@ public class ternary {
                 }
 
                 if (u.V instanceof GeneralScope){
-                    ((reg) t.src1).memory = ((ParaNode) u).ID;
+                    ((reg) t.src1).memory = "_" + ((ParaNode) u).ID;
                     u.V.var.get(((ParaNode) u).ID).IR_name.memory = ((reg) t.src1).memory;
                     u.V.var.get(((ParaNode) u).ID).IR_name.contxt = ((reg) t.src1).contxt;
                     root.GV.add(((ParaNode) u).ID);
@@ -647,7 +659,7 @@ public class ternary {
                 cnt++;
                 if (u.V instanceof GeneralScope){
                     root.GV.add(((ParaNode) u).ID);
-                    u.V.var.get(((ParaNode) u).ID).IR_name.memory = ((ParaNode) u).ID;
+                    u.V.var.get(((ParaNode) u).ID).IR_name.memory = "_" + ((ParaNode) u).ID;
                 }
             }
         }
@@ -976,28 +988,6 @@ public class ternary {
                     }
                 }
             }
-//            if (((InfixExpressionNode) u).Right instanceof ArrNode ||
-//                    ((((InfixExpressionNode) u).Right instanceof ClassNode) && !(((ClassNode) ((InfixExpressionNode) u).Right).Varname instanceof  MethodNode)){
-//                Tern tt = new Tern();
-//                tt.op = Opcode.load;
-//                tt.src2 = tmp.src2;
-//                tt.src1 = new reg();
-//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
-//                v.content.add(tt);
-//                tmp.src2 = tt.src1;
-//            }
-//
-//            if (((InfixExpressionNode) u).Left instanceof ArrNode ||
-//                    ((((InfixExpressionNode) u).Left instanceof ClassNode) && !(((ClassNode) ((InfixExpressionNode) u).Left).Varname instanceof  MethodNode)){
-//                Tern tt = new Tern();
-//                tt.op = Opcode.load;
-//                tt.src2 = tmp.src1;
-//                tt.src1 = new reg();
-//                tt.src1.contxt = "%v" + String.valueOf(cnt++);
-//                v.content.add(tt);
-//                tmp.src1 = tt.src1;
-//            }
-
             if (u instanceof DivNode) {
                 if (tmp.src2.contxt.equals("rax") || tmp.src2 instanceof imm){
                     Tern t = new Tern();
@@ -1021,9 +1011,6 @@ public class ternary {
                 v.content.add(tmp1);
                 v.content.add(tmp2);
                 v.content.add(tmp);
-//                while (flag_tern.size() != 0){
-//                    v.content.add(flag_tern.pop());
-//                }
                 return tmp1.src1;
             }
             else if (u instanceof ModNode) {
@@ -1056,6 +1043,7 @@ public class ternary {
                 }
                 return t;
             }
+
             else{
 //                if (tmp.src1 instanceof imm){
 //                    tnode t = tmp.src1;
@@ -1541,7 +1529,15 @@ public class ternary {
         }
 
         else if (u instanceof CreateNode){
-            if (!(((CreateNode) u).VarTYpe.equals("int")|| ((CreateNode) u).VarTYpe.equals("bool"))) {
+            if (((CreateNode) u).dim != 0) {
+                if (((CreateNode) u).VarTYpe.equals("int")|| ((CreateNode) u).VarTYpe.equals("bool"))
+                    return define_arr((CreateNode) u, v, 0, 8);
+                else {
+                    ClassScope ctmp = General.clas.get(((CreateNode) u).VarTYpe);
+                    return define_arr((CreateNode) u, v, 0, ctmp.var.size()*8);
+                }
+            }
+            else {
                 ClassScope ctmp = General.clas.get(((CreateNode) u).VarTYpe);
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.mov;
@@ -1571,7 +1567,6 @@ public class ternary {
                 }
                 return tmp3.src1;
             }
-            else return define_arr((CreateNode) u, v, 0);
         }
 
         else if (u instanceof ClassNode) {
