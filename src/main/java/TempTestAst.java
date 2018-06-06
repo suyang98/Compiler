@@ -780,7 +780,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public MethodNode visitExpr_meth(demoParser.Expr_methContext ctx){
         MethodNode tmp = (MethodNode) visit(ctx.methodcall());
-        for (int i = 0; i < tmp.Argument.size(); ++i)
+        for (int i = 0; tmp.Argument != null && i < tmp.Argument.size(); ++i)
             tmp.Argument.list.get(i).Is_Return = true;
         return tmp;
     }
