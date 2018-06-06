@@ -802,6 +802,15 @@ public class ternary {
             }
             Tern tmp = new Tern();
             tmp.src2 = dfs(((InfixExpressionNode) u).Right, v);
+            if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
+                Tern t0 = new Tern();
+                t0.op = Opcode.mov;
+                t0.src1 = new reg();
+                t0.src1.contxt = "%v" + String.valueOf(cnt++);
+                t0.src2 = tmp.src2;
+                v.content.add(t0);
+                tmp.src2 = t0.src1;
+            }
             tmp.src1 = dfs(((InfixExpressionNode) u).Left, v);
             if (u instanceof AssignNode) {
                 if ((((AssignNode) u).Right instanceof ArrNode) ||
@@ -838,10 +847,11 @@ public class ternary {
                     if ((((AssignNode) u).Left instanceof ArrNode) ||
                             ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
                         //arr_reg
-                        v.content.set(v.content.size()-1, tmp);
+                        int i = v.content.size()-1;
+                        while (v.content.get(i).op != Opcode.load) i--;
+                        v.content.set(i, tmp);
                         tmp.op = Opcode.store;
-                        tmp.src1 = v.content.get(v.content.size()-2).src1;
-                        v.content.add(tmp);
+                        tmp.src1 = v.content.get(i-1).src1;
                         while (flag_tern.size() != 0){
                             v.content.add(flag_tern.pop());
                         }
@@ -903,9 +913,9 @@ public class ternary {
                 v.content.add(tmp1);
                 v.content.add(tmp2);
                 v.content.add(tmp);
-                while (flag_tern.size() != 0){
-                    v.content.add(flag_tern.pop());
-                }
+//                while (flag_tern.size() != 0){
+//                    v.content.add(flag_tern.pop());
+//                }
                 return tmp1.src1;
             }
             else if (u instanceof ModNode) {

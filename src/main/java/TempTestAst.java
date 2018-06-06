@@ -780,6 +780,8 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public MethodNode visitExpr_meth(demoParser.Expr_methContext ctx){
         MethodNode tmp = (MethodNode) visit(ctx.methodcall());
+        for (int i = 0; i < tmp.Argument.size(); ++i)
+            tmp.Argument.list.get(i).Is_Return = true;
         return tmp;
     }
 
@@ -812,6 +814,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         if (tmp.ID instanceof CreateNode && !ctx.idname.getText().contains("(")){
             System.exit(1);
         }
+        tmp.Index.Is_Return = true;
         return tmp;
     }
 
@@ -827,6 +830,8 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     @Override
     public CreateNode visitExpr_crea(demoParser.Expr_creaContext ctx){
         CreateNode tmp = (CreateNode) visit(ctx.creator());
+        for (int i = 0; i < tmp.Index.size(); ++i)
+            tmp.Index.get(i).Is_Return = true;
         return tmp;
     }
 
@@ -881,6 +886,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         tmp.Left = (ExpressionNode) visit(ctx.left);
         tmp.Right = (ExpressionNode) visit(ctx.right);
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
+        tmp.Left.Is_Return = tmp.Right.Is_Return = true;
         return tmp;
     }
 
@@ -892,6 +898,7 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         tmp.Left = (ExpressionNode) visit(ctx.left);
         tmp.Right = (ExpressionNode) visit(ctx.right);
         tmp.Location.get_location(ctx.start.getLine(),ctx.start.getCharPositionInLine());
+        tmp.Left.Is_Return = tmp.Right.Is_Return = true;
         return tmp;
     }
 
