@@ -191,8 +191,8 @@ public class mayfinal {
         System.out.print("\tret\n");
         System.out.print("\n");
 
-        //parseInt
-        System.out.print("parseInt:\n");
+        //parseint
+        System.out.print("parseint:\n");
         System.out.print("\tpush    rbp\n");
         System.out.print("\tmov     rbp, rsp\n");
         System.out.print("\tsub     rsp, 32\n");
