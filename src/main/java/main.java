@@ -31,6 +31,8 @@ public class main{
         BuildScope.dfs1(Root, BuildScope.Root);
         BuildScope.put_this();
 
+
+
         Register register = new Register();
         ternary ir = new ternary();
         ir.r = register;
