@@ -1432,8 +1432,11 @@ public class ternary {
                 BasicBlock btmp3 = new BasicBlock();
                 btmp1.name = "then" + String.valueOf(bcnt);
                 btmp2.name = "else" + String.valueOf(bcnt);
-                bcnt++;
                 btmp3.name = "L" + String.valueOf(bcnt);
+                if (bcnt ==13){
+                    int j = 0;
+                    j++;
+                }
                 bcnt++;
                 v.Next = btmp1;
                 btmp1.Next = btmp2;
@@ -1475,14 +1478,14 @@ public class ternary {
                 tmp3.src1.contxt = btmp2.name;
                 LocalScope tt2 = ((LocalScope)u.V).sons.get(((ConditionNode) u).Else.name);
                 tt2.IR_name = tmp3.src1.contxt;
+                BasicBlock ttt1 = btmp1;
                 if (((ConditionNode) u).Then.StateList.size() == 0) dfs(((ConditionNode) u).Then, btmp1);
                 else {
-                    BasicBlock ttt = btmp1;
                     for (int i = 0; i < ((ConditionNode) u).Then.size(); ++i) {
                         Node tt = ((ConditionNode) u).Then.sons(i);
-                        dfs(tt, ttt);
+                        dfs(tt, ttt1);
                         if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode){
-                            ttt = label.pop();
+                            ttt1 = label.pop();
                         }
                     }
                 }
@@ -1490,7 +1493,7 @@ public class ternary {
                 tmp4.op = Opcode.jmp;
                 tmp4.src1 = new labn();
                 tmp4.src1.contxt = btmp3.name;
-                btmp1.content.add(tmp4);
+                ttt1.content.add(tmp4);
                 if (((ConditionNode) u).Else.StateList.size() == 0) dfs(((ConditionNode) u).Else, btmp2);
                 else{
                     BasicBlock ttt = btmp2;
