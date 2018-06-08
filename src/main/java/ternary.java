@@ -637,6 +637,9 @@ public class ternary {
                 dfs(tt, v);
                 if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode) v = label.pop();
                 if (Arr != null) {v = Arr; Arr = null;}
+                while (flag_tern.size() != 0){
+                    v.content.add(flag_tern.pop());
+                }
             }
             u.V.IR_name = tmp.FuncName;
             return null;
@@ -1281,12 +1284,41 @@ public class ternary {
 //                tmp.src1 = tt.src1;
 //            }
             if (((PosNode) u).op == Opcode.dec || ((PosNode) u).op == Opcode.inc) {
-                if (((PosNode) u).Is_Return) {
-                    Tern t = new Tern();
-                    t.op = ((PosNode) u).op;
-                    t.src1 = tmp.src1;
-                    flag_tern.push(t);
-                    return tmp.src1;
+                if (((PosNode) u).InnerNode instanceof ArrNode || (((PosNode) u).InnerNode instanceof ClassNode
+                        && !(((ClassNode) ((PosNode) u).InnerNode).Varname instanceof MethodNode))) {
+                    if (((PosNode) u).Is_Return) {
+                        Tern tmp0 = new Tern();
+                        tmp0.op = ((PosNode) u).op;
+                        tmp0.src1 = tmp.src1;
+                        Tern tmp1 = new Tern();
+                        tmp1.op = Opcode.store;
+                        tmp1.src1 = v.content.get(v.content.size() - 1).src2;
+                        tmp1.src2 = tmp0.src1;
+                        flag_tern.push(tmp1);
+                        flag_tern.push(tmp0);
+                        return tmp.src1;
+                    }
+                    else {
+                        Tern tmp0 = new Tern();
+                        tmp0.op = ((PosNode) u).op;
+                        tmp0.src1 = tmp.src1;
+                        v.content.add(tmp0);
+                        Tern tmp1 = new Tern();
+                        tmp1.op = Opcode.store;
+                        tmp1.src1 = v.content.get(v.content.size() - 2).src2;
+                        tmp1.src2 = tmp0.src1;
+                        v.content.add(tmp1);
+                        return tmp0.src1;
+                    }
+                }
+                else {
+                    if (((PosNode) u).Is_Return) {
+                        Tern t = new Tern();
+                        t.op = ((PosNode) u).op;
+                        t.src1 = tmp.src1;
+                        flag_tern.push(t);
+                        return tmp.src1;
+                    }
                 }
             }
             tmp.op = ((PosNode) u).op;
@@ -1346,6 +1378,22 @@ public class ternary {
                 tmp.src2 = new imm();
                 tmp.src2.contxt = "1";
             }
+            else if ((((PreNode) u).InnerNode instanceof ArrNode ||
+                    ((((PreNode) u).InnerNode instanceof ClassNode) && !(((ClassNode) ((PreNode) u).InnerNode).Varname instanceof  MethodNode)))
+                    &&(u instanceof PreDecNode || u instanceof PreIncNode)){
+                Tern tmp0 = new Tern();
+                tmp0.op = ((PreNode) u).op;
+                tmp0.src1 = tmp.src1;
+                v.content.add(tmp0);
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.store;
+                tmp1.src1 = v.content.get(v.content.size()-2).src2;
+                tmp1.src2 = tmp0.src1;
+                v.content.add(tmp1);
+                return tmp0.src1;
+            }
+
+
             else {
                 tmp.op = ((PreNode) u).op;
                 v.content.add(tmp);
