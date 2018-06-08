@@ -19,6 +19,7 @@ abstract class Node {
     abstract int size();
     abstract Node sons(int i);
     location Location;
+    public boolean Is_Logic = false;
     Scope V;
     Node(){
         this.Location = new location();
@@ -1063,6 +1064,14 @@ public class TempTestAst{
         u.print();
         for (int i = 0; i < u.size(); ++i)
             dfs(u.sons(i));
+    }
+
+    boolean find_logic(Node u) {
+        if (u == null) return false;
+        if (u instanceof LAnNode || u instanceof LOrNode) return true;
+        for (int i = 0; i < u.size(); ++i)
+            if (find_logic(u.sons(i))) u.Is_Logic = true;
+        return false;
     }
 
 }

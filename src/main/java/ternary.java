@@ -80,6 +80,10 @@ class Tern {
     Map<String, reg> in = new HashMap<>();
     Map<String, reg> out = new HashMap<>();
     void print(FuncBlock f){
+        if (op == Opcode.label) {
+            System.out.println(src1.contxt+":");
+            return;
+        }
         if (op == Opcode.idiv) {
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1){
                 ((reg) src1).reg = "rbx";
@@ -221,8 +225,8 @@ public class ternary {
     Stack<BasicBlock> label = new Stack<>();
     Stack<String> Continue = new Stack<>();
     Stack<String> Break = new Stack<>();
-    Stack<BasicBlock> Right_Logic = new Stack<>();
-    Stack<BasicBlock> Wrong_Logic = new Stack<>();
+    Stack<String> Right_Logic = new Stack<>();
+    Stack<String> Wrong_Logic = new Stack<>();
     boolean logic = false;
     GeneralScope General;
     Register r;
@@ -275,6 +279,14 @@ public class ternary {
 
     }
 
+    boolean isLogic(Node u){
+        if (u == null) return false;
+        if (u instanceof LAnNode || u instanceof LOrNode) return true;
+        for (int i = 0 ; i < u.size(); ++i)
+            if (isLogic(u.sons(i))) return true;
+        return false;
+    }
+
     void printcontext(){
         for (Object obj: root.Blocks.keySet()){
             String key = (String) obj;
@@ -282,7 +294,6 @@ public class ternary {
             print_dfs(tmp);
         }
     }
-
 
 
     void print_dfs(BasicBlock tmp){
@@ -544,50 +555,6 @@ public class ternary {
         return tmp6.src1;
     }
 
-//    BasicBlock logic_shortcut(ExpressionNode u, BasicBlock v, BasicBlock second){
-//        if (u instanceof LAnNode) {
-//            BasicBlock first = new BasicBlock();
-//            first.name = "Log" + String.valueOf(bcnt++);
-//            root.All.put(first.name, first);
-//            v.Next = first;
-//            first.Next = second;
-//            if (((LAnNode) u).Left instanceof LAnNode || ((LAnNode) u).Left instanceof LOrNode)
-//                v = logic_shortcut(((LAnNode) u).Left, v, first);
-//            else {
-//                Tern tmp = new Tern();
-//                tmp.op = Opcode.test;
-//                tmp.src1 = dfs(((LAnNode) u).Left, v);
-//                tmp.src2 = new imm();
-//                tmp.src2.contxt = "1";
-//                v.content.add(tmp);
-//            }
-//            Tern tmp1 = new Tern();
-//            tmp1.op = Opcode.jnz;
-//            tmp1.src1 = new labn();
-//            tmp1.src1.contxt = first.name;
-//            v.content.add(tmp1);
-//            Tern tmp2 = new Tern();
-//            tmp2.op = Opcode.jz;
-//            tmp2.src1 = new labn();
-//            tmp2.src1.contxt = second.name;
-//            v.content.add(tmp2);
-//            if (((LAnNode) u).Right instanceof LOrNode || ((LAnNode) u).Right instanceof LAnNode)
-//                v = logic_shortcut(((LAnNode) u).Right, v, second);
-//            else dfs(((LAnNode) u).Right, first);
-//            return second;
-//
-//        }
-//
-//        else if (u instanceof LOrNode) {
-//            BasicBlock first = new BasicBlock();
-//            first.name = "Log" + String.valueOf(bcnt++);
-//            root.All.put(first.name, first);
-//            v.Next = first;
-//            first.Next = second;
-//
-//        }
-//    }
-
 
     tnode dfs(Node u, BasicBlock v){
         if (u == null) return null;
@@ -686,18 +653,79 @@ public class ternary {
                     cnt++;
                     u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
                     t.src2 = dfs(((ParaNode) u).Init, v);
-                    if (Arr != null) {v = Arr;}
+                    if (Arr != null) v = Arr;
                     v.content.add(t);
                 }
                 else {
-                    t.op = Opcode.mov;
-                    t.src1 = new reg();
-                    ((reg) t.src1).contxt = "%v"+((ParaNode) u).ID + String.valueOf(cnt);
-                    cnt++;
-                    u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
-                    t.src2 = dfs(((ParaNode) u).Init, v);
-                    if (Arr != null) {v = Arr;}
-                    v.content.add(t);
+                    if (isLogic(u)){
+                        String t1 = "Log" + String.valueOf(bcnt++);
+                        String t2 = "Log" + String.valueOf(bcnt++);
+                        String t3 = "L" + String.valueOf(bcnt++);
+                        Tern tmp0 = new Tern();
+                        tmp0.op = Opcode.mov;
+                        Right_Logic.push(t1);
+                        Wrong_Logic.push(t2);
+                        tmp0.src2 = dfs(((ParaNode) u).Init, v);
+                        Right_Logic.pop();
+                        Wrong_Logic.pop();
+                        tmp0.src1 = new reg();
+                        tmp0.src1.contxt = "%v" + ((ParaNode) u).ID + String.valueOf(cnt++);
+                        u.V.var.get(((ParaNode) u).ID).IR_name.contxt = tmp0.src1.contxt;
+                        v.content.add(tmp0);
+                        Tern tmp1 = new Tern();
+                        tmp1.op = Opcode.jmp;
+                        tmp1.src1 = new labn();
+                        tmp1.src1.contxt = t3;
+                        v.content.add(tmp1);
+                        Tern tmp2 = new Tern();
+                        tmp2.op = Opcode.label;
+                        tmp2.src1 = new labn();
+                        tmp2.src1.contxt = t1;
+                        v.content.add(tmp2);
+                        Tern tmp3 = new Tern();
+                        tmp3.op = Opcode.mov;
+                        tmp3.src1 = tmp0.src1;
+                        tmp3.src2 = new imm();
+                        tmp3.src2.contxt = "1";
+                        v.content.add(tmp3);
+                        Tern tmp4 = new Tern();
+                        tmp4.op = Opcode.jmp;
+                        tmp4.src1 = new labn();
+                        tmp4.src1.contxt = t3;
+                        v.content.add(tmp4);
+                        Tern tmp5 = new Tern();
+                        tmp5.op = Opcode.label;
+                        tmp5.src1 = new labn();
+                        tmp5.src1.contxt = t2;
+                        v.content.add(tmp5);
+                        Tern tmp6 = new Tern();
+                        tmp6.op = Opcode.mov;
+                        tmp6.src1 = tmp0.src1;
+                        tmp6.src2 = new imm();
+                        tmp6.src2.contxt = "0";
+                        v.content.add(tmp6);
+                        Tern tmp7 = new Tern();
+                        tmp7.op = Opcode.jmp;
+                        tmp7.src1 = new labn();
+                        tmp7.src1.contxt = t3;
+                        v.content.add(tmp7);
+                        Tern tmp8 = new Tern();
+                        tmp8.op = Opcode.label;
+                        tmp8.src1 = new labn();
+                        tmp8.src1.contxt = t3;
+                        v.content.add(tmp8);
+
+                    }
+                    else {
+                        t.op = Opcode.mov;
+                        t.src1 = new reg();
+                        ((reg) t.src1).contxt = "%v" + ((ParaNode) u).ID + String.valueOf(cnt);
+                        cnt++;
+                        u.V.var.get(((ParaNode) u).ID).IR_name.contxt = t.src1.contxt;
+                        t.src2 = dfs(((ParaNode) u).Init, v);
+                        if (Arr != null) v = Arr;
+                        v.content.add(t);
+                    }
                 }
 
                 while (flag_tern.size() != 0){
@@ -749,7 +777,7 @@ public class ternary {
             Tern tmp1 = new Tern();
             tmp1.op = Opcode.jz;
             tmp1.src1 = new labn();
-            tmp1.src1.contxt = Wrong_Logic.peek().name;
+            tmp1.src1.contxt = Wrong_Logic.peek();
             v.content.add(tmp1);
             return dfs(((LAnNode) u).Right, v);
         }
@@ -771,7 +799,7 @@ public class ternary {
             Tern tmp1 = new Tern();
             tmp1.op = Opcode.jnz;
             tmp1.src1 = new labn();
-            tmp1.src1.contxt = Right_Logic.peek().name;
+            tmp1.src1.contxt = Right_Logic.peek();
             v.content.add(tmp1);
             return dfs(((LOrNode) u).Right, v);
         }
@@ -1032,6 +1060,69 @@ public class ternary {
                 temp.FuncID = "_"+((InfixExpressionNode) u).op.toString();
                 return dfs(temp, v);
             }
+
+            if (u instanceof AssignNode && isLogic(u)){
+                String t1 = "Log" + String.valueOf(bcnt++);
+                String t2 = "Log" + String.valueOf(bcnt++);
+                String t3 = "L" + String.valueOf(bcnt++);
+                Tern tmp0 = new Tern();
+                tmp0.op = Opcode.mov;
+                Right_Logic.push(t1);
+                Wrong_Logic.push(t2);
+                tmp0.src2 = dfs(((AssignNode) u).Right, v);
+                Right_Logic.pop();
+                Wrong_Logic.pop();
+                tmp0.src1 = dfs(((AssignNode) u).Left, v);
+                v.content.add(tmp0);
+                Tern tmp1 = new Tern();
+                tmp1.op = Opcode.jmp;
+                tmp1.src1 = new labn();
+                tmp1.src1.contxt = t3;
+                v.content.add(tmp1);
+                Tern tmp2 = new Tern();
+                tmp2.op = Opcode.label;
+                tmp2.src1 = new labn();
+                tmp2.src1.contxt = t1;
+                v.content.add(tmp2);
+                Tern tmp3 = new Tern();
+                tmp3.op = Opcode.mov;
+                tmp3.src1 = tmp0.src1;
+                tmp3.src2 = new imm();
+                tmp3.src2.contxt = "1";
+                v.content.add(tmp3);
+                Tern tmp4 = new Tern();
+                tmp4.op = Opcode.jmp;
+                tmp4.src1 = new labn();
+                tmp4.src1.contxt = t3;
+                v.content.add(tmp4);
+                Tern tmp5 = new Tern();
+                tmp5.op = Opcode.label;
+                tmp5.src1 = new labn();
+                tmp5.src1.contxt = t2;
+                v.content.add(tmp5);
+                Tern tmp6 = new Tern();
+                tmp6.op = Opcode.mov;
+                tmp6.src1 = tmp0.src1;
+                tmp6.src2 = new imm();
+                tmp6.src2.contxt = "0";
+                v.content.add(tmp6);
+                Tern tmp7 = new Tern();
+                tmp7.op = Opcode.jmp;
+                tmp7.src1 = new labn();
+                tmp7.src1.contxt = t3;
+                v.content.add(tmp7);
+                Tern tmp8 = new Tern();
+                tmp8.op = Opcode.label;
+                tmp8.src1 = new labn();
+                tmp8.src1.contxt = t3;
+                v.content.add(tmp8);
+
+                while (flag_tern.size() != 0){
+                    v.content.add(flag_tern.pop());
+                }
+                return null;
+            }
+
             Tern tmp = new Tern();
             tmp.src2 = dfs(((InfixExpressionNode) u).Right, v);
             if (tmp.src2 instanceof reg && tmp.src2.contxt.indexOf("%") == -1){
@@ -1050,12 +1141,6 @@ public class ternary {
                     if ((((AssignNode) u).Left instanceof ArrNode) ||
                             ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
                         //arr_arr
-//                        Tern tmp1 = new Tern();
-//                        tmp1.op = Opcode.load;
-//                        tmp1.src1 = new reg();
-//                        tmp1.src1.contxt = "%v" + String.valueOf(cnt++);
-//                        tmp1.src2 = tmp.src2;
-//                        v.content.add(tmp1);
                         v.content.set(v.content.size()-1, tmp);
                         tmp.op = Opcode.store;
                         tmp.src1 = v.content.get(v.content.size()-2).src1;
@@ -1066,7 +1151,6 @@ public class ternary {
                     }
                     else {
                         //reg_arr
-                        //tmp.op = Opcode.load;
                         tmp.op = Opcode.mov;
                         v.content.add(tmp);
                         while (flag_tern.size() != 0){
@@ -1157,11 +1241,6 @@ public class ternary {
             }
 
             else{
-//                if (tmp.src1 instanceof imm){
-//                    tnode t = tmp.src1;
-//                    tmp.src1 = tmp.src2;
-//                    tmp.src2 = t;
-//                }
                 Tern tmp0 = new Tern();
                 tmp0.op = Opcode.mov;
                 tmp0.src2 = tmp.src1;
@@ -1169,7 +1248,6 @@ public class ternary {
                 ((reg) tmp0.src1).contxt = "%v" + String.valueOf(cnt);
                 cnt++;
                 tmp.op = ((InfixExpressionNode) u).op;
-                //tmp.src2 = tmp.src2;
                 tmp.src1 = tmp0.src1;
                 v.content.add(tmp0);
                 v.content.add(tmp);
@@ -1223,8 +1301,8 @@ public class ternary {
             Tern tmp = new Tern();
             if (u instanceof LNoNode && !Right_Logic.empty()){
                 if (((LNoNode) u).InnerNode instanceof LAnNode || ((LNoNode) u).InnerNode instanceof LOrNode){
-                    BasicBlock t1 = Wrong_Logic.pop();
-                    BasicBlock t2 = Right_Logic.pop();
+                    String t1 = Wrong_Logic.pop();
+                    String t2 = Right_Logic.pop();
                     Right_Logic.push(t1);
                     Wrong_Logic.push(t2);
                     tmp.src1 = dfs(((PreNode) u).InnerNode, v);
@@ -1318,8 +1396,8 @@ public class ternary {
 
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.test;
-                Right_Logic.push(btmp1);
-                Wrong_Logic.push(btmp2);
+                Right_Logic.push(btmp1.name);
+                Wrong_Logic.push(btmp2.name);
                 tmp1.src1 = tmp1.src2 = dfs(((ConditionNode) u).Condition, v);
                 Right_Logic.pop();
                 Wrong_Logic.pop();
@@ -1394,8 +1472,8 @@ public class ternary {
 
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.test;
-                Right_Logic.push(btmp1);
-                Wrong_Logic.push(btmp3);
+                Right_Logic.push(btmp1.name);
+                Wrong_Logic.push(btmp3.name);
                 tmp1.src1 = tmp1.src2 = dfs(((ConditionNode) u).Condition, v);
                 Right_Logic.pop();
                 Wrong_Logic.pop();
@@ -1453,8 +1531,8 @@ public class ternary {
 
                 Tern tmp1 = new Tern();
                 tmp1.op = Opcode.test;
-                Right_Logic.push(btmp3);
-                Wrong_Logic.push(btmp2);
+                Right_Logic.push(btmp3.name);
+                Wrong_Logic.push(btmp2.name);
                 tmp1.src1 = tmp1.src2 = dfs(((ConditionNode) u).Condition, v);
                 Right_Logic.pop();
                 Wrong_Logic.pop();
@@ -1529,8 +1607,8 @@ public class ternary {
             v.content.add(t);
             Tern ttt = new Tern();
             ttt.op = Opcode.test;
-            Right_Logic.push(t1);
-            Wrong_Logic.push(t3);
+            Right_Logic.push(t1.name);
+            Wrong_Logic.push(t3.name);
             ttt.src1 = ttt.src2 = dfs(((WhileNode) u).Condition, t2);
             Right_Logic.pop();
             Wrong_Logic.pop();
@@ -1595,8 +1673,8 @@ public class ternary {
             if (((ForNode) u).Expr2 != null) {
                 Tern ttt = new Tern();
                 ttt.op = Opcode.test;
-                Right_Logic.push(t1);
-                Wrong_Logic.push(t4);
+                Right_Logic.push(t1.name);
+                Wrong_Logic.push(t4.name);
                 ttt.src1 = ttt.src2 = dfs(((ForNode) u).Expr2, t3);
                 Right_Logic.pop();
                 Wrong_Logic.pop();

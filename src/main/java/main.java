@@ -31,7 +31,7 @@ public class main{
         BuildScope.dfs1(Root, BuildScope.Root);
         BuildScope.put_this();
 
-
+        //test.find_logic(Root);
 
         Register register = new Register();
         ternary ir = new ternary();
