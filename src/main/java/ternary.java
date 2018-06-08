@@ -251,8 +251,8 @@ public class ternary {
     }
 
     void alloc(){
-        printcontext();
-        System.out.println("\n");
+        //printcontext();
+        //System.out.println("\n");
         add_all();
         //flow(root.gen_var);
         for (int i = 0; i < root.gen_var.content.size(); ++i)
