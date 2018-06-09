@@ -1903,7 +1903,7 @@ public class ternary {
 
         else if (u instanceof CreateNode){
             if (((CreateNode) u).dim != 0) {
-                if (((CreateNode) u).VarTYpe.equals("int")|| ((CreateNode) u).VarTYpe.equals("bool"))
+                if (((CreateNode) u).VarTYpe.equals("int")|| ((CreateNode) u).VarTYpe.equals("bool") || ((CreateNode) u).VarTYpe.equals("string") )
                     return define_arr((CreateNode) u, v, 0, 8);
                 else {
                     ClassScope ctmp = General.clas.get(((CreateNode) u).VarTYpe);
