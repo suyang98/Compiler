@@ -438,7 +438,10 @@ public class TempTestScope {
         if (v instanceof ClassScope) {
             FuncScope tmp = ((ClassScope) v).func.get(S);
             if (tmp == null) return IsFunc(S, v.parent);
-            else return tmp;
+            else {
+                if (!(v instanceof GeneralScope)) inclassflag = v.name;
+                return tmp;
+            }
         }
         else if (v.parent != null) return IsFunc(S, v.parent);
         return null;
@@ -1131,7 +1134,24 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+" 'main' can't be called");
                 System.exit(1);
             }
+
+            inclassflag = null;
+            if (((MethodNode) u).FuncID.indexOf("set") != -1){
+                int j;
+                j = 0;
+            }
             FuncScope flag = IsFunc(((MethodNode) u).FuncID, v);
+            if (inclassflag != null){
+                u.inclass = new ClassNode();
+                ((ClassNode) u.inclass).ID = new VarNode();
+                ((VarNode)((ClassNode) u.inclass).ID).ID = "this";
+                ((ClassNode) u.inclass).Varname = (MethodNode)u;
+                ((ClassNode) u.inclass).ID.V = u.V;
+                u.inclass.V = u.V;
+                ((ClassNode)u.inclass).InClass = inclassflag;
+                ((MethodNode) u).InClass = inclassflag;
+            }
+
             if (flag == null) {
                 System.err.println(u.Location.line+" "+u.Location.column+"This function isn't defined");
                 System.exit(1);

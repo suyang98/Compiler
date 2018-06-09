@@ -558,7 +558,10 @@ public class ternary {
 
     tnode dfs(Node u, BasicBlock v){
         if (u == null) return null;
-        if (u.inclass != null) u = u.inclass;
+        if (u.inclass != null) {
+            u = u.inclass;
+            //((ClassNode)u).Varname.inclass = null;
+        }
 //        if (u instanceof StateNode && !label.empty()){
 //            v = label.pop();
 //        }
@@ -1970,6 +1973,7 @@ public class ternary {
                 return tmp2.src1;
             }
             else if (((ClassNode) u).Varname instanceof MethodNode){
+                ((ClassNode) u).Varname.inclass = null;
                 Tern tmp = new Tern();
                 tmp.op = Opcode.mov;
                 tmp.src1 = new reg();
@@ -2012,6 +2016,11 @@ public class ternary {
             Scope stmp;
             if (((MethodNode) u).InClass == null) stmp = General.func.get(((MethodNode) u).FuncID);
                 else stmp = General.clas.get(((MethodNode) u).InClass).func.get(((MethodNode) u).FuncID);
+
+            if (stmp == null) {
+                int j;
+                j = 0;
+            }
 
             List<tnode> paralist = new ArrayList<>();
 
