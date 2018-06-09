@@ -881,7 +881,7 @@ public class mayfinal {
             if (f.var_num % 2 == 1) System.out.print("\tsub\trsp, " + f.var_num*8+"\n");
             else System.out.print("\tsub\trsp, " + (f.var_num+1)*8+"\n");
         }
-        if (tmp.name.equals("main")){
+        if (tmp.name.indexOf("main") != -1){
             System.out.print("\tcall\t _general\n");
 
 
