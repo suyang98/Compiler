@@ -32,6 +32,7 @@ public class main{
         BuildScope.put_this();
 
         //test.find_logic(Root);
+        //BuildScope.add_this(Root);
 
         Register register = new Register();
         ternary ir = new ternary();

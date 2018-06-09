@@ -1,16 +1,16 @@
 public class mayfinal {
     IR root;
     void transform(){
-        for (Object obj : root.Blocks.keySet())
-            System.out.println("global\t" + obj);
+        //for (Object obj : root.Blocks.keySet())
+         //   System.out.println("global\t" + obj);
 
-        System.out.println("global\t_general");
-        System.out.println("global\tprintln");
-        System.out.println("global\tprint");
-        System.out.println("global\tgetstring");
-        System.out.println("global\tgetint");
-        System.out.println("global\ttostring");
-        System.out.println("global\ttranstring");
+        System.out.println("global\tmain");
+//        System.out.println("global\tprintln");
+//        System.out.println("global\tprint");
+//        System.out.println("global\tgetstring");
+//        System.out.println("global\tgetint");
+//        System.out.println("global\ttostring");
+//        System.out.println("global\ttranstring");
         for (int i = 0; i < root.GV.size(); ++i)
             System.out.println("global\t_" + root.GV.get(i));
 
@@ -838,7 +838,6 @@ public class mayfinal {
         System.out.print("\tret\n");
 
 
-
         int tmp = 8;
         for (Object obj:root.gen_var.var.keySet()){
             reg t = root.gen_var.var.get(obj);
@@ -874,7 +873,8 @@ public class mayfinal {
     }
 
     void print_dfs(BasicBlock tmp, FuncBlock f, int c){
-        System.out.println(tmp.name+":");
+        if (tmp.name.indexOf("main") != -1) System.out.println("main:");
+            else System.out.println(tmp.name+":");
         if (tmp.name.equals(f.name)) {
             System.out.print("\tpush\trbp\n");
             System.out.print("\tmov\trbp, rsp\n");

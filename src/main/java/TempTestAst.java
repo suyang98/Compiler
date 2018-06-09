@@ -15,6 +15,7 @@ class location{
 }
 
 abstract class Node {
+    Node inclass = null;
     abstract void print();
     abstract int size();
     abstract Node sons(int i);
@@ -156,7 +157,6 @@ class ListParaNode extends StateNode {
         return list.get(i);
     }
 }
-
 
 abstract class ExpressionNode extends StateNode {
     public Opcode op;

@@ -47,6 +47,7 @@ public class TempTestScope {
     int cntthen = 0;
     int cntelse = 0;
     int cnt = 0;
+    String inclassflag = null;
 
     List<String> keyword = Arrays.asList("bool","int","string","null","void","true","false","if","for", "while","break","continue","return","new","class","this");
 
@@ -327,6 +328,15 @@ public class TempTestScope {
 
     }
 
+    public void add_this(Node u){
+        if (u == null) return;
+        if (u.inclass != null) {
+            u = u.inclass;
+            ((ClassNode)u).Varname.inclass = null;
+        }
+    }
+
+
     public void put_this(){
         for (Object obj: Root.clas.keySet()){
             String key = (String) obj;
@@ -385,6 +395,7 @@ public class TempTestScope {
         if (tmp != null &&
                 ((tmp.line < u.Location.line || (tmp.line == u.Location.line && tmp.column <= u.Location.column)) ||
                         ((v instanceof ClassScope) && !(v instanceof GeneralScope)))) {
+            if (v instanceof ClassScope && !(v instanceof GeneralScope)) inclassflag = v.name;
             if (tmp.Type.equals("int")) t = new IntType();
             else if (tmp.Type.equals("bool")) t = new BoolType();
             else if (tmp.Type.equals("str")) t = new ClassType("string");
@@ -695,6 +706,7 @@ public class TempTestScope {
             for (int i = 0; i < ((ClassDefNode) u).State.size(); ++i) {
                 dfs1(((ClassDefNode) u).State.sons(i), tmp);
             }
+
             u.V = tmp;
             return t;
         }
@@ -707,9 +719,17 @@ public class TempTestScope {
                     System.err.println(u.Location.line+" "+u.Location.column+"cannot return any value in a constructor");
                     System.exit(1);
                 }
+
+
                 dfs1(u.sons(i), tmp);
                 u.V = tmp;
             }
+
+
+            JumpNode tt = new JumpNode();
+            tt.Label = Jump.Return;
+            ((ClassConstNode)u).Body.StateList.add(tt);
+
             return t;
         }
 
@@ -992,7 +1012,17 @@ public class TempTestScope {
                 }
                 else return t1;
             }
+            inclassflag = null;
             Type t = IsVar((VarNode) u, v);
+            if (inclassflag != null) {
+                u.inclass = new ClassNode();
+                ((ClassNode)u.inclass).InClass = inclassflag;
+                VarNode uu = new VarNode();
+                uu.ID = "this";
+                uu.V = u.V;
+                ((ClassNode) u.inclass).ID = uu;
+                ((ClassNode)u.inclass).Varname = (VarNode)u;
+            }
             if (t == null){
                 System.err.println(u.Location.line+" "+u.Location.column+((VarNode) u).ID+" is not defined");
                 System.exit(1);
