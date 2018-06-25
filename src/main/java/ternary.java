@@ -256,7 +256,7 @@ public class ternary {
     }
 
     void alloc(){
-        printcontext();
+        //printcontext();
         //System.out.println("\n");
         add_all();
         //flow(root.gen_var);
