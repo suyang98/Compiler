@@ -940,8 +940,8 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
     public InfixExpressionNode visitExpr_log(demoParser.Expr_logContext ctx){
         InfixExpressionNode tmp = null;
         if (ctx.bop.getText().equals("&")) tmp = new AAnNode();
-        else if (ctx.bop.getText().equals("^")) tmp = new AOrNode();
-        else if (ctx.bop.getText().equals("|")) tmp = new AXoNode();
+        else if (ctx.bop.getText().equals("|")) tmp = new AOrNode();
+        else if (ctx.bop.getText().equals("^")) tmp = new AXoNode();
         else if (ctx.bop.getText().equals("&&")) tmp = new LAnNode();
         else if (ctx.bop.getText().equals("||")) tmp = new LOrNode();
         tmp.Left = (ExpressionNode) visit(ctx.left);
