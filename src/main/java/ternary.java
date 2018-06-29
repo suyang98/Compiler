@@ -676,7 +676,8 @@ public class ternary {
             for (int i = 0; i < ((FuncDefNode)u).Body.size(); ++i){
                 Node tt = ((FuncDefNode) u).Body.sons(i);
                 dfs(tt, v);
-                if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode) v = label.pop();
+                if (tt instanceof ForNode || tt instanceof WhileNode || tt instanceof ConditionNode)
+                    if (label.size() != 0) v = label.pop();
                 if (Arr != null) {v = Arr; Arr = null;}
                 while (flag_tern.size() != 0){
                     v.content.add(flag_tern.pop());
