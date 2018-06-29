@@ -893,11 +893,6 @@ public class mayfinal {
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
         }
-//        if (tmp.name.equals(f.name)) {
-//            System.out.print("\tmov\trsp, rbp\n");
-//            System.out.print("\tpop\trbp\n");
-//            System.out.print("\tret\n");
-//        }
 
     }
 }

@@ -1180,9 +1180,11 @@ public class ternary {
                             (((AssignNode) u).Left instanceof ArrNode) ||
                             ((((AssignNode) u).Left instanceof ClassNode) && !(((ClassNode)((AssignNode) u).Left).Varname instanceof MethodNode))){
                         //arr_arr
-                        v.content.set(v.content.size()-1, tmp);
+                        int i = v.content.size()-1;
+                        while (v.content.get(i).op != Opcode.load) i--;
+                        v.content.set(i, tmp);
                         tmp.op = Opcode.store;
-                        tmp.src1 = v.content.get(v.content.size()-2).src1;
+                        tmp.src1 = v.content.get(i-1).src1;
                         while (flag_tern.size() != 0){
                             v.content.add(flag_tern.pop());
                         }
