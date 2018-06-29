@@ -23,16 +23,23 @@ class BasicBlock{
     void print(IR root){
         System.out.println(name+":");
         if (name.indexOf("main") != -1) {
-            for (int i = 0; i < root.gen_var.content.size(); ++i){
-                Tern t = root.gen_var.content.get(i);
-                System.out.print("\t" + t.op+"\t");
-                if (t.src1 != null) System.out.print(t.src1.contxt);
-                else System.out.print("     ");
-                if (t.src2 != null) System.out.print("," + t.src2.contxt);
-                else System.out.print("     ");
-                if (t.des != null) System.out.println("," + t.des.contxt);
-                else System.out.println("     ");
+            BasicBlock tmp = root.gen_var;
+            while (tmp != null){
+                if (tmp.name != null) System.out.println(tmp.name);
+                else System.out.println("general");
+                for (int i = 0; i < tmp.content.size(); ++i){
+                    Tern t = tmp.content.get(i);
+                    System.out.print("\t" + t.op+"\t");
+                    if (t.src1 != null) System.out.print(t.src1.contxt);
+                    else System.out.print("     ");
+                    if (t.src2 != null) System.out.print("," + t.src2.contxt);
+                    else System.out.print("     ");
+                    if (t.des != null) System.out.println("," + t.des.contxt);
+                    else System.out.println("     ");
+                }
+                tmp = tmp.Next;
             }
+
         }
         for (int i = 0; i < content.size(); ++i){
             Tern t = content.get(i);
@@ -259,8 +266,8 @@ public class ternary {
         //System.out.println("\n");
         add_all();
         //flow(root.gen_var);
-        for (int i = 0; i < root.gen_var.content.size(); ++i)
-            use_def(root.gen_var.content.get(i), root.gen_var);
+        for (int i = 0; i < root.gen_var.all.size(); ++i)
+            use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
 
@@ -570,6 +577,7 @@ public class ternary {
             for (int i = 0; i < ((ProgNode) u).para_size(); ++i){
                 dfs(((ProgNode) u).ParaList.get(i), root.gen_var);
             }
+            Arr = null;
             for(int i = 0; i < u.size()-((ProgNode) u).para_size(); ++i){
                 dfs(u.sons(i), null);
             }
