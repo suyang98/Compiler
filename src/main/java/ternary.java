@@ -311,7 +311,7 @@ public class ternary {
     void alloc(){
         //printcontext();
         //System.out.println("\n");
-        //add_all();
+        add_all();
         for (int i = 0; i < root.gen_var.all.size(); ++i)
             use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
