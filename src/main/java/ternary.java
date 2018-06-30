@@ -138,6 +138,13 @@ class Tern {
                 }
             }
         }
+
+        else if (op == Opcode.test && src1 instanceof imm && src2 instanceof imm){
+            System.out.println("\tmov\trax," + src1.contxt);
+            System.out.println("\ttest\trax," + src2.contxt);
+
+        }
+
         else if (op == Opcode.test && src1 == src2){
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
                 ((reg)src1).reg = "rax";
@@ -145,6 +152,38 @@ class Tern {
                 System.out.println("\ttest\t" + ((reg) src1).reg + "," + ((reg)src1).reg);
             }
             else System.out.println("\ttest\t" + src1.contxt + "," + src1.contxt);
+        }
+
+        else if (op == Opcode.sal || op == Opcode.sar){
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rcx";
+            for (int i = 0; i < use.size(); ++i){
+                reg tmp = f.var.get(use.get(i).contxt);
+                if (use.get(i).contxt.equals(src1.contxt)) {
+                    System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
+                }
+                else {
+                    System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
+                }
+            }
+            System.out.print("\t" + op + "\t");
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                System.out.print("rax,");
+                ((reg) src1).reg = "rax";
+            } else System.out.print("" + src1.contxt + ",");
+
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                System.out.println("cl");
+                ((reg) src2).reg = "cl";
+            } else System.out.println(src2.contxt);
+
+            for (int i = 0; i < def.size(); ++i){
+                reg tmp = f.var.get(def.get(i).contxt);
+                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                else {
+                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                }
+            }
         }
 
         else if (src2 != null) {
