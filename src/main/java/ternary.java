@@ -300,37 +300,38 @@ public class ternary {
         else return null;
     }
 
-    void alloc(){
-        //printcontext();
-        //System.out.println("\n");
-        add_all();
-        //flow(root.gen_var);
-        for (int i = 0; i < root.gen_var.all.size(); ++i)
-            use_def(root.gen_var.all.get(i), root.gen_var);
-        for (Object k: root.gen_var.var.keySet())
-            if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
-
-        for (Object obj: root.Blocks.keySet()) {
-            String key = (String) obj;
-            FuncBlock tmp = root.Blocks.get(key);
-            //flow(tmp);
-            for (int i = 0; i < tmp.all.size(); ++i)
-                use_def(tmp.all.get(i), tmp);
-            for (Object k: tmp.var.keySet()){
-                if (tmp.var.get(k).memory == null) tmp.var_num++;
-            }
-            //balance(tmp);
-
-        }
-
-    }
-
     boolean isLogic(Node u){
         if (u == null) return false;
         if (u instanceof LAnNode || u instanceof LOrNode) return true;
         for (int i = 0 ; i < u.size(); ++i)
             if (isLogic(u.sons(i))) return true;
         return false;
+    }
+
+    void alloc(){
+        //printcontext();
+        //System.out.println("\n");
+        //add_all();
+        for (int i = 0; i < root.gen_var.all.size(); ++i)
+            use_def(root.gen_var.all.get(i), root.gen_var);
+        for (Object k: root.gen_var.var.keySet())
+            if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
+        flow(root.gen_var);
+        balance(root.gen_var);
+
+        for (Object obj: root.Blocks.keySet()) {
+            String key = (String) obj;
+            FuncBlock tmp = root.Blocks.get(key);
+            for (int i = 0; i < tmp.all.size(); ++i)
+                use_def(tmp.all.get(i), tmp);
+            for (Object k: tmp.var.keySet()){
+                if (tmp.var.get(k).memory == null) tmp.var_num++;
+            }
+            flow(tmp);
+            balance(tmp);
+
+        }
+
     }
 
     void printcontext(){
@@ -340,7 +341,6 @@ public class ternary {
             print_dfs(tmp);
         }
     }
-
 
     void print_dfs(BasicBlock tmp){
         if (tmp.flag) {
@@ -364,6 +364,11 @@ public class ternary {
 
 
     void add_dfs(BasicBlock tmp, FuncBlock f){
+        Tern t = new Tern();
+        t.op = Opcode.label;
+        t.src1 = new labn();
+        t.src1.contxt = tmp.name;
+        f.all.add(t);
         for (int i = 0; i < tmp.content.size(); ++i){
             f.all.add(tmp.content.get(i));
         }
@@ -376,7 +381,8 @@ public class ternary {
         Tern pre = null;
         for (int i = 0; i < tmp.all.size(); ++i){
             Tern u = tmp.all.get(i);
-            use_def(u, tmp);
+            if (u.op == Opcode.label) continue;
+            //use_def(u, tmp);
             if (pre != null) {u.pred.add(pre); pre.next.add(u);}
             if (u.op == Opcode.jz || u.op == Opcode.jnz) {
                 root.All.get(u.src1).content.get(0).pred.add(u);
@@ -392,7 +398,9 @@ public class ternary {
 
     }
 
+
     void use_def(Tern u, FuncBlock f){
+        if (u.op == Opcode.label) return;
         if (u.src1 != null && u.src1 instanceof reg && (u.src1.contxt.indexOf("%") != -1)) f.var.put(u.src1.contxt, (reg)u.src1);
         if (u.src2 != null && u.src2 instanceof reg && (u.src2.contxt.indexOf("%") != -1)) f.var.put(u.src2.contxt, (reg)u.src2);
         if (u.op == Opcode.mov || u.op == Opcode.movzx || u.op == Opcode.store || u.op == Opcode.load) {
@@ -417,7 +425,7 @@ public class ternary {
                 || u.op == Opcode.setle || u.op == Opcode.setne || u.op == Opcode.pop) {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.def.add((reg) u.src1);
         }
-        if (u.op == Opcode.push){
+        if (u.op == Opcode.push || u.op == Opcode.idiv){
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
         }
 
