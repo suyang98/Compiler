@@ -67,6 +67,7 @@ class BasicBlock{
 class FuncBlock extends BasicBlock{
     String FuncName;
     List<Tern> all = new ArrayList<>();
+    Map<String, Integer> label_list = new HashMap<>();
     int inst_num = 0;
     int var_num = 0;
     boolean [] tag = new boolean [16];
@@ -311,13 +312,14 @@ public class ternary {
     void alloc(){
         //printcontext();
         //System.out.println("\n");
+        root.gen_var.name = "_general";
         add_all();
         for (int i = 0; i < root.gen_var.all.size(); ++i)
             use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
-        //flow(root.gen_var);
-        //balance(root.gen_var);
+        flow(root.gen_var);
+        balance(root.gen_var);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -327,8 +329,8 @@ public class ternary {
             for (Object k: tmp.var.keySet()){
                 if (tmp.var.get(k).memory == null) tmp.var_num++;
             }
-            //flow(tmp);
-            //balance(tmp);
+            flow(tmp);
+            balance(tmp);
 
         }
 
@@ -353,27 +355,25 @@ public class ternary {
 
     void add_all(){
         c = 0;
-        add_dfs(root.gen_var, root.gen_var);
+        add_dfs(root.gen_var, root.gen_var, c);
         for (Object obj: root.Blocks.keySet()){
             c = 0;
             String key = (String) obj;
             FuncBlock tmp = root.Blocks.get(key);
-            add_dfs(tmp, tmp);
+            add_dfs(tmp, tmp, c);
         }
     }
 
 
-    void add_dfs(BasicBlock tmp, FuncBlock f){
-        Tern t = new Tern();
-        t.op = Opcode.label;
-        t.src1 = new labn();
-        t.src1.contxt = tmp.name;
-        f.all.add(t);
+    void add_dfs(BasicBlock tmp, FuncBlock f, int c){
+        f.label_list.put(tmp.name, c);
         for (int i = 0; i < tmp.content.size(); ++i){
+            tmp.content.get(i).num = c;
             f.all.add(tmp.content.get(i));
+            c++;
         }
         if (tmp.Next != null){
-            add_dfs(tmp.Next, f);
+            add_dfs(tmp.Next, f, c);
         }
     }
 
@@ -385,11 +385,18 @@ public class ternary {
             //use_def(u, tmp);
             if (pre != null) {u.pred.add(pre); pre.next.add(u);}
             if (u.op == Opcode.jz || u.op == Opcode.jnz) {
-                root.All.get(u.src1).content.get(0).pred.add(u);
-                u.next.add(root.All.get(u.src1).content.get(0));
+                BasicBlock tt = root.All.get(u.src1.contxt);
+                while (tt.content.size() == 0)
+                    tt = tt.Next;
+                tt.content.get(0).pred.add(u);
+                u.next.add(tt.content.get(0));
             }
             if (u.op == Opcode.jmp) {
-                root.All.get(u.src1).content.get(0).pred.add(u);
+                BasicBlock tt = root.All.get(u.src1.contxt);
+                while (tt.content.size() == 0)
+                    tt = tt.Next;
+                tt.content.get(0).pred.add(u);
+                u.next.add(tt.content.get(0));
                 pre = null;
                 continue;
             }
