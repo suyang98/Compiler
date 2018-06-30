@@ -316,8 +316,8 @@ public class ternary {
             use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
-        flow(root.gen_var);
-        balance(root.gen_var);
+        //flow(root.gen_var);
+        //balance(root.gen_var);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -327,8 +327,8 @@ public class ternary {
             for (Object k: tmp.var.keySet()){
                 if (tmp.var.get(k).memory == null) tmp.var_num++;
             }
-            flow(tmp);
-            balance(tmp);
+            //flow(tmp);
+            //balance(tmp);
 
         }
 
