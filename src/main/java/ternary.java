@@ -368,6 +368,10 @@ public class ternary {
     void add_dfs(BasicBlock tmp, FuncBlock f, int c){
         f.label_list.put(tmp.name, c);
         for (int i = 0; i < tmp.content.size(); ++i){
+            if (tmp.content.get(i).op == Opcode.label) {
+                f.label_list.put(tmp.content.get(i).src1.contxt, c);
+                continue;
+            }
             tmp.content.get(i).num = c;
             f.all.add(tmp.content.get(i));
             c++;
@@ -386,17 +390,29 @@ public class ternary {
             if (pre != null) {u.pred.add(pre); pre.next.add(u);}
             if (u.op == Opcode.jz || u.op == Opcode.jnz) {
                 BasicBlock tt = root.All.get(u.src1.contxt);
-                while (tt.content.size() == 0)
-                    tt = tt.Next;
-                tt.content.get(0).pred.add(u);
-                u.next.add(tt.content.get(0));
+                if (tt == null) {
+                    tmp.all.get(tmp.label_list.get(u.src1.contxt)).pred.add(u);
+                    u.next.add(tmp.all.get(tmp.label_list.get(u.src1.contxt)));
+                }
+                else {
+                    while (tt.content.size() == 0)
+                        tt = tt.Next;
+                    tt.content.get(0).pred.add(u);
+                    u.next.add(tt.content.get(0));
+                }
             }
             if (u.op == Opcode.jmp) {
                 BasicBlock tt = root.All.get(u.src1.contxt);
-                while (tt.content.size() == 0)
-                    tt = tt.Next;
-                tt.content.get(0).pred.add(u);
-                u.next.add(tt.content.get(0));
+                if (tt == null) {
+                    tmp.all.get(tmp.label_list.get(u.src1.contxt)).pred.add(u);
+                    u.next.add(tmp.all.get(tmp.label_list.get(u.src1.contxt)));
+                }
+                else {
+                    while (tt.content.size() == 0)
+                        tt = tt.Next;
+                    tt.content.get(0).pred.add(u);
+                    u.next.add(tt.content.get(0));
+                }
                 pre = null;
                 continue;
             }
