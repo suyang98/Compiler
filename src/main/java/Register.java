@@ -32,4 +32,14 @@ public class Register {
         else return null;
     }
 
+    String col(int i){
+        if (i == 0) return "r10";
+        else if (i == 1) return "r11";
+        else if (i == 2) return "r12";
+        else if (i == 3) return "r13";
+        else if (i == 4) return "r14";
+        else if (i == 5) return "r15";
+        else return null;
+    }
+
 }

@@ -70,9 +70,10 @@ class FuncBlock extends BasicBlock{
     Map<String, Integer> label_list = new HashMap<>();
     int inst_num = 0;
     int var_num = 0;
-    boolean [] tag = new boolean [16];
     Map<String, reg> var = new HashMap<>();
-
+    Map<String, Integer> var_list = new HashMap<>();
+    Map<Integer, String> list = new HashMap<>();
+    Boolean [][] color_map = new Boolean [250][250];
 }
 
 class Tern {
@@ -255,7 +256,6 @@ abstract class tnode {
 class reg extends tnode{
     String reg;
     String memory;
-    boolean Is_Point = false;
 }
 
 class imm extends tnode{}
@@ -320,6 +320,7 @@ public class ternary {
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
         flow(root.gen_var);
         balance(root.gen_var);
+        interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -331,6 +332,7 @@ public class ternary {
             }
             flow(tmp);
             balance(tmp);
+            interference(tmp, 6);
 
         }
 
@@ -476,7 +478,6 @@ public class ternary {
                         need = true;
                         u.in.put(tt.contxt, tt);
                     }
-                    else break;
                 }
                 for (Object key: u.out.keySet()){
                     boolean flag = false;
@@ -494,9 +495,70 @@ public class ternary {
 
     }
 
-    void color(FuncBlock tmp){
+    void interference(FuncBlock tmp, int num){
+        int c = 0;
+        for (Object obj:tmp.var.keySet()){
+            reg t = tmp.var.get(obj);
+            if (t.memory == null)  {tmp.var_list.put(t.contxt, c); tmp.list.put(c++,t.contxt);}
+        }
+        if (tmp.var_list.size() > 250) return;
+        for (int i = 0; i < tmp.all.size(); ++i) {
+            Tern t = tmp.all.get(i);
+            for (Object j:t.in.keySet()){
+                for (Object k:t.in.keySet()){
+                    tmp.color_map [tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
+                }
+            }
+            for (Object j:t.out.keySet()){
+                for (Object k:t.out.keySet()){
+                    tmp.color_map [tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
+                }
+            }
+        }
+
+        int [] sum = new int[tmp.var_list.size()];
+
+        Stack<String> color = new Stack<>();
+        boolean flag = true;
+        while (flag){
+            flag = false;
+            for (int i = 0; i < tmp.var_list.size(); ++i)
+                if (sum[i] >= 0 && sum[i] < num) {
+                    flag = true;
+                    sum[i] = -1;
+                    color.push(tmp.list.get(i));
+                    for (int j = 0; j < tmp.var_list.size(); ++j){
+                        if (i < j) {
+                            if (tmp.color_map[i][j] == null || tmp.color_map[i][j]){
+                                sum[j]--;
+                                tmp.color_map[i][j] = false;
+                            }
+                        }
+                        if (i > j){
+                            if (tmp.color_map[j][i] == null || tmp.color_map[j][i]){
+                                sum[j]--;
+                                tmp.color_map[j][i] = false;
+                            }
+                        }
+                    }
+                }
+        }
+        for (int i = 0; i < tmp.var_list.size(); ++i)
+            if (sum[i] != 0) color.push(tmp.list.get(i));
+        Boolean [][] retable = new Boolean[tmp.var_list.size()][num];
+        for (int i = 0; i < tmp.var_list.size(); ++i){
+            String s = color.pop();
+            int index = tmp.var_list.get(s);
+            int j = 0;
+            while (j < num && (retable[index][j] != null && retable[index][j])) j++;
+            if (j == num) continue;
+            for (int k = 0; k < tmp.var_list.size(); ++k)
+                if ((tmp.color_map[index][k]!=null&&tmp.color_map[index][k])||(tmp.color_map[k][index]!=null&&tmp.color_map[k][index])) retable[k][j] = true;
+            tmp.var.get(s).reg = r.col(j);
+        }
 
     }
+
 
     tnode define_arr(CreateNode u, BasicBlock v, int i, int l){
         Tern tmp0 = new Tern();
