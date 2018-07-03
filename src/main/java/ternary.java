@@ -318,9 +318,9 @@ public class ternary {
             use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
-        flow(root.gen_var);
-        balance(root.gen_var);
-        interference(root.gen_var, 6);
+        //flow(root.gen_var);
+        //balance(root.gen_var);
+        //interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -505,12 +505,16 @@ public class ternary {
         for (int i = 0; i < tmp.all.size(); ++i) {
             Tern t = tmp.all.get(i);
             for (Object j:t.in.keySet()){
+                if (tmp.var_list.get(j) == null) continue;
                 for (Object k:t.in.keySet()){
+                    if (tmp.var_list.get(k) == null) continue;
                     tmp.color_map [tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
                 }
             }
             for (Object j:t.out.keySet()){
+                if (tmp.var_list.get(j) == null) continue;
                 for (Object k:t.out.keySet()){
+                    if (tmp.var_list.get(k) == null) continue;
                     tmp.color_map [tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
                 }
             }
