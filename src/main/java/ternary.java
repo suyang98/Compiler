@@ -95,9 +95,13 @@ class Tern {
         }
         if (op == Opcode.idiv) {
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1){
-                ((reg) src1).reg = "rbx";
-                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
-                System.out.println("\tidiv\t" + ((reg)src1).reg);
+                src1 = f.var.get(src1.contxt);
+                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                    ((reg) src1).reg = "rbx";
+                    System.out.println("\tmov\t" + ((reg) src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
+                    System.out.println("\tidiv\t" + ((reg) src1).reg);
+                }
+                else System.out.println("\tidiv\t" + src1.contxt);
             }
             else {
                 System.out.println("\tidiv\t" + src1.contxt);
@@ -106,11 +110,16 @@ class Tern {
         }
         if (op == Opcode.store){
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
-                ((reg)src2).reg = "rbx";
-                System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + f.var.get(src2.contxt).memory + "]");
+                src2 = f.var.get(src2.contxt);
+                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                    ((reg) src2).reg = "rbx";
+                    System.out.println("\tmov\t" + ((reg) src2).reg + ",[" + f.var.get(src2.contxt).memory + "]");
+                }
             }
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
-                System.out.println("\tmov\trax,["+f.var.get(src1.contxt).memory+"]");
+                src1 = f.var.get(src1.contxt);
+                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1)
+                    System.out.println("\tmov\trax,["+f.var.get(src1.contxt).memory+"]");
             }
 
             System.out.print("\tmov\t");
@@ -122,21 +131,42 @@ class Tern {
         }
         else if (op == Opcode.load){
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
-                System.out.println("\tmov\trbx,["+f.var.get(src2.contxt).memory + "]");
+                src2 = f.var.get(src2.contxt);
+                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1)
+                    System.out.println("\tmov\trbx,["+f.var.get(src2.contxt).memory + "]");
             }
 
             System.out.print("\tmov\t");
-            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.print("rax,");((reg)src1).reg = "rax";}
-            else {System.out.print(""+src1.contxt +","); }
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                src1 = f.var.get(src1.contxt);
+                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                    System.out.print("rax,");
+                    ((reg) src1).reg = "rax";
+                }
+                else System.out.print(""+src1.contxt +",");
+            }
+            else System.out.print(""+src1.contxt +",");
 
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {System.out.println("[rbx]");((reg)src2).reg = "rbx";}
             else System.out.println("[" + src2.contxt + "]");
 
+            /*for (int i = 0; i < def.size(); ++i){
+                reg tmp = f.var.get(def.get(i).contxt);
+                if (def.get(i).contxt.equals(src1.contxt))  //???????????????
+                    System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                else
+                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+            }
+            */
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
-                else {
-                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                if (def.get(i).contxt.indexOf("%") != -1){
+                    if (tmp.contxt.indexOf("%") != -1)
+                        if (def.get(i).contxt.equals(src1.contxt))
+                            System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src1).reg);
+                        else {
+                            System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                        }
                 }
             }
         }
@@ -149,17 +179,23 @@ class Tern {
 
         else if (op == Opcode.test && src1 == src2){
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
-                ((reg)src1).reg = "rax";
-                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
-                System.out.println("\ttest\t" + ((reg) src1).reg + "," + ((reg)src1).reg);
+                src1 = f.var.get(src1.contxt);
+                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                    ((reg) src1).reg = "rax";
+                    System.out.println("\tmov\t" + ((reg) src1).reg + ",[" + f.var.get(src1.contxt).memory + "]");
+                    System.out.println("\ttest\t" + ((reg) src1).reg + "," + ((reg) src1).reg);
+                }
+                else System.out.println("\ttest\t" + src1.contxt + "," + src1.contxt);
             }
             else System.out.println("\ttest\t" + src1.contxt + "," + src1.contxt);
         }
 
         else if (op == Opcode.sal || op == Opcode.sar){
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) src1 = f.var.get(src1.contxt);
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) src2 = f.var.get(src2.contxt);
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rcx";
-            for (int i = 0; i < use.size(); ++i){
+            for (int i = 0; i < use.size(); ++i){   //????????????????????????
                 reg tmp = f.var.get(use.get(i).contxt);
                 if (use.get(i).contxt.equals(src1.contxt)) {
                     System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
