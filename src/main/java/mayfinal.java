@@ -841,7 +841,7 @@ public class mayfinal {
         int tmp = 8;
         for (Object obj:root.gen_var.var.keySet()){
             reg t = root.gen_var.var.get(obj);
-            if (t.memory == null) {
+            if (t.memory == null && t.contxt.indexOf("%") != -1) {
                 t.memory = "rbp-" + String.valueOf(tmp);
                 tmp = tmp + 8;
             }
@@ -858,7 +858,7 @@ public class mayfinal {
             tmp = 8;
             for (Object obj:ftmp.var.keySet()){
                 reg t = ftmp.var.get(obj);
-                if (t.memory == null) {
+                if (t.memory == null && t.contxt.indexOf("%") != -1) {
                     t.memory = "rbp-" + String.valueOf(tmp);
                     tmp = tmp + 8;
                 }

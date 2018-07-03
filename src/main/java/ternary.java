@@ -189,15 +189,19 @@ class Tern {
         }
 
         else if (src2 != null) {
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) src1 = f.var.get(src1.contxt);
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) src2 = f.var.get(src2.contxt);
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rbx";
             for (int i = 0; i < use.size(); ++i){
                 reg tmp = f.var.get(use.get(i).contxt);
-                if (use.get(i).contxt.equals(src1.contxt)) {
-                    System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
-                }
-                else {
-                    System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
+                if (use.get(i).contxt.indexOf("%") != -1) {
+                    if (tmp.contxt.indexOf("%") != -1)
+                    if (use.get(i).contxt.equals(src1.contxt)) {
+                        System.out.println("\tmov\t" + ((reg) src1).reg + ",[" + tmp.memory + "]");
+                    } else {
+                        System.out.println("\tmov\t" + ((reg) src2).reg + ",[" + tmp.memory + "]");
+                    }
                 }
             }
             if (op == Opcode.cmp && src1 instanceof imm) {
@@ -223,25 +227,34 @@ class Tern {
 
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
-                else {
-                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                if (def.get(i).contxt.indexOf("%") != -1){
+                    if (tmp.contxt.indexOf("%") != -1)
+                    if (def.get(i).contxt.equals(src1.contxt))
+                        System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src1).reg);
+                    else {
+                        System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
+                    }
                 }
             }
 
         }
         else if (src1 != null){
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) src1 = f.var.get(src1.contxt);
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             for (int i = 0; i < use.size(); ++i){
                 reg tmp = f.var.get(use.get(i).contxt);
-                System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
+                if (use.get(i).contxt.indexOf("%") != -1)
+                    if (tmp.contxt.indexOf("%") != -1)
+                        System.out.println("\tmov\t" + ((reg) src1).reg + ",[" + tmp.memory + "]");
             }
             System.out.print("\t"+op +"\t");
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {System.out.println("rax");((reg)src1).reg = "rax";}
             else {System.out.println(src1.contxt); }
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                if (def.get(i).contxt.indexOf("%") != -1)
+                    if (tmp.contxt.indexOf("%") != -1)
+                    System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src1).reg);
             }
         }
         else System.out.println("\t" + op);
@@ -318,9 +331,9 @@ public class ternary {
             use_def(root.gen_var.all.get(i), root.gen_var);
         for (Object k: root.gen_var.var.keySet())
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
-        //flow(root.gen_var);
-        //balance(root.gen_var);
-        //interference(root.gen_var, 6);
+        flow(root.gen_var);
+        balance(root.gen_var);
+        interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -517,6 +530,12 @@ public class ternary {
                     if (tmp.var_list.get(k) == null) continue;
                     tmp.color_map [tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
                 }
+                for (int kk = 0; kk < t.def.size(); ++kk){
+                    String k = t.def.get(kk).contxt;
+                    if (tmp.var_list.get(k) == null) continue;
+                    tmp.color_map[tmp.var_list.get(j)][tmp.var_list.get(k)] = true;
+                    tmp.color_map[tmp.var_list.get(k)][tmp.var_list.get(j)] = true;
+                }
             }
         }
 
@@ -558,7 +577,7 @@ public class ternary {
             if (j == num) continue;
             for (int k = 0; k < tmp.var_list.size(); ++k)
                 if ((tmp.color_map[index][k]!=null&&tmp.color_map[index][k])||(tmp.color_map[k][index]!=null&&tmp.color_map[k][index])) retable[k][j] = true;
-            tmp.var.get(s).reg = r.col(j);
+            tmp.var.get(s).contxt = r.col(j);
         }
 
     }
