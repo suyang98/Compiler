@@ -1652,7 +1652,6 @@ public class ternary {
                 v.content.add(tmp);
                 tmp.src2 = new imm();
                 tmp.src2.contxt = "1";
-                v.content.add(tmp);//why never add?????
             }
             else if ((((PreNode) u).InnerNode.inclass != null && !(((PreNode) u).InnerNode instanceof MethodNode))
                     ||(((PreNode) u).InnerNode instanceof ArrNode ||
