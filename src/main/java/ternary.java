@@ -369,7 +369,7 @@ public class ternary {
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
         flow(root.gen_var);
         balance(root.gen_var);
-        interference(root.gen_var, 6);
+        interference(root.gen_var, 4);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -381,7 +381,7 @@ public class ternary {
             }
             flow(tmp);
             balance(tmp);
-            interference(tmp, 6);
+            interference(tmp, 4);
 
         }
 

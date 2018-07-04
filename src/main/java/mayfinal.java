@@ -905,15 +905,15 @@ public class mayfinal {
             Tern t = tmp.content.get(i);
             if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
                     (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
-            if (t.op == Opcode.call) {
-                System.out.print("\tpush\tr10\n");
-                System.out.print("\tpush\tr11\n");
-            }
+//            if (t.op == Opcode.call) {
+//                System.out.print("\tpush\tr10\n");
+//                System.out.print("\tpush\tr11\n");
+//            }
             t.print(f);
-            if (t.op == Opcode.call) {
-                System.out.print("\tpop\tr11\n");
-                System.out.print("\tpop\tr10\n");
-            }
+//            if (t.op == Opcode.call) {
+//                System.out.print("\tpop\tr11\n");
+//                System.out.print("\tpop\tr10\n");
+//            }
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
