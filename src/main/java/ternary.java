@@ -193,32 +193,43 @@ class Tern {
         else if (op == Opcode.sal || op == Opcode.sar){
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) src1 = f.var.get(src1.contxt);
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) src2 = f.var.get(src2.contxt);
+            if (src2 instanceof reg && src2.contxt.indexOf("%")==-1){
+                System.out.println("\tmov\trcx," + ((reg)src2).contxt);
+            }
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
             if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rcx";
             for (int i = 0; i < use.size(); ++i){   //????????????????????????
                 reg tmp = f.var.get(use.get(i).contxt);
                 if (use.get(i).contxt.equals(src1.contxt)) {
+                    if (tmp != null)
                     System.out.println("\tmov\t" + ((reg)src1).reg + ",[" + tmp.memory + "]");
                 }
                 else {
+                    if (tmp != null)
                     System.out.println("\tmov\t" + ((reg)src2).reg + ",[" + tmp.memory + "]");
                 }
             }
+
+
             System.out.print("\t" + op + "\t");
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
                 System.out.print("rax,");
                 ((reg) src1).reg = "rax";
             } else System.out.print("" + src1.contxt + ",");
 
-            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+            if (src2 instanceof reg && (src2.contxt.indexOf("%") != -1 || src2.contxt.indexOf("r")!=-1) ) {
                 System.out.println("cl");
                 ((reg) src2).reg = "cl";
             } else System.out.println(src2.contxt);
 
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
-                if (def.get(i).contxt.equals(src1.contxt)) System.out.println("\tmov\t["+ tmp.memory +"]," + ((reg)src1).reg);
+                if (def.get(i).contxt.equals(src1.contxt)) {
+                    if (tmp != null)
+                        System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src1).reg);
+                }
                 else {
+                    if (tmp != null)
                     System.out.println("\tmov\t[" + tmp.memory + "]," + ((reg) src2).reg);
                 }
             }
@@ -545,6 +556,7 @@ public class ternary {
     }
 
     void interference(FuncBlock tmp, int num){
+
         int c = 0;
         for (Object obj:tmp.var.keySet()){
             reg t = tmp.var.get(obj);
@@ -553,6 +565,13 @@ public class ternary {
         if (tmp.var_list.size() > 250) return;
         for (int i = 0; i < tmp.all.size(); ++i) {
             Tern t = tmp.all.get(i);
+            if (t.op ==Opcode.store || t.op == Opcode.load){
+                if (t.src1 instanceof reg && t.src1.contxt.indexOf("%")!= -1 && tmp.var_list.get(t.src1.contxt)!= null
+                        && t.src2 instanceof reg && t.src2.contxt.indexOf("%")!= -1 && tmp.var_list.get(t.src2.contxt)!=null){
+                    tmp.color_map[tmp.var_list.get(t.src1.contxt)][tmp.var_list.get(t.src2.contxt)] = true;
+                    tmp.color_map[tmp.var_list.get(t.src2.contxt)][tmp.var_list.get(t.src1.contxt)] = true;
+                }
+            }
             for (Object j:t.in.keySet()){
                 if (tmp.var_list.get(j) == null) continue;
                 for (Object k:t.in.keySet()){
