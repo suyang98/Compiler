@@ -816,21 +816,31 @@ public class ternary {
             root.Blocks.put(tmp.FuncName, tmp);
             tmp.name = tmp.FuncName;
             v = tmp;
-            for (int i = ((FuncScope)u.V).para.size()-1; i >= 0 ; --i){
+            for (int i = ((FuncScope)u.V).para.size()-1; i >= 6; --i) {
                 Tern t = new Tern();
-                if (i >= 6){
+                if (i >= 6) {
                     t.op = Opcode.mov;
                     t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
                     t.src2 = new reg();
-                    ((reg) t.src2).memory = "rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8);
-                    ((reg) t.src2).contxt = "[rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8) + "]";
+                    ((reg) t.src2).memory = "rbp+" + String.valueOf((((FuncScope) u.V).para.size() - i + 1) * 8);
+                    ((reg) t.src2).contxt = "[rbp+" + String.valueOf((((FuncScope) u.V).para.size() - i + 1) * 8) + "]";
+                    v.content.add(t);
                 }
-                else {
-                    t.op = Opcode.mov;
-                    t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
-                    t.src2 = new reg();
-                    t.src2.contxt = r.param(i);
-                }
+            }
+            for (int i = 12; i < 16; ++i) {
+                Tern t = new Tern();
+                t.op = Opcode.push;
+                t.src1 = new reg();
+                t.src1.contxt = "r" + String.valueOf(i);
+                v.content.add(t);
+            }
+            int ttmp = ((FuncScope)u.V).para.size()-1 < 5? ((FuncScope)u.V).para.size()-1:5;
+            for (int i = ttmp; i >= 0; --i){
+                Tern t = new Tern();
+                t.op = Opcode.mov;
+                t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
+                t.src2 = new reg();
+                t.src2.contxt = r.param(i);
                 v.content.add(t);
             }
             for (int i = 0; i < ((ClassConstNode) u).Body.size(); ++i){
@@ -871,12 +881,14 @@ public class ternary {
                     ((reg) t.src2).contxt = "[rbp+" + String.valueOf((((FuncScope) u.V).para.size() - i + 1) * 8) + "]";
                 v.content.add(t);
             }
-            for (int i = 12; i < 16; ++i){
-                Tern t = new Tern();
-                t.op = Opcode.push;
-                t.src1 = new reg();
-                t.src1.contxt = "r"+String.valueOf(i);
-                v.content.add(t);
+            if (!((FuncDefNode) u).ID.equals("main")) {
+                for (int i = 12; i < 16; ++i) {
+                    Tern t = new Tern();
+                    t.op = Opcode.push;
+                    t.src1 = new reg();
+                    t.src1.contxt = "r" + String.valueOf(i);
+                    v.content.add(t);
+                }
             }
             int ttmp = ((FuncScope)u.V).para.size()-1 < 5? ((FuncScope)u.V).para.size()-1:5;
             for (int i = ttmp; i >= 0; --i){
