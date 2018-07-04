@@ -872,6 +872,24 @@ public class mayfinal {
         }
     }
 
+    void in_func(){
+        System.out.print("\tpush\tr10\n");
+        System.out.print("\tpush\tr11\n");
+        System.out.print("\tpush\tr12\n");
+        System.out.print("\tpush\tr13\n");
+        System.out.print("\tpush\tr14\n");
+        System.out.print("\tpush\tr15\n");
+    }
+
+    void out_func(){
+        System.out.print("\tpop\tr15\n");
+        System.out.print("\tpop\tr14\n");
+        System.out.print("\tpop\tr13\n");
+        System.out.print("\tpop\tr12\n");
+        System.out.print("\tpop\tr11\n");
+        System.out.print("\tpop\tr10\n");
+    }
+
     void print_dfs(BasicBlock tmp, FuncBlock f, int c){
         if (tmp.name.indexOf("main") != -1) System.out.println("main:");
             else System.out.println(tmp.name+":");
@@ -884,11 +902,14 @@ public class mayfinal {
         if (tmp.name.indexOf("main") != -1){
             System.out.print("\tcall\t _general\n");
 
-
         }
+        if (tmp.name.indexOf("main") == -1 && tmp.name.indexOf("_general") == -1 && tmp.name.equals(f.name)) in_func();
 
         for (int i = 0; i < tmp.content.size(); ++i) {
-            tmp.content.get(i).print(f);
+            Tern t = tmp.content.get(i);
+            if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
+                    (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
+            t.print(f);
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
