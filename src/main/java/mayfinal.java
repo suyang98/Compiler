@@ -873,8 +873,6 @@ public class mayfinal {
     }
 
     void in_func(){
-        System.out.print("\tpush\tr10\n");
-        System.out.print("\tpush\tr11\n");
         System.out.print("\tpush\tr12\n");
         System.out.print("\tpush\tr13\n");
         System.out.print("\tpush\tr14\n");
@@ -886,8 +884,6 @@ public class mayfinal {
         System.out.print("\tpop\tr14\n");
         System.out.print("\tpop\tr13\n");
         System.out.print("\tpop\tr12\n");
-        System.out.print("\tpop\tr11\n");
-        System.out.print("\tpop\tr10\n");
     }
 
     void print_dfs(BasicBlock tmp, FuncBlock f, int c){
@@ -909,7 +905,15 @@ public class mayfinal {
             Tern t = tmp.content.get(i);
             if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
                     (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
+            if (t.op == Opcode.call) {
+                System.out.print("\tpush\tr10\n");
+                System.out.print("\tpush\tr11\n");
+            }
             t.print(f);
+            if (t.op == Opcode.call) {
+                System.out.print("\tpop\tr11\n");
+                System.out.print("\tpop\tr10\n");
+            }
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
