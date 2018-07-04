@@ -829,10 +829,6 @@ public class ternary {
 
         else if (u instanceof FuncDefNode){
             FuncBlock tmp = new FuncBlock();
-            if (((FuncDefNode) u).ID.indexOf("printPoint") != -1) {
-                int j ;
-                j = 0;
-            }
             if (u.V.IR_name == null)  u.V.IR_name = tmp.FuncName = "__"+((FuncDefNode) u).ID;
             else tmp.FuncName = u.V.IR_name;
             for (int i = 0; i < ((FuncScope)u.V).para.size(); ++i){
@@ -847,21 +843,29 @@ public class ternary {
             root.Blocks.put(tmp.FuncName, tmp);
             tmp.name = tmp.FuncName;
             v = tmp;
-            for (int i = ((FuncScope)u.V).para.size()-1; i >= 0 ; --i){
+            for (int i = ((FuncScope)u.V).para.size()-1; i >= 6 ; --i) {
                 Tern t = new Tern();
-                if (i >= 6){
                     t.op = Opcode.mov;
                     t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
                     t.src2 = new reg();
-                    ((reg) t.src2).memory = "rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8);
-                    ((reg) t.src2).contxt = "[rbp+" +  String.valueOf((((FuncScope) u.V).para.size()-i+1)*8) + "]";
-                }
-                else {
+                    ((reg) t.src2).memory = "rbp+" + String.valueOf((((FuncScope) u.V).para.size() - i + 1) * 8);
+                    ((reg) t.src2).contxt = "[rbp+" + String.valueOf((((FuncScope) u.V).para.size() - i + 1) * 8) + "]";
+                v.content.add(t);
+            }
+            for (int i = 12; i < 16; ++i){
+                Tern t = new Tern();
+                t.op = Opcode.push;
+                t.src1 = new reg();
+                t.src1.contxt = "r"+String.valueOf(i);
+                v.content.add(t);
+            }
+            int ttmp = ((FuncScope)u.V).para.size()-1 < 5? ((FuncScope)u.V).para.size()-1:5;
+            for (int i = ttmp; i >= 0; --i){
+                Tern t = new Tern();
                     t.op = Opcode.mov;
                     t.src1 = ((FuncScope) u.V).para.get(i).IR_name;
                     t.src2 = new reg();
                     t.src2.contxt = r.param(i);
-                }
                 v.content.add(t);
             }
             for (int i = 0; i < ((FuncDefNode)u).Body.size(); ++i){
@@ -2218,11 +2222,6 @@ public class ternary {
             Scope stmp;
             if (((MethodNode) u).InClass == null) stmp = General.func.get(((MethodNode) u).FuncID);
                 else stmp = General.clas.get(((MethodNode) u).InClass).func.get(((MethodNode) u).FuncID);
-
-            if (stmp == null) {
-                int j;
-                j = 0;
-            }
 
             List<tnode> paralist = new ArrayList<>();
 

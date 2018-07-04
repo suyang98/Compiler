@@ -871,13 +871,13 @@ public class mayfinal {
 
         }
     }
-
-    void in_func(){
-        System.out.print("\tpush\tr12\n");
-        System.out.print("\tpush\tr13\n");
-        System.out.print("\tpush\tr14\n");
-        System.out.print("\tpush\tr15\n");
-    }
+//
+//    void in_func(){
+//        System.out.print("\tpush\tr12\n");
+//        System.out.print("\tpush\tr13\n");
+//        System.out.print("\tpush\tr14\n");
+//        System.out.print("\tpush\tr15\n");
+//    }
 
     void out_func(){
         System.out.print("\tpop\tr15\n");
@@ -899,7 +899,7 @@ public class mayfinal {
             System.out.print("\tcall\t _general\n");
 
         }
-        if (tmp.name.indexOf("main") == -1 && tmp.name.indexOf("_general") == -1 && tmp.name.equals(f.name)) in_func();
+        //if (tmp.name.indexOf("main") == -1 && tmp.name.indexOf("_general") == -1 && tmp.name.equals(f.name)) in_func();
 
         for (int i = 0; i < tmp.content.size(); ++i) {
             Tern t = tmp.content.get(i);
