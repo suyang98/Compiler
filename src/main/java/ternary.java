@@ -492,6 +492,9 @@ public class ternary {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.def.add((reg) u.src1);
             if (u.src2 instanceof reg && u.src2.contxt.indexOf("%") != -1) u.use.add((reg) u.src2);
         }
+        if (u.op == Opcode.store || u.op == Opcode.load){
+            if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
+        }
         if (u.op == Opcode.add || u.op == Opcode.sub || u.op == Opcode.imul || u.op == Opcode.sal || u.op == Opcode.sar
                 || u.op == Opcode.and || u.op == Opcode.or || u.op == Opcode.xor) {
             if (u.src1 instanceof reg && u.src1.contxt.indexOf("%") != -1) u.use.add((reg) u.src1);
