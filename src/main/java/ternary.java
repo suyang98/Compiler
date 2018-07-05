@@ -1490,12 +1490,46 @@ public class ternary {
             }
 
             if (((InfixExpressionNode)u).Right instanceof NumberNode && ((InfixExpressionNode)u).Left instanceof NumberNode){
-                imm ttmp = new imm();
-                ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode)u).Right).Value+((NumberNode) ((InfixExpressionNode)u).Left).Value);
-                while (flag_tern.size() != 0){
-                    v.content.add(flag_tern.pop());
+                if (u instanceof AddNode) {
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Right).Value + ((NumberNode) ((InfixExpressionNode) u).Left).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
                 }
-                return ttmp;
+                if (u instanceof SubNode) {
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value - ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
+                if (u instanceof MulNode) {
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value * ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
+                if (u instanceof DivNode) {
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value / ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
+                if (u instanceof ModNode) {
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value % ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
             }
 
             if (u instanceof DivNode) {
