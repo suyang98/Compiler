@@ -908,11 +908,7 @@ public class mayfinal {
             if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
                     (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
 
-            t.print(f);
-//            if (t.op == Opcode.call) {
-//                System.out.print("\tpop\tr11\n");
-//                System.out.print("\tpop\tr10\n");
-//            }
+            if (!t.Is_Dead) t.print(f);
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);

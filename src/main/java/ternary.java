@@ -82,6 +82,7 @@ class Tern {
     tnode src2;
     tnode des;
     int num;
+    boolean Is_Dead = false;
     List<Tern> pred = new ArrayList<>();
     List<Tern> next = new ArrayList<>();
     List<reg> def = new ArrayList<>();
@@ -381,6 +382,8 @@ public class ternary {
         flow(root.gen_var);
         balance(root.gen_var);
         interference(root.gen_var, 6);
+//        for (int i = 0; i < root.gen_var.all.size(); ++i)
+//            dead_delete(root.gen_var.all.get(i), root.gen_var);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -393,7 +396,8 @@ public class ternary {
             flow(tmp);
             balance(tmp);
             interference(tmp, 6);
-
+//            for (int i = 0; i < tmp.all.size(); ++i)
+//                dead_delete(tmp.all.get(i), tmp);
         }
 
     }
@@ -425,7 +429,6 @@ public class ternary {
             add_dfs(tmp, tmp, c);
         }
     }
-
 
     void add_dfs(BasicBlock tmp, FuncBlock f, int c){
         f.label_list.put(tmp.name, c);
@@ -482,7 +485,6 @@ public class ternary {
         }
 
     }
-
 
     void use_def(Tern u, FuncBlock f){
         if (u.op == Opcode.label) return;
@@ -640,6 +642,8 @@ public class ternary {
 
     }
 
+    void dead_delete(Tern u,FuncBlock tmp){
+    }
 
     tnode define_arr(CreateNode u, BasicBlock v, int i, int l){
         Tern tmp0 = new Tern();
@@ -1484,6 +1488,16 @@ public class ternary {
                     }
                 }
             }
+
+            if (((InfixExpressionNode)u).Right instanceof NumberNode && ((InfixExpressionNode)u).Left instanceof NumberNode){
+                imm ttmp = new imm();
+                ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode)u).Right).Value+((NumberNode) ((InfixExpressionNode)u).Left).Value);
+                while (flag_tern.size() != 0){
+                    v.content.add(flag_tern.pop());
+                }
+                return ttmp;
+            }
+
             if (u instanceof DivNode) {
                 if (tmp.src2.contxt.equals("rax") || tmp.src2 instanceof imm){
                     Tern t = new Tern();
