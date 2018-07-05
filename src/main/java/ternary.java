@@ -2367,7 +2367,6 @@ public class ternary {
             ((reg) tmp.src1).contxt = stmp.IR_name;
             v.content.add(tmp);
 
-
             Tern tmp3 = new Tern();
             tmp3.op = Opcode.pop;
             tmp3.src1 = new reg();
@@ -2379,13 +2378,15 @@ public class ternary {
             tmp4.src1.contxt = "r10";
             v.content.add(tmp4);
 
-            t.op = Opcode.mov;
-            t.src1 = new reg();
-            t.src1.contxt = "%f"+((MethodNode) u).FuncID+String.valueOf(cnt);
-            cnt++;
-            t.src2 = new reg();
-            t.src2.contxt = "rax";
-            v.content.add(t);
+            if (((MethodNode) u).Is_Return) {
+                t.op = Opcode.mov;
+                t.src1 = new reg();
+                t.src1.contxt = "%f" + ((MethodNode) u).FuncID + String.valueOf(cnt);
+                cnt++;
+                t.src2 = new reg();
+                t.src2.contxt = "rax";
+                v.content.add(t);
+            }
 
             for (int i = 6; i < ((FuncScope) stmp).para.size(); ++i){
                 Tern tt = new Tern();

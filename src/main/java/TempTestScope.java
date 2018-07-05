@@ -18,6 +18,7 @@ class ParTypeRef extends VarTypeRef{
 
 
 class Scope {
+    boolean Is_Return = false;
     Scope parent;
     String name;
     String IR_name;
@@ -336,7 +337,6 @@ public class TempTestScope {
         }
     }
 
-
     public void put_this(){
         for (Object obj: Root.clas.keySet()){
             String key = (String) obj;
@@ -459,7 +459,6 @@ public class TempTestScope {
         return tmp;
     }
 
-
     public void dfs(Node u, Scope v){
         if (u == null) return;
         if (u instanceof ProgNode) {
@@ -479,6 +478,9 @@ public class TempTestScope {
 
         else if (u instanceof FuncDefNode){
             FuncScope tmp = new FuncScope();
+            if (((FuncDefNode) u).Return.indexOf("void")==-1){
+                tmp.Is_Return = true;
+            }
             if (keyword.contains(((FuncDefNode) u).ID)){
                 System.err.println(u.Location.line+" "+u.Location.column+" \""+((FuncDefNode) u).ID+"\" is a reserved word");
                 System.exit(1);
