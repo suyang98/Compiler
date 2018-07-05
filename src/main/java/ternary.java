@@ -2378,15 +2378,13 @@ public class ternary {
             tmp4.src1.contxt = "r10";
             v.content.add(tmp4);
 
-            if (((MethodNode) u).Is_Return) {
-                t.op = Opcode.mov;
-                t.src1 = new reg();
-                t.src1.contxt = "%f" + ((MethodNode) u).FuncID + String.valueOf(cnt);
-                cnt++;
-                t.src2 = new reg();
-                t.src2.contxt = "rax";
-                v.content.add(t);
-            }
+            t.op = Opcode.mov;
+            t.src1 = new reg();
+            t.src1.contxt = "%f"+((MethodNode) u).FuncID+String.valueOf(cnt);
+            cnt++;
+            t.src2 = new reg();
+            t.src2.contxt = "rax";
+            v.content.add(t);
 
             for (int i = 6; i < ((FuncScope) stmp).para.size(); ++i){
                 Tern tt = new Tern();
