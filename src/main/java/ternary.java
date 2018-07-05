@@ -380,7 +380,7 @@ public class ternary {
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
         flow(root.gen_var);
         balance(root.gen_var);
-        interference(root.gen_var, 4);
+        interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -392,7 +392,7 @@ public class ternary {
             }
             flow(tmp);
             balance(tmp);
-            interference(tmp, 4);
+            interference(tmp, 6);
 
         }
 
@@ -2283,6 +2283,16 @@ public class ternary {
                         v.content.add(tmp);
                     }
                 }
+            Tern tmp1 = new Tern();
+            tmp1.op = Opcode.push;
+            tmp1.src1 = new reg();
+            tmp1.src1.contxt = "r10";
+            v.content.add(tmp1);
+            Tern tmp2 = new Tern();
+            tmp2.op = Opcode.push;
+            tmp2.src1 = new reg();
+            tmp2.src1.contxt = "r11";
+            v.content.add(tmp2);
 
             if (((FuncScope) stmp).para != null && ((FuncScope) stmp).para.size() > 6 && ((FuncScope) stmp).para.size() % 2 ==1){
                     Tern tmp = new Tern();
@@ -2314,6 +2324,17 @@ public class ternary {
             v.content.add(tmp);
 
 
+            Tern tmp3 = new Tern();
+            tmp3.op = Opcode.pop;
+            tmp3.src1 = new reg();
+            tmp3.src1.contxt = "r11";
+            v.content.add(tmp3);
+            Tern tmp4 = new Tern();
+            tmp4.op = Opcode.pop;
+            tmp4.src1 = new reg();
+            tmp4.src1.contxt = "r10";
+            v.content.add(tmp4);
+
             t.op = Opcode.mov;
             t.src1 = new reg();
             t.src1.contxt = "%f"+((MethodNode) u).FuncID+String.valueOf(cnt);
@@ -2337,8 +2358,6 @@ public class ternary {
                 tt.src1.contxt = "rax";
                 v.content.add(tt);
             }
-
-
             return t.src1;
         }
 
