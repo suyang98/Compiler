@@ -1,5 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
+
+
+
 public class mayfinal {
     IR root;
+    List<p> print_list = new ArrayList<>();
     void transform(){
         //for (Object obj : root.Blocks.keySet())
          //   System.out.println("global\t" + obj);
@@ -848,9 +854,12 @@ public class mayfinal {
         }
         root.gen_var.name = "_general";
         print_dfs(root.gen_var, root.gen_var, 0);
-        System.out.print("\tmov\trsp, rbp\n");
-        System.out.print("\tpop\trbp\n");
-        System.out.print("\tret\n");
+        sent t1 = new sent("mov", "rsp","rbp");
+        sent t2 = new sent("pop","rbp");
+        sent t3 = new sent("ret");
+        print_list.add(t1);
+        print_list.add(t2);
+        print_list.add(t3);
 
 
         for (Object key: root.Blocks.keySet()){
@@ -865,42 +874,57 @@ public class mayfinal {
             }
 
 
-
             print_dfs(ftmp, ftmp, 0);
 
 
         }
     }
-//
-//    void in_func(){
-//        System.out.print("\tpush\tr12\n");
-//        System.out.print("\tpush\tr13\n");
-//        System.out.print("\tpush\tr14\n");
-//        System.out.print("\tpush\tr15\n");
-//    }
 
     void out_func(){
-        System.out.print("\tpop\tr15\n");
-        System.out.print("\tpop\tr14\n");
-        System.out.print("\tpop\tr13\n");
-        System.out.print("\tpop\tr12\n");
+        sent t1 = new sent("pop", "r15");
+        print_list.add(t1);
+        sent t2 = new sent("pop", "r14");
+        print_list.add(t2);
+        sent t3 = new sent("pop", "r13");
+        print_list.add(t3);
+        sent t4 = new sent("pop", "r12");
+        print_list.add(t4);
     }
 
     void print_dfs(BasicBlock tmp, FuncBlock f, int c){
-        if (tmp.name.indexOf("main") != -1) System.out.println("main:");
-            else System.out.println(tmp.name+":");
+        if (tmp.name.indexOf("main") != -1) {
+            lab tmp1 = new lab("main:");
+            print_list.add(tmp1);
+        }
+        else {
+            lab tmp1 = new lab(tmp.name+":");
+            print_list.add(tmp1);
+        }
         if (tmp.name.equals(f.name)) {
-            System.out.print("\tpush\trbp\n");
-            System.out.print("\tmov\trbp, rsp\n");
-            if (f.var_num % 2 == 1) System.out.print("\tsub\trsp, " + f.var_num*8+"\n");
-            else System.out.print("\tsub\trsp, " + (f.var_num+1)*8+"\n");
+            sent tmp2 = new sent("push","rbp");
+            print_list.add(tmp2);
+            sent tmp3 = new sent("mov","rbp","rsp");
+            print_list.add(tmp3);
+            if (f.var_num % 2 == 1) {
+                sent tmp4 = new sent("sub","rsp", String.valueOf(f.var_num*8));
+                print_list.add(tmp4);
+            }
+            else {
+                sent tmp4 = new sent("sub","rsp", String.valueOf((f.var_num+1)*8));
+                print_list.add(tmp4);
+            }
         }
         if (tmp.name.indexOf("main") != -1){
-            System.out.print("\tpush\tr10\n");
-            System.out.print("\tpush\tr11\n");
-            System.out.print("\tcall\t _general\n");
-            System.out.print("\tpop\tr11\n");
-            System.out.print("\tpop\tr10\n");
+            sent tmp5 = new sent("push","r10");
+            sent tmp6 = new sent("push","r11");
+            sent tmp7 = new sent("call","_general");
+            sent tmp8 = new sent("pop","r11");
+            sent tmp9 = new sent("pop","r10");
+            print_list.add(tmp5);
+            print_list.add(tmp6);
+            print_list.add(tmp7);
+            print_list.add(tmp8);
+            print_list.add(tmp9);
         }
 
         for (int i = 0; i < tmp.content.size(); ++i) {
@@ -908,11 +932,20 @@ public class mayfinal {
             if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
                     (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
 
-            if (!t.Is_Dead) t.print(f);
+            if (!t.Is_Dead) t.print(f, print_list);
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
         }
 
     }
+
+    void out(){
+        for (int i = 0; i < print_list.size(); ++i){
+            p t = print_list.get(i);
+            if (t instanceof lab) ((lab) t).print();
+            if (t instanceof sent) ((sent) t).print();
+        }
+    }
+
 }

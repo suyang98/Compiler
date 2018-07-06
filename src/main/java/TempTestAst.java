@@ -521,6 +521,8 @@ class ForNode extends StateNode {
     public ExpressionNode Expr1, Expr2, Expr3;
     public StateNode Block;
     public String name;
+    boolean Is_continue;
+    boolean Is_break;
     void print(){
         System.out.println("For");
     }

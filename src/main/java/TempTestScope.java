@@ -459,6 +459,16 @@ public class TempTestScope {
         return tmp;
     }
 
+//    void optim(ForNode u, Node v){
+//        if (v == null) return;
+//        if (v instanceof JumpNode){
+//            if (((JumpNode) v).Label == Jump.Break) u.Is_break = true;
+//            if (((JumpNode) v).Label == Jump.Continue) u.Is_continue = true;
+//        }
+//        for (int i = 0; i < v.size(); ++i)
+//            optim(u, v.sons(i));
+//    }
+
     public void dfs(Node u, Scope v){
         if (u == null) return;
         if (u instanceof ProgNode) {
@@ -621,6 +631,7 @@ public class TempTestScope {
                     dfs(((ForNode) u).Block.sons(i), tmp);
             }
             ((LocalScope)v).sons.put(tmp.name, tmp);
+            //optim((ForNode) u, u);
         }
 
         else if (u instanceof ConditionNode){

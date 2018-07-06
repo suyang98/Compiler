@@ -2,6 +2,42 @@ import java.io.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+class p{}
+class sent extends p{
+    String operation;
+    String s1;
+    String s2;
+    int num;
+    sent(String S0, String S1, String S2){
+        operation = S0;
+        s1 = S1;
+        s2 = S2;
+        num = 3;
+    }
+    sent(String S0, String S1){
+        operation = S0;
+        s1 = S1;
+        num = 2;
+    }
+    sent(String S0){
+        operation = S0;
+        num = 1;
+    }
+    void print(){
+        if (num == 1) System.out.println("\t"+operation);
+        if (num == 2) System.out.println("\t"+operation+"\t"+s1);
+        if (num == 3) System.out.println("\t"+operation+"\t"+s1+","+s2);
+    }
+}
+class lab extends p{
+    String s;
+    lab(String S){
+        s = S;
+    }
+    void print(){
+        System.out.println(s);
+    }
+}
 
 public class main{
     public static void main(String[] args) throws Exception{
@@ -44,6 +80,7 @@ public class main{
         mayfinal fin = new mayfinal();
         fin.root = ir.root;
         fin.transform();
+        fin.out();
 
     }
 }
