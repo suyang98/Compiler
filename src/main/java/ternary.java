@@ -381,9 +381,9 @@ public class ternary {
             if (root.gen_var.var.get(k).memory == null) root.gen_var.var_num++;
         flow(root.gen_var);
         balance(root.gen_var);
-        interference(root.gen_var, 6);
 //        for (int i = 0; i < root.gen_var.all.size(); ++i)
 //            dead_delete(root.gen_var.all.get(i), root.gen_var);
+        interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -395,9 +395,9 @@ public class ternary {
             }
             flow(tmp);
             balance(tmp);
+            for (int i = 0; i < tmp.all.size(); ++i)
+                dead_delete(tmp.all.get(i), tmp);
             interference(tmp, 6);
-//            for (int i = 0; i < tmp.all.size(); ++i)
-//                dead_delete(tmp.all.get(i), tmp);
         }
 
     }
@@ -643,6 +643,17 @@ public class ternary {
     }
 
     void dead_delete(Tern u,FuncBlock tmp){
+        boolean dead_flag = true;
+        if (u.def.size() == 0 || u.op == Opcode.load || u.op == Opcode.store) return;
+        for (int i = 0; i < u.def.size(); ++i){
+            reg r = u.def.get(i);
+            for (Object obj: u.out.keySet()){
+                if (u.out.get(obj).contxt.equals(r.contxt)) {dead_flag = false;break;}
+            }
+            if (!dead_flag) break;
+        }
+        if (dead_flag)
+            u.Is_Dead = true;
     }
 
     tnode define_arr(CreateNode u, BasicBlock v, int i, int l){
