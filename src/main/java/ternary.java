@@ -221,7 +221,6 @@ class Tern {
             }
 
 
-            System.out.print("\t" + op + "\t");
             sent t = new sent(String.valueOf(op));
             t.num = 3;
             print_list.add(t);
