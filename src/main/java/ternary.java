@@ -644,7 +644,9 @@ public class ternary {
 
     void dead_delete(Tern u,FuncBlock tmp){
         boolean dead_flag = true;
-        if (u.def.size() == 0 || u.op == Opcode.load || u.op == Opcode.store) return;
+        if (u.def.size() == 0 || u.op == Opcode.load || u.op == Opcode.store ||
+                (u.src1 instanceof reg && ((reg) u.src1).memory!=null) || (u.src2 instanceof  reg && ((reg) u.src2).memory!=null))
+            return;
         for (int i = 0; i < u.def.size(); ++i){
             reg r = u.def.get(i);
             for (Object obj: u.out.keySet()){
