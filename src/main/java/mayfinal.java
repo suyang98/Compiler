@@ -952,6 +952,7 @@ public class mayfinal {
     void optim(){
         for (int i = 0; i < print_list.size(); ++i){
             p t = print_list.get(i);
+            if (t instanceof sent && ((sent) t).operation.equals("mov") && ((sent) t).s1.equals(((sent) t).s2)) t.flag = false;
             if (t instanceof sent && (((sent)t).operation.indexOf("j") != -1 || ((sent) t).operation.equals("call")))
                 if (label_map.get(((sent) t).s1+":")!=null)label_map.get(((sent) t).s1+":").appear.add(i);
         }

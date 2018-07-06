@@ -631,7 +631,6 @@ public class TempTestScope {
                     dfs(((ForNode) u).Block.sons(i), tmp);
             }
             ((LocalScope)v).sons.put(tmp.name, tmp);
-            //optim((ForNode) u, u);
         }
 
         else if (u instanceof ConditionNode){
