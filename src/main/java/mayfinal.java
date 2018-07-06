@@ -1,11 +1,14 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 public class mayfinal {
     IR root;
     List<p> print_list = new ArrayList<>();
+    List<lab> label_list = new ArrayList<>();
+    Map<String, lab> label_map = new HashMap<>();
     void transform(){
         //for (Object obj : root.Blocks.keySet())
          //   System.out.println("global\t" + obj);
@@ -895,10 +898,16 @@ public class mayfinal {
         if (tmp.name.indexOf("main") != -1) {
             lab tmp1 = new lab("main:");
             print_list.add(tmp1);
+            tmp1.loc = print_list.size();
+            label_map.put(tmp1.s, tmp1);
+            label_list.add(tmp1);
         }
         else {
             lab tmp1 = new lab(tmp.name+":");
             print_list.add(tmp1);
+            tmp1.loc = print_list.size();
+            label_map.put(tmp1.s, tmp1);
+            label_list.add(tmp1);
         }
         if (tmp.name.equals(f.name)) {
             sent tmp2 = new sent("push","rbp");
@@ -932,7 +941,7 @@ public class mayfinal {
             if (f.name.indexOf("main") ==-1 &&(t.op == Opcode.leave||
                     (t.op == Opcode.mov && t.src1.contxt.equals("rsp") && t.src2.contxt.equals("rbp")))) out_func();
 
-            if (!t.Is_Dead) t.print(f, print_list);
+            if (!t.Is_Dead) t.print(f, print_list, label_map, label_list);
         }
         if (tmp.Next != null){
             print_dfs(tmp.Next, f, c);
@@ -940,9 +949,22 @@ public class mayfinal {
 
     }
 
+    void optim(){
+        for (int i = 0; i < print_list.size(); ++i){
+            p t = print_list.get(i);
+            if (t instanceof sent && ((sent)t).operation.indexOf("j") != -1)
+                label_map.get(((sent) t).s1+":").appear.add(i);
+        }
+        for (Object obj:label_map.keySet()){
+            lab t = label_map.get(obj);
+            if (t.appear.size()==0 && !t.s.equals("_general:") && !t.s.equals("main:")) t.flag = false;
+        }
+    }
+
     void out(){
         for (int i = 0; i < print_list.size(); ++i){
             p t = print_list.get(i);
+            if (!t.flag) continue;
             if (t instanceof lab) ((lab) t).print();
             if (t instanceof sent) ((sent) t).print();
         }

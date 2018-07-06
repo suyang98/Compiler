@@ -89,10 +89,13 @@ class Tern {
     List<reg> use = new ArrayList<>();
     Map<String, reg> in = new HashMap<>();
     Map<String, reg> out = new HashMap<>();
-    void print(FuncBlock f, List<p> print_list){
+    void print(FuncBlock f, List<p> print_list, Map<String, lab> label_map, List<lab> label_list){
         if (op == Opcode.label) {
             lab t = new lab(src1.contxt+":");
             print_list.add(t);
+            t.loc = print_list.size();
+            label_map.put(t.s, t);
+            label_list.add(t);
             return;
         }
         if (op == Opcode.idiv) {

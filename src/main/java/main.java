@@ -1,8 +1,13 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-class p{}
+class p{
+    boolean flag = true;
+}
 class sent extends p{
     String operation;
     String s1;
@@ -31,6 +36,8 @@ class sent extends p{
 }
 class lab extends p{
     String s;
+    int loc;
+    List<Integer> appear = new ArrayList<>();
     lab(String S){
         s = S;
     }
@@ -80,6 +87,7 @@ public class main{
         mayfinal fin = new mayfinal();
         fin.root = ir.root;
         fin.transform();
+        fin.optim();
         fin.out();
 
     }
