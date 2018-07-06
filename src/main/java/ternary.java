@@ -584,7 +584,7 @@ public class ternary {
             reg t = tmp.var.get(obj);
             if (t.memory == null)  {tmp.var_list.put(t.contxt, c); tmp.list.put(c++,t.contxt);}
         }
-        if (tmp.var_list.size() > 250) return;
+        if (tmp.var_list.size() > 300) return;
         for (int i = 0; i < tmp.all.size(); ++i) {
             Tern t = tmp.all.get(i);
             if (t.op ==Opcode.store || t.op == Opcode.load){
@@ -649,9 +649,9 @@ public class ternary {
         for (int i = 0; i < tmp.var_list.size(); ++i){
             String s = color.pop();
             int index = tmp.var_list.get(s);
-            int j = 0;
-            while (j < num && (retable[index][j] != null && retable[index][j])) j++;
-            if (j == num) continue;
+            int j = num-1;
+            while (j >= 0 && (retable[index][j] != null && retable[index][j])) j--;
+            if (j == 0) continue;
             for (int k = 0; k < tmp.var_list.size(); ++k)
                 if ((tmp.color_map[index][k]!=null&&tmp.color_map[index][k])||(tmp.color_map[k][index]!=null&&tmp.color_map[k][index])) retable[k][j] = true;
             tmp.var.get(s).contxt = r.col(j);
