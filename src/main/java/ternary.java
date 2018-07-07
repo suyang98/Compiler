@@ -73,7 +73,7 @@ class FuncBlock extends BasicBlock{
     Map<String, reg> var = new HashMap<>();
     Map<String, Integer> var_list = new HashMap<>();
     Map<Integer, String> list = new HashMap<>();
-    Boolean [][] color_map = new Boolean [250][250];
+    Boolean [][] color_map = new Boolean [300][300];
 }
 
 class Tern {
@@ -104,10 +104,10 @@ class Tern {
                 if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
                     ((reg) src1).reg = "rbx";
                     sent t1 = new sent("mov",((reg) src1).reg,"[" + f.var.get(src1.contxt).memory + "]");
-                    sent t2 = new sent("mov", ((reg) src1).reg ,"[" + f.var.get(src1.contxt).memory + "]");
+                    //sent t2 = new sent("mov", ((reg) src1).reg ,"[" + f.var.get(src1.contxt).memory + "]");
                     sent t3 = new sent("idiv",((reg) src1).reg);
                     print_list.add(t1);
-                    print_list.add(t2);
+                    //print_list.add(t2);
                     print_list.add(t3);
                 }
                 else print_list.add(new sent("idiv", src1.contxt));
@@ -222,14 +222,17 @@ class Tern {
                     print_list.add(new sent("mov", ((reg)src2).reg, "[" + tmp.memory + "]"));
                 }
             }
-
-
             sent t = new sent(String.valueOf(op));
             t.num = 3;
             print_list.add(t);
             if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
-                t.s1 = "rax";
-                ((reg) src1).reg = "rax";
+                if (((reg) src1).memory.indexOf("_")==-1) {
+                    t.s1 = "rax";
+                    ((reg) src1).reg = "rax";
+                }
+                else {
+                    t.s1 = "["+((reg) src1).memory+"]";
+                }
             } else t.s1 = src1.contxt;
 
             if (src2 instanceof reg && (src2.contxt.indexOf("%") != -1 || src2.contxt.indexOf("r")!=-1) ) {
@@ -240,12 +243,46 @@ class Tern {
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
                 if (def.get(i).contxt.equals(src1.contxt)) {
-                    if (tmp != null)
-                        print_list.add(new sent("mov","[" + tmp.memory + "]", ((reg) src1).reg));
+                    if (tmp != null && ((reg)src1).memory.indexOf("_")==-1)
+                        print_list.add(new sent("mov", "[" + tmp.memory + "]", ((reg) src1).reg));
                 }
                 else {
-                    if (tmp != null)
-                    print_list.add(new sent("mov", "[" + tmp.memory + "]", ((reg) src2).reg));
+                    if (tmp != null && ((reg)src2).memory.indexOf("_")==-1)
+                        print_list.add(new sent("mov", "[" + tmp.memory + "]", ((reg) src2).reg));
+                }
+            }
+        }
+
+        else if (op == Opcode.cmp && src1 instanceof imm){
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) src1 = f.var.get(src1.contxt);
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) src2 = f.var.get(src2.contxt);
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) ((reg)src1).reg = "rax";
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) ((reg)src2).reg = "rbx";
+            for (int i = 0; i < use.size(); ++i){
+                reg tmp = f.var.get(use.get(i).contxt);
+                if (use.get(i).contxt.indexOf("%") != -1) {
+                    if (tmp.contxt.indexOf("%") != -1)
+                        if (use.get(i).contxt.equals(src1.contxt)) {
+                            print_list.add(new sent("mov", ((reg) src1).reg, "[" + tmp.memory + "]"));
+                        } else {
+                            print_list.add(new sent("mov", ((reg) src2).reg, "[" + tmp.memory + "]"));
+                        }
+                }
+            }
+            print_list.add(new sent("mov", "rax", src1.contxt));
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                print_list.add(new sent("cmp","rax","rbx"));
+                ((reg) src2).reg = "rbx";
+            } else print_list.add(new sent("cmp","rax", src2.contxt));
+            for (int i = 0; i < def.size(); ++i){
+                reg tmp = f.var.get(def.get(i).contxt);
+                if (def.get(i).contxt.indexOf("%") != -1){
+                    if (tmp.contxt.indexOf("%") != -1)
+                        if (def.get(i).contxt.equals(src1.contxt))
+                            print_list.add(new sent("mov", "[" + tmp.memory + "]", ((reg) src1).reg));
+                        else {
+                            print_list.add(new sent("mov", "[" + tmp.memory + "]", ((reg) src2).reg));
+                        }
                 }
             }
         }
@@ -266,27 +303,18 @@ class Tern {
                     }
                 }
             }
-            if (op == Opcode.cmp && src1 instanceof imm) {
-                print_list.add(new sent("mov", "rax", src1.contxt));
-                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
-                    print_list.add(new sent("cmp","rax","rbx"));
-                    ((reg) src2).reg = "rbx";
-                } else print_list.add(new sent("cmp","rax", src2.contxt));
-            }
-            else {
-                sent t = new sent(String.valueOf(op));
-                t.num = 3;
-                print_list.add(t);
-                if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
-                    t.s1 = "rax";
-                    ((reg) src1).reg = "rax";
-                } else t.s1 =  src1.contxt;
+            sent t = new sent(String.valueOf(op));
+            t.num = 3;
+            print_list.add(t);
+            if (src1 instanceof reg && src1.contxt.indexOf("%") != -1) {
+                t.s1 = "rax";
+                ((reg) src1).reg = "rax";
+            } else t.s1 =  src1.contxt;
 
-                if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
-                    t.s2 = "rbx";
-                    ((reg) src2).reg = "rbx";
-                } else t.s2 = src2.contxt;
-            }
+            if (src2 instanceof reg && src2.contxt.indexOf("%") != -1) {
+                t.s2 = "rbx";
+                ((reg) src2).reg = "rbx";
+            } else t.s2 = src2.contxt;
 
             for (int i = 0; i < def.size(); ++i){
                 reg tmp = f.var.get(def.get(i).contxt);
@@ -649,9 +677,9 @@ public class ternary {
         for (int i = 0; i < tmp.var_list.size(); ++i){
             String s = color.pop();
             int index = tmp.var_list.get(s);
-            int j = num-1;
-            while (j >= 0 && (retable[index][j] != null && retable[index][j])) j--;
-            if (j == 0) continue;
+            int j = 0;
+            while (j < num && (retable[index][j] != null && retable[index][j])) j++;
+            if (j == num) continue;
             for (int k = 0; k < tmp.var_list.size(); ++k)
                 if ((tmp.color_map[index][k]!=null&&tmp.color_map[index][k])||(tmp.color_map[k][index]!=null&&tmp.color_map[k][index])) retable[k][j] = true;
             tmp.var.get(s).contxt = r.col(j);
