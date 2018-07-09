@@ -1767,7 +1767,7 @@ public class ternary {
                 }
             }
             tmp.src1 = dfs(((PreNode) u).InnerNode, v);
-            if (tmp.src1 instanceof imm || u instanceof MinNode){
+            {
                 Tern t = new Tern();
                 t.op = Opcode.mov;
                 t.src1 = new reg();
