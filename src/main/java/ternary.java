@@ -1767,7 +1767,7 @@ public class ternary {
                 }
             }
             tmp.src1 = dfs(((PreNode) u).InnerNode, v);
-            {
+            if (!(u instanceof PreIncNode|| u instanceof PreDecNode)){
                 Tern t = new Tern();
                 t.op = Opcode.mov;
                 t.src1 = new reg();
