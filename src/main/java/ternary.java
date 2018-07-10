@@ -1699,10 +1699,16 @@ public class ternary {
                 v.content.add(tmp);
                 reg t = new reg();
                 t.contxt = "rdx";
+                Tern tmp3 = new Tern();
+                tmp3.op = Opcode.mov;
+                tmp3.src1 = new reg();
+                tmp3.src1.contxt = "%v" + String.valueOf(cnt++);
+                tmp3.src2 = t;
+                v.content.add(tmp3);
                 while (flag_tern.size() != 0){
                     v.content.add(flag_tern.pop());
                 }
-                return t;
+                return tmp3.src1;
             }
 
             else{
