@@ -73,7 +73,7 @@ class FuncBlock extends BasicBlock{
     Map<String, reg> var = new HashMap<>();
     Map<String, Integer> var_list = new HashMap<>();
     Map<Integer, String> list = new HashMap<>();
-    Boolean [][] color_map = new Boolean [4500][4500];
+    Boolean [][] color_map = new Boolean [2000][2000];
 }
 
 class Tern {
@@ -612,7 +612,7 @@ public class ternary {
             reg t = tmp.var.get(obj);
             if (t.memory == null)  {tmp.var_list.put(t.contxt, c); tmp.list.put(c++,t.contxt);}
         }
-        //if (tmp.var_list.size() > 300) return;
+        if (tmp.var_list.size() > 2000) return;
         for (int i = 0; i < tmp.all.size(); ++i) {
             Tern t = tmp.all.get(i);
             if (t.op ==Opcode.store || t.op == Opcode.load){
