@@ -73,7 +73,7 @@ class FuncBlock extends BasicBlock{
     Map<String, reg> var = new HashMap<>();
     Map<String, Integer> var_list = new HashMap<>();
     Map<Integer, String> list = new HashMap<>();
-    Boolean [][] color_map = new Boolean [1000][1000];
+    Boolean [][] color_map = new Boolean [4500][4500];
 }
 
 class Tern {
