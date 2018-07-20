@@ -372,6 +372,7 @@ class labn extends tnode{}
 
 public class ternary {
     IR root = new IR();
+    boolean fff;
     int cnt = 0;
     int bcnt = 0;
     Stack<Tern> flag_tern = new Stack<>();
@@ -415,7 +416,7 @@ public class ternary {
         return false;
     }
 
-    void alloc(){
+    void alloc(boolean flag){
         //printcontext();
         //System.out.println("\n");
         root.gen_var.name = "_general";
@@ -428,7 +429,8 @@ public class ternary {
         balance(root.gen_var);
 //        for (int i = 0; i < root.gen_var.all.size(); ++i)
 //            dead_delete(root.gen_var.all.get(i), root.gen_var);
-        interference(root.gen_var, 6);
+        if (flag) interference(root.gen_var, 8);
+        else interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -442,7 +444,8 @@ public class ternary {
             balance(tmp);
             for (int i = 0; i < tmp.all.size(); ++i)
                 dead_delete(tmp.all.get(i), tmp);
-            interference(tmp, 6);
+            if (flag) interference(tmp, 8);
+            else interference(tmp, 6);
         }
 
     }
@@ -733,13 +736,24 @@ public class ternary {
         tmp1.src2 = new imm();
         tmp1.src2.contxt = "8";
         v.content.add(tmp1);
-
         Tern tmp3 = new Tern();
         tmp3.op = Opcode.mov;
         tmp3.src1 = new reg();
         tmp3.src1.contxt = "rdi";
         tmp3.src2 = tmp1.src1;
         v.content.add(tmp3);
+        if (fff) {
+            Tern tt0 = new Tern();
+            tt0.op = Opcode.push;
+            tt0.src1 = new reg();
+            tt0.src1.contxt = "r8";
+            v.content.add(tt0);
+            Tern tt00 = new Tern();
+            tt00.op = Opcode.push;
+            tt00.src1 = new reg();
+            tt00.src1.contxt = "r9";
+            v.content.add(tt00);
+        }
         Tern tt1 = new Tern();
         tt1.op = Opcode.push;
         tt1.src1 = new reg();
@@ -765,6 +779,18 @@ public class ternary {
         tt4.src1 = new reg();
         tt4.src1.contxt = "r10";
         v.content.add(tt4);
+        if (fff) {
+            Tern tt33 = new Tern();
+            tt33.op = Opcode.pop;
+            tt33.src1 = new reg();
+            tt33.src1.contxt = "r9";
+            v.content.add(tt33);
+            Tern tt44 = new Tern();
+            tt44.op = Opcode.pop;
+            tt44.src1 = new reg();
+            tt44.src1.contxt = "r8";
+            v.content.add(tt44);
+        }
         Tern tmp5 = new Tern();
         tmp5.op = Opcode.store;
         tmp5.src1 = new reg();
@@ -2348,6 +2374,18 @@ public class ternary {
                 tmp1.src2 = new imm();
                 tmp1.src2.contxt = String.valueOf(ctmp.var.size()*8);
                 v.content.add(tmp1);
+                if (fff) {
+                    Tern t0 = new Tern();
+                    t0.op = Opcode.push;
+                    t0.src1 = new reg();
+                    t0.src1.contxt = "r8";
+                    v.content.add(t0);
+                    Tern t00 = new Tern();
+                    t00.op = Opcode.push;
+                    t00.src1 = new reg();
+                    t00.src1.contxt = "r9";
+                    v.content.add(t00);
+                }
                 Tern t1 = new Tern();
                 t1.op = Opcode.push;
                 t1.src1 = new reg();
@@ -2373,6 +2411,18 @@ public class ternary {
                 t4.src1 = new reg();
                 t4.src1.contxt = "r10";
                 v.content.add(t4);
+                if (fff) {
+                    Tern t33 = new Tern();
+                    t33.op = Opcode.pop;
+                    t33.src1 = new reg();
+                    t33.src1.contxt = "r9";
+                    v.content.add(t33);
+                    Tern t44 = new Tern();
+                    t44.op = Opcode.pop;
+                    t44.src1 = new reg();
+                    t44.src1.contxt = "r8";
+                    v.content.add(t44);
+                }
                 Tern tmp3 = new Tern();
                 tmp3.op = Opcode.mov;
                 tmp3.src1 = new reg();
@@ -2498,6 +2548,18 @@ public class ternary {
                         v.content.add(tmp);
                     }
                 }
+                if (fff) {
+                    Tern tmp1 = new Tern();
+                    tmp1.op = Opcode.push;
+                    tmp1.src1 = new reg();
+                    tmp1.src1.contxt = "r8";
+                    v.content.add(tmp1);
+                    Tern tmp2 = new Tern();
+                    tmp2.op = Opcode.push;
+                    tmp2.src1 = new reg();
+                    tmp2.src1.contxt = "r9";
+                    v.content.add(tmp2);
+                }
             Tern tmp1 = new Tern();
             tmp1.op = Opcode.push;
             tmp1.src1 = new reg();
@@ -2548,6 +2610,18 @@ public class ternary {
             tmp4.src1 = new reg();
             tmp4.src1.contxt = "r10";
             v.content.add(tmp4);
+            if (fff) {
+                Tern tmp33 = new Tern();
+                tmp33.op = Opcode.pop;
+                tmp33.src1 = new reg();
+                tmp33.src1.contxt = "r9";
+                v.content.add(tmp33);
+                Tern tmp44 = new Tern();
+                tmp44.op = Opcode.pop;
+                tmp44.src1 = new reg();
+                tmp44.src1.contxt = "r8";
+                v.content.add(tmp44);
+            }
 
             t.op = Opcode.mov;
             t.src1 = new reg();
