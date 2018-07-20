@@ -74,12 +74,14 @@ public class main{
         BuildScope.dfs1(Root, BuildScope.Root);
         BuildScope.put_this();
         boolean flag = BuildScope.flag;
+        //flag = false;
 
         //test.find_logic(Root);
         //BuildScope.add_this(Root);
 
         Register register = new Register();
         ternary ir = new ternary();
+        ir.fff = flag;
         ir.r = register;
         ir.General = BuildScope.Root;
         ir.dfs(Root, null);
