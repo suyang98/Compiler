@@ -5,7 +5,6 @@ import java.util.Map;
 
 
 public class mayfinal {
-    boolean flag;
     IR root;
     List<p> print_list = new ArrayList<>();
     List<lab> label_list = new ArrayList<>();
@@ -925,39 +924,16 @@ public class mayfinal {
             }
         }
         if (tmp.name.indexOf("main") != -1){
-            if (flag){
-                sent tmp5 = new sent("push","r8");
-                sent tmp6 = new sent("push","r9");
-                sent tmp7 = new sent("push","r10");
-                sent tmp8 = new sent("push","r11");
-                sent tmp9 = new sent("call","_general");
-                sent tmp10 = new sent("pop","r11");
-                sent tmp11 = new sent("pop","r10");
-                sent tmp12 = new sent("pop","r9");
-                sent tmp13 = new sent("pop","r8");
-
-                print_list.add(tmp5);
-                print_list.add(tmp6);
-                print_list.add(tmp7);
-                print_list.add(tmp8);
-                print_list.add(tmp9);
-                print_list.add(tmp10);
-                print_list.add(tmp11);
-                print_list.add(tmp12);
-                print_list.add(tmp13);
-            }
-            else{
-                sent tmp5 = new sent("push","r10");
-                sent tmp6 = new sent("push","r11");
-                sent tmp7 = new sent("call","_general");
-                sent tmp8 = new sent("pop","r11");
-                sent tmp9 = new sent("pop","r10");
-                print_list.add(tmp5);
-                print_list.add(tmp6);
-                print_list.add(tmp7);
-                print_list.add(tmp8);
-                print_list.add(tmp9);
-            }
+            sent tmp5 = new sent("push","r10");
+            sent tmp6 = new sent("push","r11");
+            sent tmp7 = new sent("call","_general");
+            sent tmp8 = new sent("pop","r11");
+            sent tmp9 = new sent("pop","r10");
+            print_list.add(tmp5);
+            print_list.add(tmp6);
+            print_list.add(tmp7);
+            print_list.add(tmp8);
+            print_list.add(tmp9);
         }
 
         for (int i = 0; i < tmp.content.size(); ++i) {
