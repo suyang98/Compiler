@@ -62,7 +62,7 @@ public class main{
 
 //        System.out.println("Visitor:");
         BuildASTVisitor buildASTVistor = new BuildASTVisitor();
-        TempTestAst test = new TempTestAst();
+//        TempTestAst test = new TempTestAst();
         Node Root = buildASTVistor.visit(tree);
 //        test.dfs(Root);
 //        System.out.println();
@@ -73,6 +73,7 @@ public class main{
 //        BuildScope.dfs2(BuildScope.Root);
         BuildScope.dfs1(Root, BuildScope.Root);
         BuildScope.put_this();
+        boolean flag = BuildScope.flag;
 
         //test.find_logic(Root);
         //BuildScope.add_this(Root);
@@ -82,9 +83,10 @@ public class main{
         ir.r = register;
         ir.General = BuildScope.Root;
         ir.dfs(Root, null);
-        ir.alloc();
+        ir.alloc(flag);
 
         mayfinal fin = new mayfinal();
+        fin.flag = flag;
         fin.root = ir.root;
         fin.transform();
         fin.optim();

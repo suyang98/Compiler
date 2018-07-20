@@ -39,6 +39,8 @@ public class Register {
         else if (i == 3) return "r13";
         else if (i == 4) return "r14";
         else if (i == 5) return "r15";
+        else if (i == 6) return "r8";
+        else if (i == 7) return "r9";
         else return null;
     }
 

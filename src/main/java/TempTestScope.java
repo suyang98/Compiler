@@ -48,6 +48,7 @@ public class TempTestScope {
     int cntthen = 0;
     int cntelse = 0;
     int cnt = 0;
+    boolean flag = true;
     String inclassflag = null;
 
     List<String> keyword = Arrays.asList("bool","int","string","null","void","true","false","if","for", "while","break","continue","return","new","class","this");
@@ -1146,12 +1147,8 @@ public class TempTestScope {
                 System.err.println(u.Location.line+" "+u.Location.column+" 'main' can't be called");
                 System.exit(1);
             }
-
+            if (((MethodNode) u).Argument != null && ((MethodNode) u).Argument.size()>3) flag = false;
             inclassflag = null;
-            if (((MethodNode) u).FuncID.indexOf("set") != -1){
-                int j;
-                j = 0;
-            }
             FuncScope flag = IsFunc(((MethodNode) u).FuncID, v);
             if (inclassflag != null){
                 u.inclass = new ClassNode();

@@ -415,7 +415,7 @@ public class ternary {
         return false;
     }
 
-    void alloc(){
+    void alloc(boolean flag){
         //printcontext();
         //System.out.println("\n");
         root.gen_var.name = "_general";
@@ -428,7 +428,8 @@ public class ternary {
         balance(root.gen_var);
 //        for (int i = 0; i < root.gen_var.all.size(); ++i)
 //            dead_delete(root.gen_var.all.get(i), root.gen_var);
-        interference(root.gen_var, 6);
+        if (flag) interference(root.gen_var, 8);
+        else interference(root.gen_var, 6);
 
         for (Object obj: root.Blocks.keySet()) {
             String key = (String) obj;
@@ -442,7 +443,8 @@ public class ternary {
             balance(tmp);
             for (int i = 0; i < tmp.all.size(); ++i)
                 dead_delete(tmp.all.get(i), tmp);
-            interference(tmp, 6);
+            if (flag) interference(tmp, 8);
+            else interference(tmp, 6);
         }
 
     }
