@@ -1212,11 +1212,13 @@ public class TempTestScope {
                       StateNode t2 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(4);
                       StateNode t3 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(5);
                       StateNode t4 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(6);
+                      StateNode t5 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(10);
                       ((ProgNode) u).FuncList.get(i).Body.StateList.clear();
                       ((ProgNode) u).FuncList.get(i).Body.StateList.add(t1);
                       ((ProgNode) u).FuncList.get(i).Body.StateList.add(t2);
                       ((ProgNode) u).FuncList.get(i).Body.StateList.add(t3);
                       ((ProgNode) u).FuncList.get(i).Body.StateList.add(t4);
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.add(t5);
                   }
             }
         }
