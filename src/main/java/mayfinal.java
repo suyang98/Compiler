@@ -992,15 +992,18 @@ public class mayfinal {
         }
         for (Object obj:label_map.keySet()){
             lab t = label_map.get(obj);
+            if (t.loc - 2 < 0) continue;
             if (t.appear.size()==0 && !t.s.equals("_general:") && !t.s.equals("main:")) t.flag = false;
-            if (t.appear.size()==1 && print_list.get(t.loc-1) instanceof sent
-                    && ((sent) print_list.get(t.loc-1)).operation.indexOf("jmp")!= -1 && ((sent) print_list.get(t.loc-1)).s1.equals(t.s)){
+            if (t.appear.size()==1 && print_list.get(t.loc-2) instanceof sent
+                    && ((sent) print_list.get(t.loc-2)).operation.indexOf("jmp")!= -1 && ((sent) print_list.get(t.loc-2)).s1.equals(t.s)){
+                print_list.get(t.loc-2).flag = false;
                 print_list.get(t.loc-1).flag = false;
-                print_list.get(t.loc).flag = false;
             }
-            if (print_list.get(t.loc+1) instanceof sent && ((sent) print_list.get(t.loc+1)).operation.equals("jmp"))
-                for (int i = 0; i < t.appear.size(); ++i) ((sent) print_list.get(t.appear.get(i))).s1 = ((sent) print_list.get(t.loc+1)).s1;
+            if (print_list.get(t.loc) instanceof sent && ((sent) print_list.get(t.loc)).operation.equals("jmp"))
+                for (int i = 0; i < t.appear.size(); ++i)
+                    ((sent) print_list.get(t.appear.get(i))).s1 = ((sent) print_list.get(t.loc)).s1;
         }
+
 
     }
 
