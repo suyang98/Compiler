@@ -988,12 +988,20 @@ public class mayfinal {
 //            }
             if (t instanceof sent && ((sent) t).operation.equals("mov") && ((sent) t).s1.equals(((sent) t).s2)) t.flag = false;
             if (t instanceof sent && (((sent)t).operation.indexOf("j") != -1 || ((sent) t).operation.equals("call")))
-                if (label_map.get(((sent) t).s1+":")!=null)label_map.get(((sent) t).s1+":").appear.add(i);
+                if (label_map.get(((sent) t).s1+":")!=null) label_map.get(((sent) t).s1+":").appear.add(i);
         }
         for (Object obj:label_map.keySet()){
             lab t = label_map.get(obj);
             if (t.appear.size()==0 && !t.s.equals("_general:") && !t.s.equals("main:")) t.flag = false;
+            if (t.appear.size()==1 && print_list.get(t.loc-1) instanceof sent
+                    && ((sent) print_list.get(t.loc-1)).operation.indexOf("jmp")!= -1 && ((sent) print_list.get(t.loc-1)).s1.equals(t.s)){
+                print_list.get(t.loc-1).flag = false;
+                print_list.get(t.loc).flag = false;
+            }
+            if (print_list.get(t.loc+1) instanceof sent && ((sent) print_list.get(t.loc+1)).operation.equals("jmp"))
+                for (int i = 0; i < t.appear.size(); ++i) ((sent) print_list.get(t.appear.get(i))).s1 = ((sent) print_list.get(t.loc+1)).s1;
         }
+
     }
 
     void out(){

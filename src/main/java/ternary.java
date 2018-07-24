@@ -2,7 +2,7 @@ import java.util.*;
 
 enum Opcode {
     mov, add, sub, imul, idiv, sal, sar, setg, setge, setl, setle, sete, setne, movzx, and, xor, or,
-    not, neg, inc, dec, jz, jnz, jmp, call, ret, size, cmp, load, store, push, pop, leave, test, label, cqo
+    not, neg, inc, dec, jz, jnz, jmp, call, ret, cmp, load, store, push, pop, leave, test, label, cqo
 }
 
 
@@ -1668,6 +1668,22 @@ public class ternary {
                 if (u instanceof ModNode) {
                     imm ttmp = new imm();
                     ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value % ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
+                if (u instanceof LShNode){
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value >> ((NumberNode) ((InfixExpressionNode) u).Right).Value);
+                    while (flag_tern.size() != 0) {
+                        v.content.add(flag_tern.pop());
+                    }
+                    return ttmp;
+                }
+                if (u instanceof RShNode){
+                    imm ttmp = new imm();
+                    ttmp.contxt = String.valueOf(((NumberNode) ((InfixExpressionNode) u).Left).Value << ((NumberNode) ((InfixExpressionNode) u).Right).Value);
                     while (flag_tern.size() != 0) {
                         v.content.add(flag_tern.pop());
                     }
