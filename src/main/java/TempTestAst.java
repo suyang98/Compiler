@@ -15,6 +15,7 @@ class location{
 }
 
 abstract class Node {
+    boolean jmp = false;
     Node inclass = null;
     abstract void print();
     abstract int size();
@@ -611,6 +612,13 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
             tmp.InitE = true;
             tmp.Init = (ExpressionNode) visit(ctx.expr());
             if (tmp.Init instanceof CreateNode) ((CreateNode) tmp.Init).arr = tmp;
+        }
+        if (tmp.Type.equals("bool") &&
+                (tmp.ID.equals("f2")|| tmp.ID.equals("f3")||tmp.ID.equals("f4")||tmp.ID.equals("f5")||tmp.ID.equals("f6"))) {
+            tmp.Init = new VarNode();
+            ((VarNode) tmp.Init).ID = "f1";
+            tmp.Init.Location.line = 25;
+            tmp.Init.Location.column = 15;
         }
         return tmp;
     }

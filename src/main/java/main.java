@@ -69,6 +69,7 @@ public class main{
 
 //        System.out.println("Scope");
         TempTestScope BuildScope = new TempTestScope();
+        //BuildScope.del_repeat(Root);
         BuildScope.dfs(Root, BuildScope.Root);
 //        BuildScope.dfs2(BuildScope.Root);
         BuildScope.dfs1(Root, BuildScope.Root);

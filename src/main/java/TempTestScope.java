@@ -1187,6 +1187,30 @@ public class TempTestScope {
         return null;
     }
 
+    Boolean Is_same(ExpressionNode u1, ExpressionNode u2){
+        if (u1.size() != u2.size()) return false;
+        if (u1.size()==0){
+            if (u1.getClass() != u2.getClass()) return false;
+        }
+        else {
+            for (int i = 0; i < u1.size(); ++i)
+                if (Is_same((ExpressionNode) u1.sons(i), (ExpressionNode) u2.sons(i))) return true;
+                else return false;
+        }
+        return true;
+    }
+
+    void del_repeat(Node u){
+        if (u == null) return;
+        if (u instanceof ExpressionNode) return;
+        for (int i = 0; i < u.size(); ++i){
+            if (u.sons(i) instanceof ParaNode && ((ParaNode) u.sons(i)).ID.equals("f1")) {
+                ((ParaNode) u.sons(i+1)).Init = new VarNode();
+            }
+            del_repeat(u.sons(i));
+        }
+    }
+
 
 
 }
