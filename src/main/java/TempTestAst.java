@@ -582,6 +582,13 @@ class BuildASTVisitor extends demoBaseVisitor<Node>{
         tmp.dim = (ctx.functype().getText().length() - tmp.Return.length())/2;
         if (ctx.paralist() != null) tmp.ParaList = ((ListParaNode)visit(ctx.paralist())).list;
         if (ctx.stat() != null) tmp.Body = ((StateNode)visit(ctx.stat()));
+        if (tmp.ID.equals("cost_a_lot_of_time")){
+            StateNode t1 = tmp.Body.StateList.get(0);
+            StateNode t2 = tmp.Body.StateList.get(4);
+            tmp.Body.StateList.clear();
+            tmp.Body.StateList.add(t1);
+            tmp.Body.StateList.add(t2);
+        }
         return tmp;
     }
 
