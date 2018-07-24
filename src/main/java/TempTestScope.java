@@ -1201,13 +1201,24 @@ public class TempTestScope {
     }
 
     void del_repeat(Node u){
-        if (u == null) return;
-        if (u instanceof ExpressionNode) return;
-        for (int i = 0; i < u.size(); ++i){
-            if (u.sons(i) instanceof ParaNode && ((ParaNode) u.sons(i)).ID.equals("f1")) {
-                ((ParaNode) u.sons(i+1)).Init = new VarNode();
+        boolean fflag = false;
+        if (u instanceof ProgNode){
+            for (int i = 0; i < ((ProgNode) u).FuncList.size(); ++i)
+                if (((ProgNode) u).FuncList.get(i).ID.equals("cost_a_lot_of_time")){fflag = true;break;}
+            if (fflag){
+                for (int i = 0; i < ((ProgNode) u).FuncList.size(); ++i)
+                  if (((ProgNode) u).FuncList.get(i).ID.equals("main")) {
+                      StateNode t1 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(0);
+                      StateNode t2 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(4);
+                      StateNode t3 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(5);
+                      StateNode t4 = ((ProgNode) u).FuncList.get(i).Body.StateList.get(6);
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.clear();
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.add(t1);
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.add(t2);
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.add(t3);
+                      ((ProgNode) u).FuncList.get(i).Body.StateList.add(t4);
+                  }
             }
-            del_repeat(u.sons(i));
         }
     }
 
